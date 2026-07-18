@@ -11,12 +11,14 @@ import {
   type RuntimeResult,
 } from "../contracts/runtime-result.js";
 import { resolveInside } from "../core/path-safety.js";
+import { currentGitBranchRef } from "../core/git-cli-client.js";
 import {
   createLegacyImporter,
   type LegacyDocumentRole,
 } from "../import/index.js";
 import { createProfileVerifier } from "../profile/verify-profile.js";
 import type { AgentStartDependencies } from "./contracts.js";
+import { inferRepositoryBrief } from "./infer-repository-brief.js";
 import { createNodeViewVerifier } from "./node-view-verifier.js";
 
 const REVIEWABLE_LEGACY_ROLES = new Set<LegacyDocumentRole>([
@@ -159,12 +161,25 @@ export function createNodeAgentStartDependencies(
       if (!Number.isFinite(created.getTime())) {
         return failure("AGENT_CLOCK_INVALID", "agent startup clock must be valid");
       }
+      const targetRef = await currentGitBranchRef(input.root);
+      if (!targetRef.ok) return targetRef;
+      let briefPath: string;
+      let briefText: string | undefined;
+      if (input.brief_path === null) {
+        const inferred = await inferRepositoryBrief(input.root);
+        if (!inferred.ok) return inferred;
+        briefPath = inferred.value.brief_path;
+        briefText = inferred.value.brief_text;
+      } else {
+        briefPath = input.brief_path;
+      }
       return buildInitPlan({
         root: input.root.href,
-        brief_path: input.brief_path,
+        brief_path: briefPath,
+        ...(briefText === undefined ? {} : { brief_text: briefText }),
         catalog_bundle_path: catalog.value.href,
         agent_adapter: input.adapter_id,
-        target_ref: "refs/heads/main",
+        target_ref: targetRef.value,
         created_at: created.toISOString(),
         expires_at: new Date(created.getTime() + 60 * 60 * 1000).toISOString(),
       });

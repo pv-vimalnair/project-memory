@@ -9,6 +9,7 @@ import { failure, success, type RuntimeResult } from "../contracts/runtime-resul
 import { SystemClock, type Clock } from "../core/clock.js";
 import type { CommandRunner } from "../contracts/command-runner.js";
 import { NodeCommandRunner } from "../core/command-runner.js";
+import { currentGitBranchRef } from "../core/git-cli-client.js";
 import { sha256 } from "../core/hash.js";
 import { resolveInside } from "../core/path-safety.js";
 import { createLegacyImporter } from "../import/index.js";
@@ -38,7 +39,6 @@ import type { CommandRegistry } from "./command-registry.js";
 import type { AgentCommandDependencies } from "./commands/agent.js";
 import type { InitCommandDependencies } from "./commands/init.js";
 
-const TARGET_REF = "refs/heads/main";
 const INTEGRATOR_ID = "project-memory-integrator";
 
 function sameRoot(left: URL, right: URL): boolean {
@@ -49,8 +49,9 @@ async function currentSnapshot(
   repo: URL,
   git: IntegrationGitCliClient,
   snapshots: CanonicalSnapshotBuilder,
+  targetRef: string,
 ): Promise<Awaited<ReturnType<CanonicalSnapshotBuilder["build"]>>> {
-  const head = await git.resolveRef(repo, TARGET_REF);
+  const head = await git.resolveRef(repo, targetRef);
   return snapshots.build(repo, { kind: "commit", object_id: head });
 }
 
@@ -92,30 +93,42 @@ async function verifyExactHashes(
 
 function createBindingValidator(
   fixedRepo: URL,
+  targetRef: string,
+  runner: CommandRunner,
   git: IntegrationGitCliClient,
   profiles: ProfileVerifier,
 ): MutationBindingValidator {
   return {
     async verify(repo, plan) {
-      if (!sameRoot(repo, fixedRepo) || plan.target_ref !== TARGET_REF) {
+      if (!sameRoot(repo, fixedRepo) || plan.target_ref !== targetRef) {
         return failure(
           "runtime.binding_root_mismatch",
           "mutation root and target ref must match the local runtime",
           repo.href,
         );
       }
+      const currentBranch = await currentGitBranchRef(repo, runner);
+      if (!currentBranch.ok) return currentBranch;
+      if (currentBranch.value !== targetRef) {
+        return failure(
+          "runtime.binding_branch_drift",
+          "checked-out branch no longer matches the approved target ref",
+          targetRef,
+          [currentBranch.value],
+        );
+      }
       let head: string;
       try {
-        head = await git.resolveRef(repo, TARGET_REF);
+        head = await git.resolveRef(repo, targetRef);
       } catch (error: unknown) {
         return failure(
           "runtime.binding_head_failed",
           error instanceof Error ? error.message : String(error),
-          TARGET_REF,
+          targetRef,
         );
       }
       if (head !== plan.expected_head) {
-        return failure("runtime.binding_head_drift", "mutation base no longer matches HEAD", TARGET_REF);
+        return failure("runtime.binding_head_drift", "mutation base no longer matches HEAD", targetRef);
       }
       let status;
       try {
@@ -304,6 +317,7 @@ function unavailableSingleRepo(): SingleRepoFinalizer {
 
 function createLocalCoordinator(
   repo: URL,
+  targetRef: string,
   clock: Clock,
   runner: NodeCommandRunner,
   git: IntegrationGitCliClient,
@@ -315,12 +329,12 @@ function createLocalCoordinator(
   );
   const views = createViewGenerator({
     clock,
-    target_ref: TARGET_REF,
+    target_ref: targetRef,
     created_by: INTEGRATOR_ID,
     snapshots: {
       async current(root) {
         try {
-          return await currentSnapshot(root, git, snapshots);
+          return await currentSnapshot(root, git, snapshots, targetRef);
         } catch (error: unknown) {
           return failure(
             "runtime.snapshot_failed",
@@ -339,7 +353,7 @@ function createLocalCoordinator(
     leases: createIntegrationLeaseStore({ clock, git }),
     snapshots,
     views,
-    bindings: createBindingValidator(repo, git, profiles),
+    bindings: createBindingValidator(repo, targetRef, runner, git, profiles),
     authority: createAuthorityValidator(repo),
     repository: createRepositoryValidator(snapshots, profiles),
     bootstrap: createBootstrapMutationHooks({ git, verifier: profiles }),
@@ -351,6 +365,25 @@ function createLocalCoordinator(
     mutations,
     single_repo: unavailableSingleRepo(),
   });
+}
+
+function createDynamicLocalCoordinator(
+  repo: URL,
+  clock: Clock,
+  runner: NodeCommandRunner,
+  git: IntegrationGitCliClient,
+  snapshots: CanonicalSnapshotBuilder,
+  profiles: ProfileVerifier,
+): IntegrationCoordinator {
+  const coordinatorFor = (targetRef: string) =>
+    createLocalCoordinator(repo, targetRef, clock, runner, git, snapshots, profiles);
+  const singleRepo = unavailableSingleRepo();
+  return {
+    bootstrap: (input) => coordinatorFor(input.target_ref).bootstrap(input),
+    finalizeMutation: (plan) => coordinatorFor(plan.target_ref).finalizeMutation(plan),
+    validate: (input) => singleRepo.validate(input),
+    finalize: (token) => singleRepo.finalize(token),
+  };
 }
 
 export interface NodeProjectMemoryServices {
@@ -365,7 +398,7 @@ export function createNodeProjectMemoryServices(repo: URL): NodeProjectMemorySer
   const git = new IntegrationGitCliClient(runner);
   const snapshots = createCanonicalSnapshotBuilder(createRevisionTreeReader(runner));
   const profiles = createProfileVerifier();
-  const coordinator = createLocalCoordinator(repo, clock, runner, git, snapshots, profiles);
+  const coordinator = createDynamicLocalCoordinator(repo, clock, runner, git, snapshots, profiles);
   const lifecycle = createWorkLifecycleService({
     clock,
     context: {

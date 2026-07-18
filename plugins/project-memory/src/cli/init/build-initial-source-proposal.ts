@@ -25,7 +25,7 @@ export type InitialFactValue = string | readonly string[];
 
 export interface InitialFactEvidence {
   readonly evidence_id: string;
-  readonly source_kind: "brief" | "path";
+  readonly source_kind: "brief" | "path" | "classifier";
   readonly source_ref: string;
   readonly source_sha256: string;
   readonly pointer: string;
@@ -80,11 +80,11 @@ function record(value: unknown): Readonly<Record<string, unknown>> | null {
     : null;
 }
 
-function factValue(value: unknown): InitialFactValue | null {
+function factValue(value: unknown, allowEmpty = false): InitialFactValue | null {
   if (typeof value === "string" && value.trim().length > 0) return value.trim();
   if (
     Array.isArray(value) &&
-    value.length > 0 &&
+    (allowEmpty || value.length > 0) &&
     value.every((item) => typeof item === "string" && item.trim().length > 0)
   ) {
     return [...new Set(value.map((item) => (item as string).trim()))];
@@ -111,7 +111,10 @@ export function buildInitialSourceProposal(
   const digest = sha256(new TextEncoder().encode(input.brief_text));
   const facts: Record<string, InitialSourceFact> = {};
   for (const name of [...REQUIRED_FACTS, ...OPTIONAL_FACTS]) {
-    const value = factValue(brief[name]);
+    const value = factValue(
+      brief[name],
+      name === "workflow_adapters" || name === "excluded_scope",
+    );
     if (value === null) {
       facts[name] = { status: "unresolved", value: null, evidence: null };
       continue;
@@ -121,7 +124,9 @@ export function buildInitialSourceProposal(
       value,
       evidence: {
         evidence_id: deterministicInstanceId("EVD", `${input.root.href}\u0000${input.brief_path}\u0000${name}\u0000${digest}`),
-        source_kind: "brief",
+        source_kind: input.brief_path.startsWith("inferred://")
+          ? "classifier"
+          : "brief",
         source_ref: input.brief_path,
         source_sha256: digest,
         pointer: `/${name}`,

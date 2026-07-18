@@ -128,7 +128,7 @@ function dependencies(
 }
 
 describe("read-only agent startup", () => {
-  it("blocks an empty repository until one grouped brief is available", async () => {
+  it("asks the planner to infer one grouped brief when no brief path is supplied", async () => {
     const deps = dependencies({
       doctor: vi.fn(() => Promise.resolve(failure("CONFIG_NOT_FOUND", "no project memory"))),
     });
@@ -138,9 +138,13 @@ describe("read-only agent startup", () => {
     );
     expect(result).toMatchObject({
       ok: true,
-      value: { kind: "blocked", issues: [{ code: "AGENT_BRIEF_REQUIRED" }] },
+      value: { kind: "bootstrap_review_required" },
     });
-    expect(deps.planInitialization).not.toHaveBeenCalled();
+    expect(deps.planInitialization).toHaveBeenCalledWith({
+      root: ROOT,
+      brief_path: null,
+      adapter_id: "adapter.codex",
+    });
   });
 
   it("returns an engine-selected bootstrap proposal without a profile menu or mutation", async () => {

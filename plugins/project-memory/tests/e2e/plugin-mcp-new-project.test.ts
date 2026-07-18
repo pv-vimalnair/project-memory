@@ -1,5 +1,5 @@
 import { Buffer } from "node:buffer";
-import { access } from "node:fs/promises";
+import { access, mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
@@ -9,6 +9,7 @@ import {
   cleanupPluginWorkflow,
   preparePluginWorkflow,
   projectSnapshot,
+  runGit,
   startPluginMcp,
   type McpSession,
   type PluginWorkflow,
@@ -42,6 +43,31 @@ describe("clean Plugin MCP workflow for a new project", () => {
   it("keeps startup compact and read-only, applies one confirmation, then resumes", async () => {
     const workflow = await preparePluginWorkflow("new");
     workflows.push(workflow);
+    await rm(path.join(workflow.project_root, "BRIEF.md"));
+    await Promise.all([
+      writeFile(path.join(workflow.project_root, "AGENTS.md"), [
+        "## Master: Pv Vimal Nair (Pitaji)",
+        "",
+        "- His mission: **Pocket Practice** \u2014 a daily learning habit app",
+        "- His stack: Flutter, Firebase, Figma",
+        "",
+      ].join("\n"), "utf8"),
+      writeFile(path.join(workflow.project_root, "pubspec.yaml"), [
+        "name: pocket_practice",
+        "description: A new Flutter project.",
+        "dependencies:",
+        "  flutter:",
+        "    sdk: flutter",
+        "  firebase_core: ^4.6.0",
+        "",
+      ].join("\n"), "utf8"),
+      writeFile(path.join(workflow.project_root, "firebase.json"), "{}\n", "utf8"),
+      mkdir(path.join(workflow.project_root, "android")),
+      mkdir(path.join(workflow.project_root, "ios")),
+    ]);
+    runGit(workflow.project_root, ["add", "--all", "--", "."]);
+    runGit(workflow.project_root, ["commit", "--quiet", "-m", "test: repository inferred bootstrap"]);
+    runGit(workflow.project_root, ["switch", "-c", "version-5.6"]);
     const before = await projectSnapshot(workflow.project_root);
     const session = await startPluginMcp(workflow);
     sessions.push(session);
@@ -56,7 +82,6 @@ describe("clean Plugin MCP workflow for a new project", () => {
 
     const started = await callMcpTool(session, "project_memory_start", {
       root: workflow.project_url.href,
-      brief_path: "BRIEF.md",
     });
     const serialized = JSON.stringify(started);
     expect(started.isError).toBeUndefined();
@@ -85,6 +110,7 @@ describe("clean Plugin MCP workflow for a new project", () => {
     expect(applied.isError).toBeUndefined();
     expect(applied.structuredContent).toMatchObject({
       status: "initialized_verified",
+      target_ref: "refs/heads/version-5.6",
     });
 
     for (const relativePath of READING_ORDER) {

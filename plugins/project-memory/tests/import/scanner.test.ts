@@ -80,4 +80,51 @@ describe("legacy scanner", () => {
       issues: [{ code: "LEGACY_SYMLINK_ESCAPE" }],
     });
   });
+
+  it("ignores nested Claude worktrees while retaining symlink safety elsewhere", async () => {
+    const repository = await temporaryRoot();
+    const outside = await temporaryRoot();
+    await writeFile(path.join(repository.path, "README.md"), "# Product\n", "utf8");
+    await writeFile(path.join(outside.path, "README.md"), "# Generated dependency\n", "utf8");
+    const pluginDirectory = path.join(
+      repository.path,
+      ".claude",
+      "worktrees",
+      "parallel-agent",
+      "linux",
+      "flutter",
+      "ephemeral",
+      ".plugin_symlinks",
+    );
+    await mkdir(pluginDirectory, { recursive: true });
+    await symlink(
+      outside.path,
+      path.join(pluginDirectory, "path_provider_linux"),
+      process.platform === "win32" ? "junction" : "dir",
+    );
+    const rootPluginDirectory = path.join(
+      repository.path,
+      "linux",
+      "flutter",
+      "ephemeral",
+      ".plugin_symlinks",
+    );
+    await mkdir(rootPluginDirectory, { recursive: true });
+    await symlink(
+      outside.path,
+      path.join(rootPluginDirectory, "app_links_linux"),
+      process.platform === "win32" ? "junction" : "dir",
+    );
+
+    const result = await createLegacyScanner({
+      git_revision: () => Promise.resolve(null),
+    }).scan(repository.url);
+
+    expect(result).toMatchObject({
+      ok: true,
+      value: {
+        artifacts: [{ relative_path: "README.md" }],
+      },
+    });
+  });
 });

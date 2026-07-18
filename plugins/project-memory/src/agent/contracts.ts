@@ -18,7 +18,7 @@ export interface AgentDoctorInput {
 
 export interface AgentInitializationInput {
   readonly root: URL;
-  readonly brief_path: string;
+  readonly brief_path: string | null;
   readonly adapter_id: string;
 }
 

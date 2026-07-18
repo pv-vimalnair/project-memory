@@ -73,7 +73,7 @@ const TOOLS = Object.freeze([
         root: { type: "string", format: "uri" },
         brief_path: {
           type: ["string", "null"],
-          description: "Repository-relative path to a structured initialization brief. Never use a task dataset, prompt, schema, or output file.",
+          description: "Optional repository-relative path to a pre-existing structured initialization brief. Omit it to infer from repository evidence; never use a task dataset, prompt, schema, or output file.",
         },
         adapter_id: { type: "string", default: "adapter.codex" },
       },

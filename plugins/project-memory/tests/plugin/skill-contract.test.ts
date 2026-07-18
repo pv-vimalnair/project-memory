@@ -74,10 +74,12 @@ describe("Project Memory skill command contract", () => {
   it("keeps task inputs out of the repository initialization brief slot", async () => {
     const skill = await readFile(SKILL, "utf8");
     expect(skill).toContain("Invoke `project_memory_start` with the repository root only first.");
-    expect(skill).toContain("`BRIEF.md`");
+    expect(skill).toContain("infer one complete proposal");
+    expect(skill).toContain("Do not create a YAML brief");
     expect(skill).toMatch(
       /Never pass a task dataset, prompt, schema, output file, or other work artifact as `brief_path`/,
     );
+    expect(skill).not.toContain("AGENT_BRIEF_REQUIRED");
   });
 
   it("exposes lower-reasoning repository-continuity trigger vocabulary", async () => {

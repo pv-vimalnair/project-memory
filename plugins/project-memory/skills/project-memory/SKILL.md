@@ -22,10 +22,11 @@ Do not search for or install dependencies. If neither the bundled MCP route nor 
 
 1. Locate the repository root.
 2. Invoke `project_memory_start` with the repository root only first.
-3. If an uninitialized repository returns `AGENT_BRIEF_REQUIRED`, locate a structured repository-initialization brief. Retry with `brief_path` only when the user explicitly identified that file as the repository initialization brief, or when exactly one conventional structured candidate such as `BRIEF.md` contains the grouped initialization facts.
-4. Never pass a task dataset, prompt, schema, output file, or other work artifact as `brief_path` merely because the user asked to read or process it later.
-5. Include an adapter only when it is not Codex.
-6. Follow the compact directive returned by the tool. Startup is read-only.
+3. For an uninitialized repository, let the engine infer one complete proposal from a pre-existing conventional brief or repository evidence. Do not create a YAML brief or ask Pitaji to prepare one.
+4. Pass `brief_path` only when Pitaji explicitly identifies a pre-existing repository initialization brief.
+5. Never pass a task dataset, prompt, schema, output file, or other work artifact as `brief_path` merely because the user asked to read or process it later.
+6. Include an adapter only when it is not Codex.
+7. Follow the compact directive returned by the tool. Startup is read-only.
 
 For `bootstrap_review_required`:
 

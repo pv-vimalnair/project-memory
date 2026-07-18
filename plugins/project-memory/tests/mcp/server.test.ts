@@ -126,7 +126,7 @@ describe("ProjectMemoryMcpServer", () => {
 
     const start = result.tools.find((tool) => tool.name === "project_memory_start");
     expect(start?.inputSchema.properties.brief_path?.description).toBe(
-      "Repository-relative path to a structured initialization brief. Never use a task dataset, prompt, schema, or output file.",
+      "Optional repository-relative path to a pre-existing structured initialization brief. Omit it to infer from repository evidence; never use a task dataset, prompt, schema, or output file.",
     );
   });
 

@@ -94,7 +94,7 @@ function validateInput(input: AgentStartInput): RuntimeResult<true> {
 }
 
 async function bootstrapDirective(
-  input: AgentStartInput & { readonly brief_path: string },
+  input: AgentStartInput,
   dependencies: AgentStartDependencies,
 ): Promise<RuntimeResult<AgentStartDirective>> {
   const planned = await callDependency("planInitialization", () =>
@@ -139,12 +139,6 @@ async function bootstrapDirective(
   }, planned.warnings);
 }
 
-function inputWithBrief(
-  input: AgentStartInput,
-): (AgentStartInput & { readonly brief_path: string }) | null {
-  return input.brief_path === null ? null : { ...input, brief_path: input.brief_path };
-}
-
 export async function startAgentSession(
   input: AgentStartInput,
   dependencies: AgentStartDependencies,
@@ -161,14 +155,7 @@ export async function startAgentSession(
         ? doctorIssues
         : [agentIssue("AGENT_DOCTOR_INVALID", "repository diagnostics are not valid")]);
     }
-    const bootstrapInput = inputWithBrief(input);
-    return bootstrapInput === null
-      ? blocked([agentIssue(
-          "AGENT_BRIEF_REQUIRED",
-          "one project brief is required before initialization planning",
-          "brief_path",
-        )])
-      : bootstrapDirective(bootstrapInput, dependencies);
+    return bootstrapDirective(input, dependencies);
   }
 
   const profile = await callDependency("verifyProfile", () => dependencies.verifyProfile(input.root));

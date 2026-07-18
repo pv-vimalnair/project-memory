@@ -34,6 +34,14 @@ function inside(root: string, candidate: string): boolean {
   return path.resolve(candidate).toLowerCase().startsWith(normalizedRoot);
 }
 
+function ignoredGeneratedDirectory(relativePath: string): boolean {
+  const normalized = relativePath.toLowerCase();
+  return normalized === ".claude/worktrees" ||
+    /^(?:linux|windows)\/flutter\/ephemeral\/\.plugin_symlinks$/u.test(normalized) ||
+    normalized === "ios/.symlinks" ||
+    normalized === "macos/flutter/ephemeral/.symlinks";
+}
+
 async function defaultGitRevision(root: URL, relativePath: string): Promise<string | null> {
   const result = await runCommand({
     executable: "git",
@@ -63,8 +71,10 @@ export function createLegacyScanner(
         const entries = await readdir(directory, { withFileTypes: true });
         entries.sort((left, right) => compareUtf8(left.name, right.name));
         for (const entry of entries) {
-          if (entry.name === ".git" || entry.name === "node_modules" || entry.name === "build") continue;
           const absolute = path.join(directory, entry.name);
+          if (entry.name === ".git" || entry.name === "node_modules" || entry.name === "build") continue;
+          const relative = path.relative(rootPath, absolute).split(path.sep).join("/");
+          if (entry.isDirectory() && ignoredGeneratedDirectory(relative)) continue;
           const stat = await lstat(absolute);
           if (stat.isSymbolicLink()) {
             const target = await realpath(absolute);

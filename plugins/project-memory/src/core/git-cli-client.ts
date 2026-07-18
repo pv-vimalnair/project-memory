@@ -11,6 +11,7 @@ import {
   success,
   type RuntimeResult,
 } from "../contracts/runtime-result.js";
+import { NodeCommandRunner } from "./command-runner.js";
 
 function gitEnvironment(): Readonly<Record<string, string>> {
   const environment: Record<string, string> = {
@@ -22,6 +23,59 @@ function gitEnvironment(): Readonly<Record<string, string>> {
     if (value !== undefined) environment[name] = value;
   }
   return environment;
+
+}
+function isSafeLocalBranchRef(value: string): boolean {
+  return /^refs\/heads\/[A-Za-z0-9][A-Za-z0-9._/-]*$/u.test(value) &&
+    !value.includes("..") &&
+    !value.includes("@{") &&
+    !value.includes("//") &&
+    !value.endsWith("/") &&
+    !value.endsWith(".") &&
+    !value.endsWith(".lock");
+}
+
+export async function currentGitBranchRef(
+  repo: URL,
+  runner: CommandRunner = new NodeCommandRunner(),
+): Promise<RuntimeResult<string>> {
+  try {
+    const result = await runner.run({
+      executable: "git",
+      args: ["-c", "core.longpaths=true", "symbolic-ref", "--quiet", "HEAD"],
+      cwd: repo,
+      timeout_ms: 30_000,
+      env_allowlist: gitEnvironment(),
+      max_output_bytes: 65_536,
+    });
+    if (result.timed_out) {
+      return failure("GIT_CURRENT_BRANCH_FAILED", "Git branch lookup timed out", repo.href);
+    }
+    if (result.output_truncated) {
+      return failure("GIT_CURRENT_BRANCH_FAILED", "Git branch lookup exceeded its output bound", repo.href);
+    }
+    if (result.exit_code !== 0) {
+      return failure(
+        "GIT_CURRENT_BRANCH_UNAVAILABLE",
+        "Project Memory requires a checked-out local branch",
+        repo.href,
+      );
+    }
+    const branch = result.stdout.trim();
+    return isSafeLocalBranchRef(branch)
+      ? success(branch)
+      : failure(
+          "GIT_CURRENT_BRANCH_INVALID",
+          "Git returned an unsafe checked-out branch ref",
+          repo.href,
+        );
+  } catch (error: unknown) {
+    return failure(
+      "GIT_CURRENT_BRANCH_FAILED",
+      error instanceof Error ? error.message : String(error),
+      repo.href,
+    );
+  }
 }
 
 function assertRevision(value: string): void {

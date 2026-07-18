@@ -74,6 +74,7 @@ interface CatalogLockHeader {
 export interface InitReplayInput {
   readonly root: string;
   readonly brief_path: string;
+  readonly brief_text?: string;
   readonly catalog_bundle_path: string;
   readonly agent_adapter: string;
   readonly target_ref: string;
@@ -689,7 +690,9 @@ export async function buildInitPlan(
   } catch (error: unknown) {
     return failure("INIT_REPLAY_INVALID", error instanceof Error ? error.message : String(error));
   }
-  const brief = await dependencies.read_brief(root, replay.brief_path);
+  const brief = replay.brief_text === undefined
+    ? await dependencies.read_brief(root, replay.brief_path)
+    : success(replay.brief_text);
   if (!brief.ok) return brief;
   const proposal = buildInitialSourceProposal({ root, brief_path: replay.brief_path, brief_text: brief.value });
   if (!proposal.ok) return proposal;
