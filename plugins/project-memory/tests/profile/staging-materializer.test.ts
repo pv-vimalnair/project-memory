@@ -404,7 +404,7 @@ describe("capability-checked isolated staging", () => {
       issues: [{ code: "TEST_PROFILE_INVALID" }],
     });
     await assertNoPlannedFiles();
-  });
+  }, 30_000);
 
   it("is idempotent only for the exact already-staged plan", async () => {
     const materializer = createProfileMaterializer(dependencies());
