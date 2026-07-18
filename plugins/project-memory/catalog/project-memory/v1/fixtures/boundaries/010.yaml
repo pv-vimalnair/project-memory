@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-010
+  kind: blueprint-boundary
+  description: Boundary case selecting game.premium-single-player over game.multiplayer-networked.
+  normalized_features:
+    root.kind: product
+    product.shape: game.premium-single-player
+    product.exclusions:
+      - game.multiplayer-networked
+  expected:
+    decision: selected
+    blueprint_id: game.premium-single-player
+    prohibited_blueprint_ids:
+      - game.multiplayer-networked
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

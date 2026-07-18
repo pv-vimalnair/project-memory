@@ -1,0 +1,20 @@
+{
+  "actor_authority": "worker",
+  "minimum_authority": "worker",
+  "actual_changed_paths": [
+    "lib/features/referral/referral_service.dart"
+  ],
+  "deleted_paths": [],
+  "directional_acceptance": {
+    "category": "directional",
+    "accepted_by": "agent.codex-worker-1",
+    "accepted_by_authority": "worker",
+    "target": "lifeof-referral-direction",
+    "environment": "canonical",
+    "scope": [
+      "lib/features/referral/**"
+    ],
+    "timing": "once"
+  },
+  "external_action": null
+}

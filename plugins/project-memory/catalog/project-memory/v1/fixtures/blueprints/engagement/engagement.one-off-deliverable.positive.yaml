@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.engagement.one-off-deliverable.positive
+  kind: blueprint-positive
+  description: Positive selection case for engagement.one-off-deliverable.
+  normalized_features:
+    root.kind: engagement
+    product.shape: engagement.one-off-deliverable
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: engagement.one-off-deliverable
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

@@ -1,0 +1,76 @@
+blueprint:
+  id: content.publication-newsletter
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.content-learning
+  allowed_root_kinds:
+    - product
+    - shared-system
+  primary_archetype: content-learning
+  purpose: Use when the enduring root is best described as content publication newsletter, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: content.publication-newsletter.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - product
+          - shared-system
+        evidence_required: true
+    positive_signals:
+      - id: content.publication-newsletter.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: content.publication-newsletter
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: content.publication-newsletter.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: content.publication-newsletter
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: content.publication-newsletter.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: content.publication-newsletter
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 100
+    precedence: 1000
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+      - overlay.surface.web
+    forbidden: []
+  default_components:
+    - component.editorial-content
+    - component.content-design
+    - component.localization
+    - component.knowledge-base
+  default_domains:
+    - domain.content-communications-localization
+    - domain.research-insight
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable content publication newsletter root containing many different workstreams.
+  negative_examples:
+    - A temporary content publication newsletter-related deliverable inside another enduring product.
+  name: Content Publication Newsletter
+  inclusion_boundary: Include the enduring capabilities and governance of the content publication newsletter root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

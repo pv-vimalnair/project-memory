@@ -1,0 +1,75 @@
+blueprint:
+  id: portfolio.company-brand-ecosystem
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.portfolio
+  allowed_root_kinds:
+    - portfolio
+    - program
+  primary_archetype: portfolio
+  purpose: Use when the enduring root is best described as portfolio company brand ecosystem, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: portfolio.company-brand-ecosystem.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - portfolio
+          - program
+        evidence_required: true
+    positive_signals:
+      - id: portfolio.company-brand-ecosystem.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: portfolio.company-brand-ecosystem
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: portfolio.company-brand-ecosystem.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: portfolio.company-brand-ecosystem
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: portfolio.company-brand-ecosystem.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: portfolio.company-brand-ecosystem
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 101
+    precedence: 999
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+    forbidden: []
+  default_components:
+    - component.product-management
+    - component.shared-platform
+    - component.brand
+  default_domains:
+    - domain.governance-coordination
+    - domain.product-strategy
+    - domain.engineering-architecture
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable portfolio company brand ecosystem root containing many different workstreams.
+  negative_examples:
+    - A temporary portfolio company brand ecosystem-related deliverable inside another enduring product.
+  name: Portfolio Company Brand Ecosystem
+  inclusion_boundary: Include the enduring capabilities and governance of the portfolio company brand ecosystem root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

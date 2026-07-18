@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.research.market-intelligence.positive
+  kind: blueprint-positive
+  description: Positive selection case for research.market-intelligence.
+  normalized_features:
+    root.kind: program
+    product.shape: research.market-intelligence
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: research.market-intelligence
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

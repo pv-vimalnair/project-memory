@@ -1,0 +1,73 @@
+blueprint:
+  id: operations.support-service
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.operations-automation
+  allowed_root_kinds:
+    - shared-system
+    - program
+  primary_archetype: operations-automation
+  purpose: Use when the enduring root is best described as operations support service, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: operations.support-service.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - shared-system
+          - program
+        evidence_required: true
+    positive_signals:
+      - id: operations.support-service.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: operations.support-service
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: operations.support-service.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: operations.support-service
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: operations.support-service.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: operations.support-service
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 102
+    precedence: 998
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+    forbidden: []
+  default_components:
+    - component.operations-workflow
+    - component.sop-training
+  default_domains:
+    - domain.governance-coordination
+    - domain.release-platform-operations
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable operations support service root containing many different workstreams.
+  negative_examples:
+    - A temporary operations support service-related deliverable inside another enduring product.
+  name: Operations Support Service
+  inclusion_boundary: Include the enduring capabilities and governance of the operations support service root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

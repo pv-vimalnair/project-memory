@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-011
+  kind: blueprint-boundary
+  description: Boundary case selecting game.simulation-learning over game.xr-immersive.
+  normalized_features:
+    root.kind: product
+    product.shape: game.simulation-learning
+    product.exclusions:
+      - game.xr-immersive
+  expected:
+    decision: selected
+    blueprint_id: game.simulation-learning
+    prohibited_blueprint_ids:
+      - game.xr-immersive
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

@@ -1,0 +1,10 @@
+{
+  "id": "APR-01J00000000000000000000000",
+  "root_id": "ROOT-01J00000000000000000000000",
+  "revision": 1,
+  "decision": "approved",
+  "approved_by": "Pitaji",
+  "approved_at": "2026-07-15T03:45:00.000Z",
+  "scope": "profile.bootstrap",
+  "artifact_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+}

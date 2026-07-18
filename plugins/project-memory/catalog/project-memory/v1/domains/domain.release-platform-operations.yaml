@@ -1,0 +1,43 @@
+domain_definition:
+  id: domain.release-platform-operations
+  version: 1.0.0
+  status: active
+  name: Release Platform Operations
+  purpose: Preserve authoritative release platform operations context across workstreams and agents.
+  inclusion_boundary: Include decisions, records, risks, and evidence whose primary owner is release platform operations.
+  exclusion_boundary: Exclude facts whose canonical owner is another permanent domain.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  default_components:
+    - component.ci-cd
+    - component.release
+    - component.infrastructure
+  required_records:
+    - decision-log
+    - worklog
+    - evidence
+  required_documents:
+    - docs/domains/release-platform-operations.md
+  tags:
+    - permanent-domain
+    - release-platform-operations
+  positive_examples:
+    - A durable release platform operations decision must remain available after handoff.
+  negative_examples:
+    - A temporary scratch note with no accepted release platform operations fact.

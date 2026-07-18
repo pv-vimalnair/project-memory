@@ -1,0 +1,21 @@
+component_definition:
+  id: component.information-architecture
+  version: 1.0.0
+  status: active
+  name: Information Architecture
+  type: shared-system
+  purpose: Own the information architecture boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by information architecture.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with information architecture.
+  required_documents:
+    - docs/components/information-architecture.md
+  default_domains:
+    - domain.ux-content-design
+  tags:
+    - foundation-product
+    - shared-system
+    - information-architecture
+  positive_examples:
+    - A task changes or validates the project's information architecture capability.
+  negative_examples:
+    - A task merely mentions information architecture without changing or validating it.

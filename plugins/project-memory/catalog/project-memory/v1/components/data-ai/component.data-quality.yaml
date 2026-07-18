@@ -1,0 +1,21 @@
+component_definition:
+  id: component.data-quality
+  version: 1.0.0
+  status: active
+  name: Data Quality
+  type: data
+  purpose: Own the data quality boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by data quality.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with data quality.
+  required_documents:
+    - docs/components/data-quality.md
+  default_domains:
+    - domain.data-analytics-ai
+  tags:
+    - data-ai
+    - data
+    - data-quality
+  positive_examples:
+    - A task changes or validates the project's data quality capability.
+  negative_examples:
+    - A task merely mentions data quality without changing or validating it.

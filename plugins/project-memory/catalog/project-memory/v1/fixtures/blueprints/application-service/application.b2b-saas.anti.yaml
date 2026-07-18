@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.application.b2b-saas.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for application.b2b-saas.
+  normalized_features:
+    root.kind: product
+    product.shape: application.b2b-saas
+    product.exclusions:
+      - application.b2b-saas
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - application.b2b-saas
+    reason_codes:
+      - explicit-exclusion

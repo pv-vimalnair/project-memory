@@ -1,0 +1,21 @@
+component_definition:
+  id: component.admin-console
+  version: 1.0.0
+  status: active
+  name: Admin Console
+  type: surface
+  purpose: Own the admin console boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by admin console.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with admin console.
+  required_documents:
+    - docs/components/admin-console.md
+  default_domains:
+    - domain.product-strategy
+  tags:
+    - foundation-product
+    - surface
+    - admin-console
+  positive_examples:
+    - A task changes or validates the project's admin console capability.
+  negative_examples:
+    - A task merely mentions admin console without changing or validating it.

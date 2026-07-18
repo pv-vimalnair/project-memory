@@ -1,0 +1,1 @@
+{"catalog_lock":"docs/project-memory/catalog.lock.json","hub":{"kind":"local","repository":"."},"memory_root":"docs/project-memory","policy":{"archive_secret_scan":true,"generated_view_check":false,"require_clean_canonical_tree":true},"profile_lock":"docs/project-memory/profile.lock.yaml","root_id":"ROOT-01J01000000000000000000000","schema_version":"1.0.0"}

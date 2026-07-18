@@ -1,0 +1,21 @@
+component_definition:
+  id: component.game-runtime
+  version: 1.0.0
+  status: active
+  name: Game Runtime
+  type: platform
+  purpose: Own the game runtime boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by game runtime.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with game runtime.
+  required_documents:
+    - docs/components/game-runtime.md
+  default_domains:
+    - domain.game-design-art-audio-live-operations
+  tags:
+    - commercial-specialist
+    - platform
+    - game-runtime
+  positive_examples:
+    - A task changes or validates the project's game runtime capability.
+  negative_examples:
+    - A task merely mentions game runtime without changing or validating it.

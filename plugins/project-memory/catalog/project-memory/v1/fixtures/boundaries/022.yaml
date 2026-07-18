@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-022
+  kind: blueprint-boundary
+  description: Boundary case selecting research.ongoing-program over research.evidence-corpus.
+  normalized_features:
+    root.kind: program
+    product.shape: research.ongoing-program
+    product.exclusions:
+      - research.evidence-corpus
+  expected:
+    decision: selected
+    blueprint_id: research.ongoing-program
+    prohibited_blueprint_ids:
+      - research.evidence-corpus
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

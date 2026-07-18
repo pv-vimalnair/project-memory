@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.commerce.ecommerce.positive
+  kind: blueprint-positive
+  description: Positive selection case for commerce.ecommerce.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.ecommerce
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: commerce.ecommerce
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

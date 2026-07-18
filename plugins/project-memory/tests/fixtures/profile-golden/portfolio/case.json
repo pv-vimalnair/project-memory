@@ -1,0 +1,71 @@
+{
+  "name": "portfolio",
+  "case_number": 4,
+  "repository": "repos/product-family",
+  "root": {
+    "namespace": "pitaji.product-family",
+    "kind": "portfolio",
+    "primary_archetype": "portfolio",
+    "blueprint_id": "portfolio.product-family",
+    "lifecycle": "active",
+    "display_name": "Pitaji Product Family",
+    "mission": "Coordinate durable products without copying child-owned truth."
+  },
+  "overlays": ["overlay.lifecycle.active"],
+  "components": [
+    "component.api",
+    "component.backend-service",
+    "component.brand",
+    "component.configuration",
+    "component.datastore",
+    "component.design-system",
+    "component.operations-workflow",
+    "component.product-management",
+    "component.product-strategy",
+    "component.shared-platform",
+    "component.visual-design"
+  ],
+  "domains": [
+    "domain.engineering-architecture",
+    "domain.governance-coordination",
+    "domain.product-strategy",
+    "domain.visual-brand-design-systems"
+  ],
+  "adapters": {
+    "agent": [{ "id": "adapter.codex", "version": "1.0.0" }],
+    "runtime": [{ "id": "adapter.node-typescript", "version": "1.0.0" }],
+    "workflow": [{ "id": "adapter.github-ci", "version": "1.0.0" }]
+  },
+  "documents": [
+    {
+      "id": "document.portfolio-governance",
+      "relative_path": "docs/project-memory/source/PORTFOLIO.md",
+      "title": "Portfolio Governance",
+      "purpose": "Define relationship ownership without duplicating child product facts.",
+      "sections": [
+        {
+          "heading": "Boundary",
+          "body": "This root owns coordination and relationship records only; each child owns its own product truth."
+        }
+      ]
+    }
+  ],
+  "relationship": {
+    "kind": "portfolio",
+    "local_profile_lock_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+    "children": [
+      {
+        "case_number": 2,
+        "namespace": "lifeof.app",
+        "canonical_repository": "repos/lifeof",
+        "profile_lock_hash": "2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      {
+        "case_number": 3,
+        "namespace": "dino-escape.game",
+        "canonical_repository": "repos/dino-escape",
+        "profile_lock_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+      }
+    ]
+  }
+}

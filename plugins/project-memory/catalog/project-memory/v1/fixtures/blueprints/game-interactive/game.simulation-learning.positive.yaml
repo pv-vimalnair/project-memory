@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.game.simulation-learning.positive
+  kind: blueprint-positive
+  description: Positive selection case for game.simulation-learning.
+  normalized_features:
+    root.kind: product
+    product.shape: game.simulation-learning
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: game.simulation-learning
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

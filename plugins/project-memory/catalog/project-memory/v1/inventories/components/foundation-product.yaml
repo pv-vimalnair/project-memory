@@ -1,0 +1,18 @@
+inventory:
+  id: inventory.components.foundation-product
+  version: 1.0.0
+  expected_count: 13
+  ids:
+    - component.product-strategy
+    - component.product-management
+    - component.user-research
+    - component.ux
+    - component.information-architecture
+    - component.content-design
+    - component.visual-design
+    - component.brand
+    - component.design-system
+    - component.web-client
+    - component.mobile-client
+    - component.desktop-client
+    - component.admin-console

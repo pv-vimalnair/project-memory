@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.application.consumer-multisurface.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for application.consumer-multisurface.
+  normalized_features:
+    root.kind: product
+    product.shape: application.consumer-multisurface
+    product.exclusions:
+      - application.consumer-multisurface
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - application.consumer-multisurface
+    reason_codes:
+      - explicit-exclusion

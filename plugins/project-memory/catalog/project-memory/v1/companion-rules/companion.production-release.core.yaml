@@ -1,0 +1,28 @@
+id: companion.production-release
+version: 1.0.0
+status: active
+purpose: Narrow production release work by adding mandatory validation and evidence without expanding authority.
+when:
+  all:
+    - id: companion.production-release.when
+      feature: action.mode
+      operator: equals
+      expected: release
+      evidence_required: true
+  any: []
+  none: []
+require_patterns:
+  - id: release.rollback.plan
+    version_range: 1.0.0
+    condition: true
+  - id: release.monitor.operate
+    version_range: 1.0.0
+    condition: true
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validated production release evidence
+  - linked source references
+authority_effect: narrow-only
+conflict_policy: fail_closed

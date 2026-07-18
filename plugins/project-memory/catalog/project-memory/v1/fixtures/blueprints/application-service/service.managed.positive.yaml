@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.service.managed.positive
+  kind: blueprint-positive
+  description: Positive selection case for service.managed.
+  normalized_features:
+    root.kind: product
+    product.shape: service.managed
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: service.managed
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

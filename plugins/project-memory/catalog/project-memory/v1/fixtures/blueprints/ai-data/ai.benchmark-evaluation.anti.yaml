@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.ai.benchmark-evaluation.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for ai.benchmark-evaluation.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.benchmark-evaluation
+    product.exclusions:
+      - ai.benchmark-evaluation
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - ai.benchmark-evaluation
+    reason_codes:
+      - explicit-exclusion

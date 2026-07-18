@@ -1,0 +1,7 @@
+{
+  "product": "Orbit App",
+  "root_kind": "product",
+  "blueprint": "application.consumer-web",
+  "workstreams": ["approved-launch-campaign"],
+  "external_action": "approval-required"
+}

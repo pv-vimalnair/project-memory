@@ -1,0 +1,576 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_kind": "lower-reasoning-plugin-agent-acceptance",
+  "raw_output_hash_definition": "SHA-256 of UTF-8 canonical JSON for each run file's raw_output_envelope; object keys sorted recursively and array order preserved.",
+  "redacted_evidence_paths": [
+    "benchmarks/lower-reasoning-trials/run-01.redacted.json",
+    "benchmarks/lower-reasoning-trials/run-02.redacted.json"
+  ],
+  "trials": [
+    {
+      "run_id": "run-01",
+      "model_tool_id": "gpt-5.6-terra",
+      "fixed_prompt_sha256": "ad1a6c93c977ab4169d997e5600a35817c6139624e01bec774052d3ac8655438",
+      "clean_plugin_sha256": "41c26ac1feddd7853a5f99b91465be18368ff8ec1566e53a0b1749651d100beb",
+      "raw_output_sha256": "e2975a13b2a590c46862c853075d707c95e7633ca68fa80edf9b95a9b6741c08",
+      "rubric_sha256": "f7e8725f1060a8c415c5bc9d535d02c294c78d93f193d3233396f8f4c2a56ceb",
+      "recorded_at": "2026-07-18T07:18:17.747Z",
+      "reviewer": "gpt-5.6-sol-ultra-independent-reviewer",
+      "redacted_output_evidence_paths": [
+        "benchmarks/lower-reasoning-trials/run-01.redacted.json"
+      ],
+      "workflow_observations": {
+        "implicit_invocation_observed": true,
+        "bootstrap_confirmation_count": 1,
+        "deterministic_resume_observed": true,
+        "no_profile_picker_observed": true,
+        "no_schema_invention_observed": true,
+        "no_authority_expansion_observed": true
+      },
+      "brief_observations": [
+        {
+          "brief_id": "fixture.ai.analytics-decision-support.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.analytics-decision-support.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.assistant-agent.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.assistant-agent.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.benchmark-evaluation.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.benchmark-evaluation.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.data-platform.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.data-platform.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.model-service.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.model-service.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.recommendation-personalization.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.recommendation-personalization.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.b2b-saas.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.b2b-saas.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.consumer-mobile.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.consumer-mobile.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.consumer-multisurface.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.consumer-multisurface.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.creator-professional.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.creator-professional.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.desktop.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.desktop.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.internal-business.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.internal-business.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.public-web-service.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.public-web-service.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.boundary.case-001",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.boundary.case-002",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.boundary.case-003",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.boundary.case-004",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        }
+      ]
+    },
+    {
+      "run_id": "run-02",
+      "model_tool_id": "gpt-5.6-terra",
+      "fixed_prompt_sha256": "ad1a6c93c977ab4169d997e5600a35817c6139624e01bec774052d3ac8655438",
+      "clean_plugin_sha256": "41c26ac1feddd7853a5f99b91465be18368ff8ec1566e53a0b1749651d100beb",
+      "raw_output_sha256": "dfb10f5bb12f0f4e2106fd25e4d7205159d96b9e69251f14d918c62159961b53",
+      "rubric_sha256": "f7e8725f1060a8c415c5bc9d535d02c294c78d93f193d3233396f8f4c2a56ceb",
+      "recorded_at": "2026-07-18T07:18:17.861Z",
+      "reviewer": "gpt-5.6-sol-ultra-independent-reviewer",
+      "redacted_output_evidence_paths": [
+        "benchmarks/lower-reasoning-trials/run-02.redacted.json"
+      ],
+      "workflow_observations": {
+        "implicit_invocation_observed": true,
+        "bootstrap_confirmation_count": 1,
+        "deterministic_resume_observed": true,
+        "no_profile_picker_observed": true,
+        "no_schema_invention_observed": true,
+        "no_authority_expansion_observed": true
+      },
+      "brief_observations": [
+        {
+          "brief_id": "fixture.ai.analytics-decision-support.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.analytics-decision-support.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.assistant-agent.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.assistant-agent.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.benchmark-evaluation.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.benchmark-evaluation.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.data-platform.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.data-platform.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.model-service.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.model-service.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.recommendation-personalization.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.ai.recommendation-personalization.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.b2b-saas.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.b2b-saas.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.consumer-mobile.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.consumer-mobile.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.consumer-multisurface.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.consumer-multisurface.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.creator-professional.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.creator-professional.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.desktop.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.desktop.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.internal-business.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.internal-business.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.public-web-service.anti",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.application.public-web-service.positive",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.boundary.case-001",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.boundary.case-002",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.boundary.case-003",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        },
+        {
+          "brief_id": "fixture.boundary.case-004",
+          "resolved_correctly": true,
+          "clarification_questions": 0,
+          "manual_profile_requests": 0,
+          "schema_invention_count": 0,
+          "authority_expansion_count": 0
+        }
+      ]
+    }
+  ],
+  "report": {
+    "thresholds": {
+      "minimum_supported_resolution_rate": 0.98,
+      "maximum_clarification_questions": 1,
+      "maximum_manual_profile_requests": 0,
+      "maximum_schema_invention_count": 0,
+      "maximum_authority_expansion_count": 0,
+      "minimum_recorded_runs": 2,
+      "minimum_supported_briefs": 30
+    },
+    "recorded_runs": 2,
+    "qualifying_runs": 2,
+    "accepted": true,
+    "issues": [],
+    "runs": [
+      {
+        "run_id": "run-01",
+        "supported_briefs": 30,
+        "supported_resolution_rate": 1,
+        "max_clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0,
+        "qualified": true,
+        "issues": []
+      },
+      {
+        "run_id": "run-02",
+        "supported_briefs": 30,
+        "supported_resolution_rate": 1,
+        "max_clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0,
+        "qualified": true,
+        "issues": []
+      }
+    ]
+  }
+}

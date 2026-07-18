@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-021
+  kind: blueprint-boundary
+  description: Boundary case selecting design.brand-system over design.product-design-system.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: design.brand-system
+    product.exclusions:
+      - design.product-design-system
+  expected:
+    decision: selected
+    blueprint_id: design.brand-system
+    prohibited_blueprint_ids:
+      - design.product-design-system
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

@@ -1,0 +1,14 @@
+blueprint_group:
+  id: blueprint-group.brand-design
+  version: 1.0.0
+  status: active
+  name: Brand Design
+  purpose: Classify enduring brand design roots before workstreams are planned.
+  primary_archetype: brand-design
+  allowed_root_kinds:
+    - shared-system
+  blueprint_ids:
+    - design.brand-system
+    - design.product-design-system
+    - design.multi-brand-language
+    - design.creative-asset-system

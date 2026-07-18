@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.network.community-social.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for network.community-social.
+  normalized_features:
+    root.kind: product
+    product.shape: network.community-social
+    product.exclusions:
+      - network.community-social
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - network.community-social
+    reason_codes:
+      - explicit-exclusion

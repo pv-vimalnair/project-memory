@@ -1,0 +1,27 @@
+overlay_definition:
+  id: overlay.surface.mobile
+  version: 1.0.0
+  status: active
+  name: Mobile Surface
+  category: surface
+  purpose: Add durable mobile-surface context.
+  inclusion_boundary: Include mobile surface concerns.
+  exclusion_boundary: Exclude non-mobile surface concerns.
+  compatible_root_kinds:
+    - product
+  compatible_archetypes:
+    - application-service
+  requires_overlays: []
+  conflicts_with: []
+  default_components: []
+  default_domains: []
+  required_documents:
+    - MOBILE.md
+  required_records:
+    - decision-log
+  tags:
+    - mobile
+  positive_examples:
+    - A product has a mobile client.
+  negative_examples:
+    - A backend-only service.

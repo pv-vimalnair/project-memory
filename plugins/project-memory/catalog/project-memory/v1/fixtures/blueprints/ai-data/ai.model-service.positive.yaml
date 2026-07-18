@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.ai.model-service.positive
+  kind: blueprint-positive
+  description: Positive selection case for ai.model-service.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.model-service
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: ai.model-service
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

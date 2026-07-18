@@ -1,0 +1,76 @@
+blueprint:
+  id: ai.model-service
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.ai-data
+  allowed_root_kinds:
+    - product
+    - shared-system
+  primary_archetype: ai-data
+  purpose: Use when the enduring root is best described as ai model service, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: ai.model-service.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - product
+          - shared-system
+        evidence_required: true
+    positive_signals:
+      - id: ai.model-service.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: ai.model-service
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: ai.model-service.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: ai.model-service
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: ai.model-service.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: ai.model-service
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 101
+    precedence: 999
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+      - overlay.capability.ai
+    forbidden: []
+  default_components:
+    - component.ai-model
+    - component.ai-evaluation
+    - component.data-pipeline
+    - component.ai-guardrails
+  default_domains:
+    - domain.data-analytics-ai
+    - domain.security-privacy-compliance-trust
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable ai model service root containing many different workstreams.
+  negative_examples:
+    - A temporary ai model service-related deliverable inside another enduring product.
+  name: Ai Model Service
+  inclusion_boundary: Include the enduring capabilities and governance of the ai model service root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

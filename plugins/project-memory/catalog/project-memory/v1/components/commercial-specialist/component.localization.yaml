@@ -1,0 +1,21 @@
+component_definition:
+  id: component.localization
+  version: 1.0.0
+  status: active
+  name: Localization
+  type: content
+  purpose: Own the localization boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by localization.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with localization.
+  required_documents:
+    - docs/components/localization.md
+  default_domains:
+    - domain.content-communications-localization
+  tags:
+    - commercial-specialist
+    - content
+    - localization
+  positive_examples:
+    - A task changes or validates the project's localization capability.
+  negative_examples:
+    - A task merely mentions localization without changing or validating it.

@@ -1,0 +1,7 @@
+{
+  "product": "LifeOf",
+  "root_kind": "product",
+  "blueprint": "application.consumer-mobile",
+  "workstreams": ["context-continuity"],
+  "external_action": "forbidden"
+}

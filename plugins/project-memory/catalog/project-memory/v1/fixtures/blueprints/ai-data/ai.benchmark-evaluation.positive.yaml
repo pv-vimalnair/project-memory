@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.ai.benchmark-evaluation.positive
+  kind: blueprint-positive
+  description: Positive selection case for ai.benchmark-evaluation.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.benchmark-evaluation
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: ai.benchmark-evaluation
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

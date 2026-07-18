@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.application.internal-business.positive
+  kind: blueprint-positive
+  description: Positive selection case for application.internal-business.
+  normalized_features:
+    root.kind: product
+    product.shape: application.internal-business
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: application.internal-business
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

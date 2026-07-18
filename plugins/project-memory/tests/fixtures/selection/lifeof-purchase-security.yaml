@@ -1,0 +1,60 @@
+schema_version: 1.0.0
+scenario_id: lifeof-purchase-security
+root:
+  id: ROOT-01J00000000000000000000021
+  profile_lock_hash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  catalog_release: 1.0.0
+  catalog_hash: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  kind: product
+  primary_archetype: application-service
+  profile_id: profile.lifeof
+  overlay_ids: [overlay.lifecycle.active]
+initiative_id: INIT-01J00000000000000000000021
+repository: lifeof
+original_base_revision: 1123456789abcdef0123456789abcdef01234567
+integrator_id: agent.integrator
+worker_id: agent.codex-worker-1
+artifact_types: [code/runtime, security-report]
+artifact_refs: [profile.lock.yaml, docs/product/purchases.md]
+feature_flags:
+  purchase.production: false
+components:
+  - instance_id: CMP-01J00000000000000000000021
+    definition_id: component.purchase-service
+    type: service
+    tags: [commerce, engineering, qa, security]
+    dependency_rules: []
+    paths: [lib/features/purchase/**]
+outcomes:
+  - id: outcome.purchase-implementation
+    statement: Implement the bounded LifeOf purchase verification flow
+    mode: implement
+    family: commerce
+    object: payment
+    acceptance_criteria: [Purchase verification is idempotent and tested]
+    authority_class: automatic-by-rule
+    release_fate: planned
+    can_complete_independently: true
+    depends_on: []
+    paths: [lib/features/purchase/**]
+    exclusions: [firebase/production/**]
+  - id: outcome.purchase-security-assessment
+    statement: Assess the purchase flow threat model independently
+    mode: assess
+    family: security
+    object: threat-model
+    acceptance_criteria: [Threats and mitigations are recorded]
+    authority_class: automatic-by-rule
+    release_fate: none
+    can_complete_independently: true
+    depends_on: []
+    paths: [lib/features/purchase/**]
+    exclusions: []
+approvals: []
+external_authorizations: {}
+accepted_decision_ids: [DEC-01J00000000000000000000021]
+proposed_decision_ids: []
+claim:
+  ttl_ms: 900000
+  heartbeat_interval: PT5M
+  renewal_policy: claim.same-scope-only

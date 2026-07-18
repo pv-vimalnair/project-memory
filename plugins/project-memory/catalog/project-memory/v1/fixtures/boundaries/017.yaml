@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-017
+  kind: blueprint-boundary
+  description: Boundary case selecting commerce.membership over network.community-social.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.membership
+    product.exclusions:
+      - network.community-social
+  expected:
+    decision: selected
+    blueprint_id: commerce.membership
+    prohibited_blueprint_ids:
+      - network.community-social
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.game.multiplayer-networked.positive
+  kind: blueprint-positive
+  description: Positive selection case for game.multiplayer-networked.
+  normalized_features:
+    root.kind: product
+    product.shape: game.multiplayer-networked
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: game.multiplayer-networked
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

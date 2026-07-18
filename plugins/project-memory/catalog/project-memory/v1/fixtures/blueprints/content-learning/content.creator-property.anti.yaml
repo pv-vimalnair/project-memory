@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.content.creator-property.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for content.creator-property.
+  normalized_features:
+    root.kind: product
+    product.shape: content.creator-property
+    product.exclusions:
+      - content.creator-property
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - content.creator-property
+    reason_codes:
+      - explicit-exclusion

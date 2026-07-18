@@ -1,0 +1,20 @@
+inventory:
+  id: inventory.domains
+  version: 1.0.0
+  expected_count: 15
+  ids:
+    - domain.governance-coordination
+    - domain.product-strategy
+    - domain.research-insight
+    - domain.ux-content-design
+    - domain.visual-brand-design-systems
+    - domain.engineering-architecture
+    - domain.data-analytics-ai
+    - domain.security-privacy-compliance-trust
+    - domain.qa-reliability-performance
+    - domain.growth-marketing-commercial
+    - domain.content-communications-localization
+    - domain.release-platform-operations
+    - domain.support-community
+    - domain.finance-legal-partnerships
+    - domain.game-design-art-audio-live-operations

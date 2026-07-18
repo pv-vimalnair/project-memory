@@ -1,0 +1,21 @@
+component_definition:
+  id: component.desktop-client
+  version: 1.0.0
+  status: active
+  name: Desktop Client
+  type: surface
+  purpose: Own the desktop client boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by desktop client.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with desktop client.
+  required_documents:
+    - docs/components/desktop-client.md
+  default_domains:
+    - domain.product-strategy
+  tags:
+    - foundation-product
+    - surface
+    - desktop-client
+  positive_examples:
+    - A task changes or validates the project's desktop client capability.
+  negative_examples:
+    - A task merely mentions desktop client without changing or validating it.

@@ -1,0 +1,21 @@
+component_definition:
+  id: component.user-research
+  version: 1.0.0
+  status: active
+  name: User Research
+  type: service
+  purpose: Own the user research boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by user research.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with user research.
+  required_documents:
+    - docs/components/user-research.md
+  default_domains:
+    - domain.research-insight
+  tags:
+    - foundation-product
+    - service
+    - user-research
+  positive_examples:
+    - A task changes or validates the project's user research capability.
+  negative_examples:
+    - A task merely mentions user research without changing or validating it.

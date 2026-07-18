@@ -1,0 +1,28 @@
+kind: shared-platform-consumer
+relationship_id: relationship.platform.identity-consumer
+revision: 4
+consumer:
+  namespace: lifeof.app
+  root_id: ROOT-01J00000000000000000000003
+  canonical_repository: https://github.com/acme/lifeof
+  profile_lock_hash: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+provider:
+  namespace: acme.identity
+  root_id: ROOT-01J00000000000000000000002
+  canonical_repository: https://github.com/acme/identity-platform
+  profile_lock_hash: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+owner_root_id: ROOT-01J00000000000000000000003
+provider_interface_refs:
+  - root:
+      namespace: acme.identity
+      root_id: ROOT-01J00000000000000000000002
+      canonical_repository: https://github.com/acme/identity-platform
+      profile_lock_hash: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    relative_path: docs/project-memory/source/INTERFACES.md
+    revision: 3
+    sha256: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+usage_component_ids:
+  - CMP-01J00000000000000000000000
+migration_state: current
+approval_refs:
+  - APR-01J00000000000000000000002

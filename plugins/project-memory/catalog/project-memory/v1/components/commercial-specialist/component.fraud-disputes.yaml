@@ -1,0 +1,21 @@
+component_definition:
+  id: component.fraud-disputes
+  version: 1.0.0
+  status: active
+  name: Fraud Disputes
+  type: service
+  purpose: Own the fraud disputes boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by fraud disputes.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with fraud disputes.
+  required_documents:
+    - docs/components/fraud-disputes.md
+  default_domains:
+    - domain.finance-legal-partnerships
+  tags:
+    - commercial-specialist
+    - service
+    - fraud-disputes
+  positive_examples:
+    - A task changes or validates the project's fraud disputes capability.
+  negative_examples:
+    - A task merely mentions fraud disputes without changing or validating it.

@@ -1,0 +1,73 @@
+blueprint:
+  id: operations.governance-compliance
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.operations-automation
+  allowed_root_kinds:
+    - shared-system
+    - program
+  primary_archetype: operations-automation
+  purpose: Use when the enduring root is best described as operations governance compliance, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: operations.governance-compliance.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - shared-system
+          - program
+        evidence_required: true
+    positive_signals:
+      - id: operations.governance-compliance.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: operations.governance-compliance
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: operations.governance-compliance.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: operations.governance-compliance
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: operations.governance-compliance.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: operations.governance-compliance
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 104
+    precedence: 996
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+    forbidden: []
+  default_components:
+    - component.operations-workflow
+    - component.sop-training
+  default_domains:
+    - domain.governance-coordination
+    - domain.release-platform-operations
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable operations governance compliance root containing many different workstreams.
+  negative_examples:
+    - A temporary operations governance compliance-related deliverable inside another enduring product.
+  name: Operations Governance Compliance
+  inclusion_boundary: Include the enduring capabilities and governance of the operations governance compliance root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

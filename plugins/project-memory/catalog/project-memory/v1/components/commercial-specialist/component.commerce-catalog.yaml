@@ -1,0 +1,21 @@
+component_definition:
+  id: component.commerce-catalog
+  version: 1.0.0
+  status: active
+  name: Commerce Catalog
+  type: shared-system
+  purpose: Own the commerce catalog boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by commerce catalog.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with commerce catalog.
+  required_documents:
+    - docs/components/commerce-catalog.md
+  default_domains:
+    - domain.growth-marketing-commercial
+  tags:
+    - commercial-specialist
+    - shared-system
+    - commerce-catalog
+  positive_examples:
+    - A task changes or validates the project's commerce catalog capability.
+  negative_examples:
+    - A task merely mentions commerce catalog without changing or validating it.

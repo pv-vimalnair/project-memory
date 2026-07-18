@@ -1,0 +1,46 @@
+overlay_definition:
+  id: overlay.surface.mobile
+  version: 1.0.0
+  status: active
+  name: Surface Mobile
+  category: surface
+  purpose: Apply the surface mobile trait without changing the enduring project root.
+  inclusion_boundary: Include constraints and defaults caused specifically by the surface mobile trait.
+  exclusion_boundary: Do not use this overlay as a substitute for a blueprint, component, or temporary workstream.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  requires_overlays: []
+  conflicts_with: []
+  default_components:
+    - component.mobile-client
+  default_domains:
+    - domain.engineering-architecture
+  required_documents:
+    - docs/overlays/surface-mobile.md
+  required_records:
+    - profile-lock
+    - decision-log
+  tags:
+    - market-shape
+    - surface
+    - mobile
+  positive_examples:
+    - The project explicitly operates with the surface mobile trait.
+  negative_examples:
+    - A one-off task resembles surface mobile but does not change the project trait.

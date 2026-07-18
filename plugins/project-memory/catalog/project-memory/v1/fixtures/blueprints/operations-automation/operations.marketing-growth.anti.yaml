@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.operations.marketing-growth.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for operations.marketing-growth.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.marketing-growth
+    product.exclusions:
+      - operations.marketing-growth
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - operations.marketing-growth
+    reason_codes:
+      - explicit-exclusion

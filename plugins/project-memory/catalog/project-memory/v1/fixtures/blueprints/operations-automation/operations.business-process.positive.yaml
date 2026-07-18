@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.operations.business-process.positive
+  kind: blueprint-positive
+  description: Positive selection case for operations.business-process.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.business-process
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: operations.business-process
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

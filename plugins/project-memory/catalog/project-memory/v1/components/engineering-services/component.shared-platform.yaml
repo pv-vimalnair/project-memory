@@ -1,0 +1,21 @@
+component_definition:
+  id: component.shared-platform
+  version: 1.0.0
+  status: active
+  name: Shared Platform
+  type: platform
+  purpose: Own the shared platform boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by shared platform.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with shared platform.
+  required_documents:
+    - docs/components/shared-platform.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - platform
+    - shared-platform
+  positive_examples:
+    - A task changes or validates the project's shared platform capability.
+  negative_examples:
+    - A task merely mentions shared platform without changing or validating it.

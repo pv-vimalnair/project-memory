@@ -1,0 +1,21 @@
+component_definition:
+  id: component.cli
+  version: 1.0.0
+  status: active
+  name: Cli
+  type: platform
+  purpose: Own the cli boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by cli.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with cli.
+  required_documents:
+    - docs/components/cli.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - platform
+    - cli
+  positive_examples:
+    - A task changes or validates the project's cli capability.
+  negative_examples:
+    - A task merely mentions cli without changing or validating it.

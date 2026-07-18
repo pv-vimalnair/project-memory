@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.service.managed.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for service.managed.
+  normalized_features:
+    root.kind: product
+    product.shape: service.managed
+    product.exclusions:
+      - service.managed
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - service.managed
+    reason_codes:
+      - explicit-exclusion

@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.ai.data-platform.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for ai.data-platform.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.data-platform
+    product.exclusions:
+      - ai.data-platform
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - ai.data-platform
+    reason_codes:
+      - explicit-exclusion

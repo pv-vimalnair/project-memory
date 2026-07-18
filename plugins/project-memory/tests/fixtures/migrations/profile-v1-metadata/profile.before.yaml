@@ -1,0 +1,11 @@
+# generated_at: 2026-07-15T03:45:00.000Z
+schema_version: "1.0.0"
+profile_revision: 1
+root_id: "ROOT-01J00000000000000000000000"
+authority:
+  accepted_by: "Pitaji"
+  approval_ids:
+    - "APR-01J00000000000000000000000"
+profile:
+  blueprint_id: "application.consumer-mobile"
+  lifecycle: "active"

@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.ai.assistant-agent.positive
+  kind: blueprint-positive
+  description: Positive selection case for ai.assistant-agent.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.assistant-agent
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: ai.assistant-agent
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

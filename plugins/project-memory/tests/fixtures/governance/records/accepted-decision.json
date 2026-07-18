@@ -1,0 +1,24 @@
+{
+  "id": "DEC-01J00000000000000000000000",
+  "type": "decision",
+  "title": "Keep one canonical hub",
+  "status": "accepted",
+  "root_id": "ROOT-01J00000000000000000000000",
+  "component_ids": [],
+  "initiative_id": null,
+  "workstream_id": "WS-01J00000000000000000000000",
+  "task_id": "TASK-01J00000000000000000000000",
+  "actor_id": "pitaji",
+  "authority_class": "pitaji",
+  "created_at": "2026-07-14T12:00:00.000Z",
+  "original_base_revision": "0123456789abcdef0123456789abcdef01234567",
+  "integration_base_revision": "0123456789abcdef0123456789abcdef01234567",
+  "catalog_versions": ["1.0.0"],
+  "relationships": [],
+  "payload": {
+    "choice": "Use one memory-hub repository",
+    "rationale": "Serialized integration prevents competing truth",
+    "alternatives": ["Independent mutable handoffs"],
+    "consequences": ["Satellites reference the hub"]
+  }
+}

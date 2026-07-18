@@ -1,0 +1,24 @@
+domain_definition:
+  id: domain.product
+  version: 1.0.0
+  status: active
+  name: Product
+  purpose: Own fixture product context.
+  inclusion_boundary: Include accepted product intent.
+  exclusion_boundary: Exclude implementation details owned elsewhere.
+  compatible_root_kinds:
+    - product
+  compatible_archetypes:
+    - application-service
+  default_components:
+    - component.mobile
+  required_records:
+    - decision-log
+  required_documents:
+    - docs/domains/product.md
+  tags:
+    - product
+  positive_examples:
+    - A durable product decision.
+  negative_examples:
+    - A temporary scratch note.

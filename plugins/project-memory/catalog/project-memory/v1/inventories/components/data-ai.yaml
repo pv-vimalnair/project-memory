@@ -1,0 +1,18 @@
+inventory:
+  id: inventory.components.data-ai
+  version: 1.0.0
+  expected_count: 13
+  ids:
+    - component.analytics
+    - component.instrumentation
+    - component.data-pipeline
+    - component.data-quality
+    - component.experimentation
+    - component.reporting
+    - component.ai-model
+    - component.ai-prompt
+    - component.ai-retrieval
+    - component.ai-agent-tools
+    - component.ai-evaluation
+    - component.ai-guardrails
+    - component.ai-serving

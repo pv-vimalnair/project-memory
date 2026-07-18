@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.design.multi-brand-language.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for design.multi-brand-language.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: design.multi-brand-language
+    product.exclusions:
+      - design.multi-brand-language
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - design.multi-brand-language
+    reason_codes:
+      - explicit-exclusion

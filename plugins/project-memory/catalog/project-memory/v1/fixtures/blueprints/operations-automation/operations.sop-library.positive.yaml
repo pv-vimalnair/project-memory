@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.operations.sop-library.positive
+  kind: blueprint-positive
+  description: Positive selection case for operations.sop-library.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.sop-library
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: operations.sop-library
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

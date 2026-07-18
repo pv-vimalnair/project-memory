@@ -1,0 +1,21 @@
+component_definition:
+  id: component.ai-evaluation
+  version: 1.0.0
+  status: active
+  name: Ai Evaluation
+  type: data
+  purpose: Own the ai evaluation boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by ai evaluation.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with ai evaluation.
+  required_documents:
+    - docs/components/ai-evaluation.md
+  default_domains:
+    - domain.data-analytics-ai
+  tags:
+    - data-ai
+    - data
+    - ai-evaluation
+  positive_examples:
+    - A task changes or validates the project's ai evaluation capability.
+  negative_examples:
+    - A task merely mentions ai evaluation without changing or validating it.

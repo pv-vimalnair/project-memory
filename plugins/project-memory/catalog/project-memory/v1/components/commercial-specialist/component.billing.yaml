@@ -1,0 +1,21 @@
+component_definition:
+  id: component.billing
+  version: 1.0.0
+  status: active
+  name: Billing
+  type: service
+  purpose: Own the billing boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by billing.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with billing.
+  required_documents:
+    - docs/components/billing.md
+  default_domains:
+    - domain.finance-legal-partnerships
+  tags:
+    - commercial-specialist
+    - service
+    - billing
+  positive_examples:
+    - A task changes or validates the project's billing capability.
+  negative_examples:
+    - A task merely mentions billing without changing or validating it.

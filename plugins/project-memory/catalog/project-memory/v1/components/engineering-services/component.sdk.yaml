@@ -1,0 +1,21 @@
+component_definition:
+  id: component.sdk
+  version: 1.0.0
+  status: active
+  name: Sdk
+  type: platform
+  purpose: Own the sdk boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by sdk.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with sdk.
+  required_documents:
+    - docs/components/sdk.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - platform
+    - sdk
+  positive_examples:
+    - A task changes or validates the project's sdk capability.
+  negative_examples:
+    - A task merely mentions sdk without changing or validating it.

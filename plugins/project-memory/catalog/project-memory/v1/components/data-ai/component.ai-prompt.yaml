@@ -1,0 +1,21 @@
+component_definition:
+  id: component.ai-prompt
+  version: 1.0.0
+  status: active
+  name: Ai Prompt
+  type: shared-system
+  purpose: Own the ai prompt boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by ai prompt.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with ai prompt.
+  required_documents:
+    - docs/components/ai-prompt.md
+  default_domains:
+    - domain.data-analytics-ai
+  tags:
+    - data-ai
+    - shared-system
+    - ai-prompt
+  positive_examples:
+    - A task changes or validates the project's ai prompt capability.
+  negative_examples:
+    - A task merely mentions ai prompt without changing or validating it.

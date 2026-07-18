@@ -1,0 +1,17 @@
+blueprint_group:
+  id: blueprint-group.content-learning
+  version: 1.0.0
+  status: active
+  name: Content Learning
+  purpose: Classify enduring content learning roots before workstreams are planned.
+  primary_archetype: content-learning
+  allowed_root_kinds:
+    - product
+    - shared-system
+  blueprint_ids:
+    - content.publication-newsletter
+    - content.podcast-video-channel
+    - content.media-library
+    - learning.course-curriculum
+    - content.documentation-portal
+    - content.creator-property

@@ -1,0 +1,21 @@
+component_definition:
+  id: component.game-live-operations
+  version: 1.0.0
+  status: active
+  name: Game Live Operations
+  type: shared-system
+  purpose: Own the game live operations boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by game live operations.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with game live operations.
+  required_documents:
+    - docs/components/game-live-operations.md
+  default_domains:
+    - domain.game-design-art-audio-live-operations
+  tags:
+    - commercial-specialist
+    - shared-system
+    - game-live-operations
+  positive_examples:
+    - A task changes or validates the project's game live operations capability.
+  negative_examples:
+    - A task merely mentions game live operations without changing or validating it.

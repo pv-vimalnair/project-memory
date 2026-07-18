@@ -1,0 +1,43 @@
+domain_definition:
+  id: domain.visual-brand-design-systems
+  version: 1.0.0
+  status: active
+  name: Visual Brand Design Systems
+  purpose: Preserve authoritative visual brand design systems context across workstreams and agents.
+  inclusion_boundary: Include decisions, records, risks, and evidence whose primary owner is visual brand design systems.
+  exclusion_boundary: Exclude facts whose canonical owner is another permanent domain.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  default_components:
+    - component.visual-design
+    - component.brand
+    - component.design-system
+  required_records:
+    - decision-log
+    - worklog
+    - evidence
+  required_documents:
+    - docs/domains/visual-brand-design-systems.md
+  tags:
+    - permanent-domain
+    - visual-brand-design-systems
+  positive_examples:
+    - A durable visual brand design systems decision must remain available after handoff.
+  negative_examples:
+    - A temporary scratch note with no accepted visual brand design systems fact.

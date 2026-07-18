@@ -1,0 +1,72 @@
+blueprint:
+  id: engagement.client-delivery
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.engagement
+  allowed_root_kinds:
+    - engagement
+  primary_archetype: engagement
+  purpose: Use when the enduring root is best described as engagement client delivery, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: engagement.client-delivery.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - engagement
+        evidence_required: true
+    positive_signals:
+      - id: engagement.client-delivery.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: engagement.client-delivery
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: engagement.client-delivery.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: engagement.client-delivery
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: engagement.client-delivery.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: engagement.client-delivery
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 100
+    precedence: 1000
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+    forbidden: []
+  default_components:
+    - component.product-management
+    - component.operations-workflow
+    - component.reporting
+  default_domains:
+    - domain.governance-coordination
+    - domain.product-strategy
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable engagement client delivery root containing many different workstreams.
+  negative_examples:
+    - A temporary engagement client delivery-related deliverable inside another enduring product.
+  name: Engagement Client Delivery
+  inclusion_boundary: Include the enduring capabilities and governance of the engagement client delivery root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

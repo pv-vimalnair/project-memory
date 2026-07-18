@@ -1,0 +1,21 @@
+component_definition:
+  id: component.operations-workflow
+  version: 1.0.0
+  status: active
+  name: Operations Workflow
+  type: workflow
+  purpose: Own the operations workflow boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by operations workflow.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with operations workflow.
+  required_documents:
+    - docs/components/operations-workflow.md
+  default_domains:
+    - domain.governance-coordination
+  tags:
+    - commercial-specialist
+    - workflow
+    - operations-workflow
+  positive_examples:
+    - A task changes or validates the project's operations workflow capability.
+  negative_examples:
+    - A task merely mentions operations workflow without changing or validating it.

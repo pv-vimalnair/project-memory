@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.engagement.standalone-internal.positive
+  kind: blueprint-positive
+  description: Positive selection case for engagement.standalone-internal.
+  normalized_features:
+    root.kind: engagement
+    product.shape: engagement.standalone-internal
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: engagement.standalone-internal
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-016
+  kind: blueprint-boundary
+  description: Boundary case selecting commerce.booking-reservation over network.multi-party-transaction.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.booking-reservation
+    product.exclusions:
+      - network.multi-party-transaction
+  expected:
+    decision: selected
+    blueprint_id: commerce.booking-reservation
+    prohibited_blueprint_ids:
+      - network.multi-party-transaction
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

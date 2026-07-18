@@ -1,0 +1,42 @@
+domain_definition:
+  id: domain.research-insight
+  version: 1.0.0
+  status: active
+  name: Research Insight
+  purpose: Preserve authoritative research insight context across workstreams and agents.
+  inclusion_boundary: Include decisions, records, risks, and evidence whose primary owner is research insight.
+  exclusion_boundary: Exclude facts whose canonical owner is another permanent domain.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  default_components:
+    - component.user-research
+    - component.research-program
+  required_records:
+    - decision-log
+    - worklog
+    - evidence
+  required_documents:
+    - docs/domains/research-insight.md
+  tags:
+    - permanent-domain
+    - research-insight
+  positive_examples:
+    - A durable research insight decision must remain available after handoff.
+  negative_examples:
+    - A temporary scratch note with no accepted research insight fact.

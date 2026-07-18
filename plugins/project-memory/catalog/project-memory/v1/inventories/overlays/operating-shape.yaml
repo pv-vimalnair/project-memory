@@ -1,0 +1,29 @@
+inventory:
+  id: inventory.overlays.operating-shape
+  version: 1.0.0
+  expected_count: 24
+  ids:
+    - overlay.runtime.offline-capable
+    - overlay.runtime.realtime
+    - overlay.runtime.high-availability
+    - overlay.runtime.hosted
+    - overlay.runtime.self-hosted
+    - overlay.capability.authentication
+    - overlay.capability.ai
+    - overlay.capability.community-ugc
+    - overlay.capability.payments
+    - overlay.capability.personal-data
+    - overlay.risk.sensitive-data
+    - overlay.risk.regulated
+    - overlay.risk.child-directed
+    - overlay.risk.financial-value
+    - overlay.lifecycle.prototype
+    - overlay.lifecycle.active
+    - overlay.lifecycle.legacy
+    - overlay.lifecycle.migration
+    - overlay.lifecycle.retiring
+    - overlay.distribution.app-store
+    - overlay.distribution.play-store
+    - overlay.distribution.public-web
+    - overlay.distribution.enterprise
+    - overlay.distribution.package-registry

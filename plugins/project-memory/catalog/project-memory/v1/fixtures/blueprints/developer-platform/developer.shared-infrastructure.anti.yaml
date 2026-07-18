@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.developer.shared-infrastructure.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for developer.shared-infrastructure.
+  normalized_features:
+    root.kind: product
+    product.shape: developer.shared-infrastructure
+    product.exclusions:
+      - developer.shared-infrastructure
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - developer.shared-infrastructure
+    reason_codes:
+      - explicit-exclusion

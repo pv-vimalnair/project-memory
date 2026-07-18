@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.design.multi-brand-language.positive
+  kind: blueprint-positive
+  description: Positive selection case for design.multi-brand-language.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: design.multi-brand-language
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: design.multi-brand-language
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

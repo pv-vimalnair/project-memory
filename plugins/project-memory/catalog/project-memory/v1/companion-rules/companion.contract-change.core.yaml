@@ -1,0 +1,28 @@
+id: companion.contract-change
+version: 1.0.0
+status: active
+purpose: Narrow contract change work by adding mandatory validation and evidence without expanding authority.
+when:
+  all:
+    - id: companion.contract-change.when
+      feature: project.tags
+      operator: tag_present
+      expected: contract-change
+      evidence_required: true
+  any: []
+  none: []
+require_patterns:
+  - id: engineering.api.change
+    version_range: 1.0.0
+    condition: true
+  - id: qa.compatibility.validate
+    version_range: 1.0.0
+    condition: true
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validated contract change evidence
+  - linked source references
+authority_effect: narrow-only
+conflict_policy: fail_closed

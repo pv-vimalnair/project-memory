@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.developer.cli-tool.positive
+  kind: blueprint-positive
+  description: Positive selection case for developer.cli-tool.
+  normalized_features:
+    root.kind: product
+    product.shape: developer.cli-tool
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: developer.cli-tool
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

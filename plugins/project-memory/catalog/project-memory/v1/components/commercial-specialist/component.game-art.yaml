@@ -1,0 +1,21 @@
+component_definition:
+  id: component.game-art
+  version: 1.0.0
+  status: active
+  name: Game Art
+  type: content
+  purpose: Own the game art boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by game art.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with game art.
+  required_documents:
+    - docs/components/game-art.md
+  default_domains:
+    - domain.game-design-art-audio-live-operations
+  tags:
+    - commercial-specialist
+    - content
+    - game-art
+  positive_examples:
+    - A task changes or validates the project's game art capability.
+  negative_examples:
+    - A task merely mentions game art without changing or validating it.

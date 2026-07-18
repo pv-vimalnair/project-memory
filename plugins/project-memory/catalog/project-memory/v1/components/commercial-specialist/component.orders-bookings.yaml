@@ -1,0 +1,21 @@
+component_definition:
+  id: component.orders-bookings
+  version: 1.0.0
+  status: active
+  name: Orders Bookings
+  type: service
+  purpose: Own the orders bookings boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by orders bookings.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with orders bookings.
+  required_documents:
+    - docs/components/orders-bookings.md
+  default_domains:
+    - domain.growth-marketing-commercial
+  tags:
+    - commercial-specialist
+    - service
+    - orders-bookings
+  positive_examples:
+    - A task changes or validates the project's orders bookings capability.
+  negative_examples:
+    - A task merely mentions orders bookings without changing or validating it.

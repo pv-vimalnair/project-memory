@@ -1,0 +1,79 @@
+{
+  "name": "lifeof",
+  "case_number": 2,
+  "repository": "repos/lifeof",
+  "root": {
+    "namespace": "lifeof.app",
+    "kind": "product",
+    "primary_archetype": "application-service",
+    "blueprint_id": "application.consumer-mobile",
+    "lifecycle": "active",
+    "display_name": "LifeOf",
+    "mission": "Help people build habits through visible financial motivation."
+  },
+  "overlays": [
+    "overlay.audience.consumer",
+    "overlay.lifecycle.active",
+    "overlay.surface.mobile"
+  ],
+  "components": [
+    "component.api",
+    "component.backend-service",
+    "component.configuration",
+    "component.content-design",
+    "component.datastore",
+    "component.mobile-client",
+    "component.operations-workflow",
+    "component.product-management",
+    "component.product-strategy",
+    "component.ux",
+    "component.web-client"
+  ],
+  "domains": [
+    "domain.engineering-architecture",
+    "domain.governance-coordination",
+    "domain.product-strategy",
+    "domain.ux-content-design"
+  ],
+  "adapters": {
+    "agent": [
+      { "id": "adapter.claude-code", "version": "1.0.0" },
+      { "id": "adapter.codex", "version": "1.0.0" }
+    ],
+    "runtime": [
+      { "id": "adapter.firebase", "version": "1.0.0" },
+      { "id": "adapter.flutter", "version": "1.0.0" }
+    ],
+    "workflow": [
+      { "id": "adapter.figma", "version": "1.0.0" },
+      { "id": "adapter.maestro", "version": "1.0.0" }
+    ]
+  },
+  "documents": [
+    {
+      "id": "document.product-model",
+      "relative_path": "docs/project-memory/source/PRODUCT.md",
+      "title": "LifeOf Product Model",
+      "purpose": "Capture the accepted habit and motivation product boundary.",
+      "sections": [
+        {
+          "heading": "Product boundary",
+          "body": "The app is one durable product containing design, engineering, security, and marketing workstreams."
+        }
+      ]
+    },
+    {
+      "id": "document.architecture-boundary",
+      "relative_path": "docs/project-memory/source/ARCHITECTURE.md",
+      "title": "LifeOf Architecture Boundary",
+      "purpose": "Capture the accepted mobile and backend ownership split.",
+      "sections": [
+        {
+          "heading": "Ownership",
+          "body": "Flutter owns the client surface and Firebase owns accepted backend capabilities."
+        }
+      ]
+    }
+  ],
+  "relationship": null
+}

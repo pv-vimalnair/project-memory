@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-009
+  kind: blueprint-boundary
+  description: Boundary case selecting game.casual-mobile over game.free-to-play-live-service.
+  normalized_features:
+    root.kind: product
+    product.shape: game.casual-mobile
+    product.exclusions:
+      - game.free-to-play-live-service
+  expected:
+    decision: selected
+    blueprint_id: game.casual-mobile
+    prohibited_blueprint_ids:
+      - game.free-to-play-live-service
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

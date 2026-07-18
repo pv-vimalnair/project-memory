@@ -1,0 +1,47 @@
+overlay_definition:
+  id: overlay.distribution.package-registry
+  version: 1.0.0
+  status: active
+  name: Distribution Package Registry
+  category: distribution
+  purpose: Apply the distribution package registry trait without changing the enduring project root.
+  inclusion_boundary: Include constraints and defaults caused specifically by the distribution package registry trait.
+  exclusion_boundary: Do not use this overlay as a substitute for a blueprint, component, or temporary workstream.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  requires_overlays:
+    - overlay.audience.developer
+  conflicts_with: []
+  default_components:
+    - component.distribution
+  default_domains:
+    - domain.release-platform-operations
+  required_documents:
+    - docs/overlays/distribution-package-registry.md
+  required_records:
+    - profile-lock
+    - decision-log
+  tags:
+    - operating-shape
+    - distribution
+    - package-registry
+  positive_examples:
+    - The project explicitly operates with the distribution package registry trait.
+  negative_examples:
+    - A one-off task resembles distribution package registry but does not change the project trait.

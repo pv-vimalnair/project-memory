@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-012
+  kind: blueprint-boundary
+  description: Boundary case selecting ai.assistant-agent over ai.model-service.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.assistant-agent
+    product.exclusions:
+      - ai.model-service
+  expected:
+    decision: selected
+    blueprint_id: ai.assistant-agent
+    prohibited_blueprint_ids:
+      - ai.model-service
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

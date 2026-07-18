@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.application.desktop.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for application.desktop.
+  normalized_features:
+    root.kind: product
+    product.shape: application.desktop
+    product.exclusions:
+      - application.desktop
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - application.desktop
+    reason_codes:
+      - explicit-exclusion

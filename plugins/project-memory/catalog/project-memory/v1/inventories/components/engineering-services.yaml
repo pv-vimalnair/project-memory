@@ -1,0 +1,19 @@
+inventory:
+  id: inventory.components.engineering-services
+  version: 1.0.0
+  expected_count: 14
+  ids:
+    - component.api
+    - component.sdk
+    - component.cli
+    - component.backend-service
+    - component.identity
+    - component.datastore
+    - component.search
+    - component.messaging
+    - component.notifications
+    - component.realtime
+    - component.integration
+    - component.shared-platform
+    - component.configuration
+    - component.feature-flags

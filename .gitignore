@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+.tmp/
+.plugin-dev/
+*.log
+
+# Project Memory clean-install verification output
+plugins/project-memory/.tmp/plugin-install/

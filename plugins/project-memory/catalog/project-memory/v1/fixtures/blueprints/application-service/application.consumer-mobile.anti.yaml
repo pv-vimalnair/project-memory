@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.application.consumer-mobile.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for application.consumer-mobile.
+  normalized_features:
+    root.kind: product
+    product.shape: application.consumer-mobile
+    product.exclusions:
+      - application.consumer-mobile
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - application.consumer-mobile
+    reason_codes:
+      - explicit-exclusion

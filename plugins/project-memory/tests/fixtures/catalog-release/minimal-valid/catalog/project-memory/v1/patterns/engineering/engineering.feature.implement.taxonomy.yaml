@@ -1,0 +1,17 @@
+pattern_taxonomy:
+  pattern_id: engineering.feature.implement
+  pattern_version: 1.0.0
+  compatibility:
+    root_kinds:
+      - product
+    primary_archetypes:
+      - application-service
+    required_overlays: []
+    forbidden_overlays: []
+  overlay_applicability:
+    baked: []
+    allowed:
+      - overlay.surface.mobile
+    forbidden: []
+  component_impacts: []
+  domain_impacts: []

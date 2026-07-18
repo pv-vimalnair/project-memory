@@ -1,0 +1,21 @@
+component_definition:
+  id: component.experimentation
+  version: 1.0.0
+  status: active
+  name: Experimentation
+  type: data
+  purpose: Own the experimentation boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by experimentation.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with experimentation.
+  required_documents:
+    - docs/components/experimentation.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - data-ai
+    - data
+    - experimentation
+  positive_examples:
+    - A task changes or validates the project's experimentation capability.
+  negative_examples:
+    - A task merely mentions experimentation without changing or validating it.

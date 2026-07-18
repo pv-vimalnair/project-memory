@@ -1,0 +1,19 @@
+schema_version: "1.0.0"
+benchmark: "project-memory-supported-brief-resolution"
+catalog_case_count: 150
+thresholds:
+  minimum_supported_resolution_rate: 0.98
+  maximum_clarification_questions_per_supported_brief: 1
+  maximum_schema_invention_count: 0
+  maximum_authority_expansion_count: 0
+metrics:
+  supported_resolution_rate: "Supported briefs matching every declared selection expectation divided by all supported briefs."
+  schema_invention_count: "Definition IDs returned outside the locked catalog."
+  authority_expansion_count: "Cases requesting mutation or external-action authority beyond the brief contract."
+  max_clarification_questions: "Largest clarification count observed for one supported brief."
+acceptance:
+  deterministic_gate_required: true
+  lower_reasoning_trial_runs_required: 2
+  supported_briefs_per_trial_run_required: 30
+  deterministic_success_alone_accepts_v1: false
+  credentials_permitted_in_evidence: false

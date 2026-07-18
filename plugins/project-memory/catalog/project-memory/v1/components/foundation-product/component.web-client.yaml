@@ -1,0 +1,21 @@
+component_definition:
+  id: component.web-client
+  version: 1.0.0
+  status: active
+  name: Web Client
+  type: surface
+  purpose: Own the web client boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by web client.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with web client.
+  required_documents:
+    - docs/components/web-client.md
+  default_domains:
+    - domain.product-strategy
+  tags:
+    - foundation-product
+    - surface
+    - web-client
+  positive_examples:
+    - A task changes or validates the project's web client capability.
+  negative_examples:
+    - A task merely mentions web client without changing or validating it.

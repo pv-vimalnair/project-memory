@@ -1,0 +1,21 @@
+inventory:
+  id: inventory.patterns.growth
+  version: 1.0.0
+  expected_count: 16
+  ids:
+    - growth.strategy.plan
+    - growth.campaign.plan
+    - growth.campaign.implement
+    - growth.campaign.release
+    - growth.positioning.design
+    - growth.offer.design
+    - growth.funnel.assess
+    - growth.acquisition.plan
+    - growth.lifecycle.plan
+    - growth.referral.design
+    - growth.store-listing.change
+    - growth.seo.change
+    - growth.measurement.design
+    - growth.creative.design
+    - growth.pricing.assess
+    - growth.partnership.plan

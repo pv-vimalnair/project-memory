@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-023
+  kind: blueprint-boundary
+  description: Boundary case selecting operations.workflow-automation over operations.business-process.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.workflow-automation
+    product.exclusions:
+      - operations.business-process
+  expected:
+    decision: selected
+    blueprint_id: operations.workflow-automation
+    prohibited_blueprint_ids:
+      - operations.business-process
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

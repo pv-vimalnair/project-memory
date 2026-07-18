@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.content.publication-newsletter.positive
+  kind: blueprint-positive
+  description: Positive selection case for content.publication-newsletter.
+  normalized_features:
+    root.kind: product
+    product.shape: content.publication-newsletter
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: content.publication-newsletter
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

@@ -1,0 +1,21 @@
+component_definition:
+  id: component.qa
+  version: 1.0.0
+  status: active
+  name: Qa
+  type: workflow
+  purpose: Own the qa boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by qa.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with qa.
+  required_documents:
+    - docs/components/qa.md
+  default_domains:
+    - domain.qa-reliability-performance
+  tags:
+    - assurance-platform
+    - workflow
+    - qa
+  positive_examples:
+    - A task changes or validates the project's qa capability.
+  negative_examples:
+    - A task merely mentions qa without changing or validating it.

@@ -1,0 +1,21 @@
+component_definition:
+  id: component.messaging
+  version: 1.0.0
+  status: active
+  name: Messaging
+  type: service
+  purpose: Own the messaging boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by messaging.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with messaging.
+  required_documents:
+    - docs/components/messaging.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - service
+    - messaging
+  positive_examples:
+    - A task changes or validates the project's messaging capability.
+  negative_examples:
+    - A task merely mentions messaging without changing or validating it.

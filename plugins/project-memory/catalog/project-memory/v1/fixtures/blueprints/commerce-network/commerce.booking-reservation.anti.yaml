@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.commerce.booking-reservation.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for commerce.booking-reservation.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.booking-reservation
+    product.exclusions:
+      - commerce.booking-reservation
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - commerce.booking-reservation
+    reason_codes:
+      - explicit-exclusion

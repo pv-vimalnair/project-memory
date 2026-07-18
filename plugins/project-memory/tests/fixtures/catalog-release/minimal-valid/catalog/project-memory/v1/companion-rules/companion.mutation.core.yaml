@@ -1,0 +1,21 @@
+id: companion.mutation
+version: 1.0.0
+status: active
+purpose: Add validation evidence to fixture mutation work.
+when:
+  all:
+    - id: companion.mutation.mode
+      feature: action.mode
+      operator: equals
+      expected: implement
+      evidence_required: true
+  any: []
+  none: []
+require_patterns: []
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validation results
+authority_effect: narrow-only
+conflict_policy: fail_closed

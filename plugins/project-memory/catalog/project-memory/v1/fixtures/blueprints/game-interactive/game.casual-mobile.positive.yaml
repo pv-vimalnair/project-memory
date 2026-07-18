@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.game.casual-mobile.positive
+  kind: blueprint-positive
+  description: Positive selection case for game.casual-mobile.
+  normalized_features:
+    root.kind: product
+    product.shape: game.casual-mobile
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: game.casual-mobile
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

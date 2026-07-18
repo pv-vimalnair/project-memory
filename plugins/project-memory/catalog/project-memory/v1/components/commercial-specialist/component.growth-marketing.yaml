@@ -1,0 +1,21 @@
+component_definition:
+  id: component.growth-marketing
+  version: 1.0.0
+  status: active
+  name: Growth Marketing
+  type: shared-system
+  purpose: Own the growth marketing boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by growth marketing.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with growth marketing.
+  required_documents:
+    - docs/components/growth-marketing.md
+  default_domains:
+    - domain.growth-marketing-commercial
+  tags:
+    - commercial-specialist
+    - shared-system
+    - growth-marketing
+  positive_examples:
+    - A task changes or validates the project's growth marketing capability.
+  negative_examples:
+    - A task merely mentions growth marketing without changing or validating it.

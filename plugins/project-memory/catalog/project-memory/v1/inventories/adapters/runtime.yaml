@@ -1,0 +1,13 @@
+inventory:
+  id: inventory.adapters.runtime
+  version: 1.0.0
+  expected_count: 8
+  ids:
+    - adapter.flutter
+    - adapter.firebase
+    - adapter.unity
+    - adapter.react-nextjs
+    - adapter.ios
+    - adapter.android
+    - adapter.node-typescript
+    - adapter.python-data-ai

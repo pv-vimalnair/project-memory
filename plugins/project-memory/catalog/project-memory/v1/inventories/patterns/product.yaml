@@ -1,0 +1,21 @@
+inventory:
+  id: inventory.patterns.product
+  version: 1.0.0
+  expected_count: 16
+  ids:
+    - product.discovery.assess
+    - product.opportunity.assess
+    - product.requirements.plan
+    - product.prd.plan
+    - product.prd.change
+    - product.feature.design
+    - product.acceptance.validate
+    - product.roadmap.plan
+    - product.rule.change
+    - product.pricing.plan
+    - product.pricing.change
+    - product.experiment.plan
+    - product.launch.plan
+    - product.policy.change
+    - product.feature.retire
+    - product.root.retire

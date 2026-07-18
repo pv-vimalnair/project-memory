@@ -1,0 +1,64 @@
+{
+  "name": "small-service",
+  "case_number": 1,
+  "repository": "repos/small-service",
+  "root": {
+    "namespace": "small-service.app",
+    "kind": "product",
+    "primary_archetype": "application-service",
+    "blueprint_id": "service.managed",
+    "lifecycle": "active",
+    "display_name": "Small Managed Service",
+    "mission": "Operate one focused managed service with durable product memory."
+  },
+  "overlays": [
+    "overlay.commercial.managed-service",
+    "overlay.lifecycle.active",
+    "overlay.runtime.hosted"
+  ],
+  "components": [
+    "component.api",
+    "component.backend-service",
+    "component.ci-cd",
+    "component.configuration",
+    "component.content-design",
+    "component.datastore",
+    "component.growth-marketing",
+    "component.infrastructure",
+    "component.operations-workflow",
+    "component.product-management",
+    "component.product-strategy",
+    "component.release",
+    "component.stores-aso",
+    "component.ux",
+    "component.web-client"
+  ],
+  "domains": [
+    "domain.engineering-architecture",
+    "domain.governance-coordination",
+    "domain.growth-marketing-commercial",
+    "domain.product-strategy",
+    "domain.release-platform-operations",
+    "domain.ux-content-design"
+  ],
+  "adapters": {
+    "agent": [{ "id": "adapter.codex", "version": "1.0.0" }],
+    "runtime": [{ "id": "adapter.node-typescript", "version": "1.0.0" }],
+    "workflow": [{ "id": "adapter.github-ci", "version": "1.0.0" }]
+  },
+  "documents": [
+    {
+      "id": "document.service-boundary",
+      "relative_path": "docs/project-memory/source/SERVICE.md",
+      "title": "Service Boundary",
+      "purpose": "Define the accepted managed-service boundary.",
+      "sections": [
+        {
+          "heading": "Operating model",
+          "body": "The product root owns the service; campaigns and audits remain workstreams."
+        }
+      ]
+    }
+  ],
+  "relationship": null
+}

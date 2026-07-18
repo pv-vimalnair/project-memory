@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.operations.governance-compliance.positive
+  kind: blueprint-positive
+  description: Positive selection case for operations.governance-compliance.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.governance-compliance
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: operations.governance-compliance
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

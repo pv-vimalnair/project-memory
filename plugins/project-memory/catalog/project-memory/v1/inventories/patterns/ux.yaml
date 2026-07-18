@@ -1,0 +1,21 @@
+inventory:
+  id: inventory.patterns.ux
+  version: 1.0.0
+  expected_count: 16
+  ids:
+    - ux.research.assess
+    - ux.flow.assess
+    - ux.flow.design
+    - ux.information-architecture.design
+    - ux.interaction.design
+    - ux.visual.design
+    - ux.prototype.design
+    - ux.copy.design
+    - ux.accessibility.assess
+    - ux.accessibility.change
+    - ux.design-system.assess
+    - ux.design-system.change
+    - ux.responsive.validate
+    - ux.localization.validate
+    - ux.visual.validate
+    - ux.handoff.change

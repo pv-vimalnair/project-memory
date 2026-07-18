@@ -1,0 +1,21 @@
+component_definition:
+  id: component.ux
+  version: 1.0.0
+  status: active
+  name: Ux
+  type: shared-system
+  purpose: Own the ux boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by ux.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with ux.
+  required_documents:
+    - docs/components/ux.md
+  default_domains:
+    - domain.ux-content-design
+  tags:
+    - foundation-product
+    - shared-system
+    - ux
+  positive_examples:
+    - A task changes or validates the project's ux capability.
+  negative_examples:
+    - A task merely mentions ux without changing or validating it.

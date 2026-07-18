@@ -1,0 +1,102 @@
+schema_version: 1.0.0
+scenario_id: dinoescape-game-system
+root:
+  id: ROOT-01J00000000000000000000051
+  profile_lock_hash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  catalog_release: 1.0.0
+  catalog_hash: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  kind: product
+  primary_archetype: game-interactive
+  profile_id: profile.dinoescape
+  overlay_ids: [overlay.lifecycle.active]
+initiative_id: INIT-01J00000000000000000000051
+repository: dinoescape
+original_base_revision: 4123456789abcdef0123456789abcdef01234567
+integrator_id: agent.integrator
+worker_id: agent.codex-worker-1
+artifact_types: [code/runtime, game-design, telemetry-schema]
+artifact_refs: [profile.lock.yaml, docs/gameplay/game-system.md]
+feature_flags:
+  game.competitive: false
+  game.valuable-state: true
+components:
+  - instance_id: CMP-01J00000000000000000000051
+    definition_id: component.gameplay-system
+    type: service
+    tags: [data, engineering, game, game-system, qa]
+    dependency_rules: []
+    paths: [Assets/Scripts/GameSystem/**]
+outcomes:
+  - id: outcome.game-balance
+    statement: Assess Dino Escape game-system balance
+    mode: assess
+    family: game
+    object: balance
+    acceptance_criteria: [Balance risks and tuning evidence are recorded]
+    authority_class: automatic-by-rule
+    release_fate: none
+    can_complete_independently: true
+    depends_on: []
+    paths: [Assets/Scripts/GameSystem/**]
+    exclusions: []
+  - id: outcome.game-telemetry
+    statement: Implement telemetry for the Dino Escape game system
+    mode: implement
+    family: game
+    object: telemetry
+    acceptance_criteria: [Telemetry covers the accepted game-system events]
+    authority_class: automatic-by-rule
+    release_fate: planned
+    can_complete_independently: true
+    depends_on: []
+    paths: [Assets/Scripts/GameSystem/**]
+    exclusions: []
+  - id: outcome.game-playtest
+    statement: Validate the Dino Escape game system through playtesting
+    mode: validate
+    family: game
+    object: playtest
+    acceptance_criteria: [Playtest results are linked to the build]
+    authority_class: automatic-by-rule
+    release_fate: none
+    can_complete_independently: true
+    depends_on: [outcome.game-telemetry]
+    paths: [Assets/Scripts/GameSystem/**]
+    exclusions: []
+  - id: outcome.game-save-validation
+    statement: Validate Dino Escape save compatibility
+    mode: validate
+    family: game
+    object: save
+    acceptance_criteria: [Save migration and rollback behavior are verified]
+    authority_class: automatic-by-rule
+    release_fate: none
+    can_complete_independently: true
+    depends_on: [outcome.game-telemetry]
+    paths: [Assets/Scripts/GameSystem/**]
+    exclusions: []
+  - id: outcome.game-anti-cheat
+    statement: Assess anti-cheat only when competitive or valuable state exists
+    mode: assess
+    family: game
+    object: anti-cheat
+    acceptance_criteria: [Anti-cheat need and scope are evidence-backed]
+    authority_class: automatic-by-rule
+    release_fate: none
+    can_complete_independently: true
+    depends_on: [outcome.game-telemetry]
+    paths: [Assets/Scripts/GameSystem/**]
+    exclusions: []
+    enabled_when_any:
+      - feature: game.competitive
+        expected: true
+      - feature: game.valuable-state
+        expected: true
+approvals: []
+external_authorizations: {}
+accepted_decision_ids: [DEC-01J00000000000000000000051]
+proposed_decision_ids: []
+claim:
+  ttl_ms: 900000
+  heartbeat_interval: PT5M
+  renewal_policy: claim.same-scope-only

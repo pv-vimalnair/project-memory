@@ -1,0 +1,75 @@
+schema_version: 1.0.0
+scenario_id: external-campaign
+root:
+  id: ROOT-01J00000000000000000000041
+  profile_lock_hash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  catalog_release: 1.0.0
+  catalog_hash: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  kind: engagement
+  primary_archetype: brand-design
+  profile_id: profile.external-campaign
+  overlay_ids: [overlay.lifecycle.active]
+initiative_id: null
+repository: campaign-assets
+original_base_revision: 3123456789abcdef0123456789abcdef01234567
+integrator_id: agent.integrator
+worker_id: agent.codex-worker-1
+artifact_types: [campaign-config, creative]
+artifact_refs: [profile.lock.yaml, briefs/campaign.md]
+feature_flags:
+  release.production: true
+components:
+  - instance_id: CMP-01J00000000000000000000041
+    definition_id: component.campaign-assets
+    type: content
+    tags: [content, growth, release]
+    dependency_rules: []
+    paths: [campaign/external/**]
+outcomes:
+  - id: outcome.external-campaign-launch
+    statement: Release the approved external brand campaign
+    mode: release
+    family: growth
+    object: campaign
+    acceptance_criteria: [External launch is approved measured and reversible]
+    authority_class: integrator
+    release_fate: production
+    can_complete_independently: true
+    depends_on: []
+    paths: [campaign/external/**]
+    exclusions: [firebase/**, lib/**]
+approvals:
+  - id: APR-01J00000000000000000000041
+    kind: mutation
+    granted_by: Pitaji
+    issued_at: "2026-07-14T11:55:00.000Z"
+    expires_at: "2026-07-14T13:00:00.000Z"
+    target: outcome.external-campaign-launch
+    environment: production
+    scope: [campaign/external/**]
+    timing: once
+    invalidation_conditions: [scope-change, base-change]
+  - id: APR-01J00000000000000000000042
+    kind: external
+    granted_by: Pitaji
+    issued_at: "2026-07-14T11:55:00.000Z"
+    expires_at: "2026-07-14T13:00:00.000Z"
+    target: external-brand-campaign
+    environment: production
+    scope: [campaign/external/**]
+    timing: once
+    invalidation_conditions: [target-change, scope-change, timing-change]
+external_authorizations:
+  outcome.external-campaign-launch:
+    allowed: true
+    approval_ids: [APR-01J00000000000000000000042]
+    target: external-brand-campaign
+    environment: production
+    scope: [campaign/external/**]
+    timing: once
+accepted_decision_ids: [DEC-01J00000000000000000000041]
+proposed_decision_ids: []
+claim:
+  ttl_ms: 900000
+  heartbeat_interval: PT5M
+  renewal_policy: claim.same-scope-only

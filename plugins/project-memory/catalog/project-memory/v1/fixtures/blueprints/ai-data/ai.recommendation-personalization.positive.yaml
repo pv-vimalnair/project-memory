@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.ai.recommendation-personalization.positive
+  kind: blueprint-positive
+  description: Positive selection case for ai.recommendation-personalization.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.recommendation-personalization
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: ai.recommendation-personalization
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

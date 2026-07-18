@@ -1,0 +1,17 @@
+blueprint_group:
+  id: blueprint-group.operations-automation
+  version: 1.0.0
+  status: active
+  name: Operations Automation
+  purpose: Classify enduring operations automation roots before workstreams are planned.
+  primary_archetype: operations-automation
+  allowed_root_kinds:
+    - shared-system
+    - program
+  blueprint_ids:
+    - operations.sop-library
+    - operations.workflow-automation
+    - operations.support-service
+    - operations.marketing-growth
+    - operations.governance-compliance
+    - operations.business-process

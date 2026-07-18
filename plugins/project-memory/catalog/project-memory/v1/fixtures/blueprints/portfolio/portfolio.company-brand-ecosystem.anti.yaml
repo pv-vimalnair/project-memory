@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.portfolio.company-brand-ecosystem.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for portfolio.company-brand-ecosystem.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: portfolio.company-brand-ecosystem
+    product.exclusions:
+      - portfolio.company-brand-ecosystem
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - portfolio.company-brand-ecosystem
+    reason_codes:
+      - explicit-exclusion

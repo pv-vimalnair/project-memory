@@ -1,0 +1,42 @@
+domain_definition:
+  id: domain.finance-legal-partnerships
+  version: 1.0.0
+  status: active
+  name: Finance Legal Partnerships
+  purpose: Preserve authoritative finance legal partnerships context across workstreams and agents.
+  inclusion_boundary: Include decisions, records, risks, and evidence whose primary owner is finance legal partnerships.
+  exclusion_boundary: Exclude facts whose canonical owner is another permanent domain.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  default_components:
+    - component.billing
+    - component.settlement-reconciliation
+  required_records:
+    - decision-log
+    - worklog
+    - evidence
+  required_documents:
+    - docs/domains/finance-legal-partnerships.md
+  tags:
+    - permanent-domain
+    - finance-legal-partnerships
+  positive_examples:
+    - A durable finance legal partnerships decision must remain available after handoff.
+  negative_examples:
+    - A temporary scratch note with no accepted finance legal partnerships fact.

@@ -1,0 +1,19 @@
+inventory:
+  id: inventory.patterns.qa
+  version: 1.0.0
+  expected_count: 14
+  ids:
+    - qa.strategy.plan
+    - qa.unit.validate
+    - qa.integration.validate
+    - qa.e2e.validate
+    - qa.regression.validate
+    - qa.visual.validate
+    - qa.accessibility.validate
+    - qa.performance.assess
+    - qa.performance.change
+    - qa.reliability.assess
+    - qa.compatibility.validate
+    - qa.release.validate
+    - qa.defect.assess
+    - qa.test-automation.implement

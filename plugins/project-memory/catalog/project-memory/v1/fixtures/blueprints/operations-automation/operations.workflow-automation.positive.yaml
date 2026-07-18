@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.operations.workflow-automation.positive
+  kind: blueprint-positive
+  description: Positive selection case for operations.workflow-automation.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.workflow-automation
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: operations.workflow-automation
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

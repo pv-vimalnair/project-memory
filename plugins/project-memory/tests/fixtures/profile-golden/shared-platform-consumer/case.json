@@ -1,0 +1,73 @@
+{
+  "name": "shared-platform-consumer",
+  "case_number": 6,
+  "repository": "repos/platform-consumer",
+  "root": {
+    "namespace": "platform-consumer.app",
+    "kind": "product",
+    "primary_archetype": "application-service",
+    "blueprint_id": "application.public-web-service",
+    "lifecycle": "active",
+    "display_name": "Shared Platform Consumer",
+    "mission": "Own product usage and migration state while referencing provider truth."
+  },
+  "overlays": [
+    "overlay.lifecycle.active",
+    "overlay.surface.web"
+  ],
+  "components": [
+    "component.api",
+    "component.backend-service",
+    "component.configuration",
+    "component.content-design",
+    "component.datastore",
+    "component.operations-workflow",
+    "component.product-management",
+    "component.product-strategy",
+    "component.ux",
+    "component.web-client"
+  ],
+  "domains": [
+    "domain.engineering-architecture",
+    "domain.governance-coordination",
+    "domain.product-strategy",
+    "domain.ux-content-design"
+  ],
+  "adapters": {
+    "agent": [{ "id": "adapter.claude-code", "version": "1.0.0" }],
+    "runtime": [{ "id": "adapter.node-typescript", "version": "1.0.0" }],
+    "workflow": [{ "id": "adapter.github-ci", "version": "1.0.0" }]
+  },
+  "documents": [
+    {
+      "id": "document.platform-usage",
+      "relative_path": "docs/project-memory/source/PLATFORM_USAGE.md",
+      "title": "Shared Platform Usage",
+      "purpose": "Own consumer usage and migration state without copying interface bodies.",
+      "sections": [
+        {
+          "heading": "Usage",
+          "body": "The consumer records which local capability uses the provider reference."
+        },
+        {
+          "heading": "Migration",
+          "body": "The consumer owns its migration-required state and implementation work."
+        }
+      ]
+    }
+  ],
+  "relationship": {
+    "kind": "shared-platform-consumer",
+    "local_profile_lock_hash": "6666666666666666666666666666666666666666666666666666666666666666",
+    "provider": {
+      "case_number": 5,
+      "namespace": "platform.shared",
+      "canonical_repository": "repos/shared-platform",
+      "profile_lock_hash": "5555555555555555555555555555555555555555555555555555555555555555"
+    },
+    "interface_relative_path": "docs/project-memory/source/INTERFACES.md",
+    "interface_sha256": "5dbac9af9d4f1d43c39506997e3f75c3a0387e6062dbbdf72fde1b8ed8771af0",
+    "usage_component_definition_id": "component.backend-service",
+    "migration_state": "migration-required"
+  }
+}

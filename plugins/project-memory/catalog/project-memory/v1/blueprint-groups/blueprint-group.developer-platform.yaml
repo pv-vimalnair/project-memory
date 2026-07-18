@@ -1,0 +1,17 @@
+blueprint_group:
+  id: blueprint-group.developer-platform
+  version: 1.0.0
+  status: active
+  name: Developer Platform
+  purpose: Classify enduring developer platform roots before workstreams are planned.
+  primary_archetype: developer-platform
+  allowed_root_kinds:
+    - product
+    - shared-system
+  blueprint_ids:
+    - developer.api-product
+    - developer.sdk-library
+    - developer.cli-tool
+    - developer.shared-infrastructure
+    - developer.integration-ecosystem
+    - developer.open-source

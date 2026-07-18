@@ -1,0 +1,48 @@
+blueprint:
+  id: application.test
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.test
+  allowed_root_kinds:
+    - product
+  primary_archetype: application-service
+  purpose: Define a minimal mobile application profile fixture.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: application.test.root
+        feature: root.kind
+        operator: equals
+        expected: product
+        evidence_required: true
+    positive_signals:
+      - id: application.test.shape
+        feature: product.shape
+        operator: equals
+        expected: application.test
+        evidence_required: true
+        weight: 100
+    negative_signals: []
+    exclusions: []
+    max_positive_weight: 100
+    specificity_rank: 100
+    precedence: 100
+  overlays:
+    baked:
+      - overlay.surface.mobile
+    defaults: []
+    forbidden: []
+  default_components:
+    - component.mobile
+  default_domains:
+    - domain.product
+  adapter_slots:
+    - agent
+  required_documents:
+    - PROJECT.md
+  validation_gates:
+    - profile references valid
+  positive_examples:
+    - A durable mobile application root.
+  negative_examples:
+    - A temporary campaign inside another product.

@@ -1,0 +1,59 @@
+schema_version: 1.0.0
+scenario_id: lifeof-settings-ux
+root:
+  id: ROOT-01J00000000000000000000031
+  profile_lock_hash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  catalog_release: 1.0.0
+  catalog_hash: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  kind: product
+  primary_archetype: application-service
+  profile_id: profile.lifeof
+  overlay_ids: [overlay.lifecycle.active]
+initiative_id: INIT-01J00000000000000000000031
+repository: lifeof
+original_base_revision: 2123456789abcdef0123456789abcdef01234567
+integrator_id: agent.integrator
+worker_id: agent.codex-worker-1
+artifact_types: [design-spec, audit-report]
+artifact_refs: [profile.lock.yaml, docs/design/settings.md]
+feature_flags: {}
+components:
+  - instance_id: CMP-01J00000000000000000000031
+    definition_id: component.settings-surface
+    type: surface
+    tags: [qa, ux]
+    dependency_rules: []
+    paths: [lib/features/settings/**]
+outcomes:
+  - id: outcome.settings-audit
+    statement: Audit the current LifeOf settings flow
+    mode: assess
+    family: ux
+    object: flow
+    acceptance_criteria: [Usability findings are evidence-backed]
+    authority_class: automatic-by-rule
+    release_fate: none
+    can_complete_independently: true
+    depends_on: []
+    paths: [lib/features/settings/**]
+    exclusions: []
+  - id: outcome.settings-redesign
+    statement: Design the accepted settings flow improvements
+    mode: design
+    family: ux
+    object: flow
+    acceptance_criteria: [The redesign addresses accepted audit findings]
+    authority_class: integrator
+    release_fate: planned
+    can_complete_independently: true
+    depends_on: [outcome.settings-audit]
+    paths: [lib/features/settings/**]
+    exclusions: []
+approvals: []
+external_authorizations: {}
+accepted_decision_ids: [DEC-01J00000000000000000000031]
+proposed_decision_ids: []
+claim:
+  ttl_ms: 900000
+  heartbeat_interval: PT5M
+  renewal_policy: claim.same-scope-only

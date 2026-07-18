@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.research.experimental-program.positive
+  kind: blueprint-positive
+  description: Positive selection case for research.experimental-program.
+  normalized_features:
+    root.kind: program
+    product.shape: research.experimental-program
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: research.experimental-program
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

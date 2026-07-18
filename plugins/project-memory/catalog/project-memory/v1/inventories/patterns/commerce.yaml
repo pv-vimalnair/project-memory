@@ -1,0 +1,22 @@
+inventory:
+  id: inventory.patterns.commerce
+  version: 1.0.0
+  expected_count: 17
+  ids:
+    - commerce.catalog.change
+    - commerce.checkout.design
+    - commerce.checkout.implement
+    - commerce.payment.implement
+    - commerce.entitlement.implement
+    - commerce.entitlement.validate
+    - commerce.pricing.change
+    - commerce.order.implement
+    - commerce.booking.implement
+    - commerce.settlement.validate
+    - commerce.reconciliation.validate
+    - commerce.fraud.assess
+    - commerce.dispute.operate
+    - commerce.refund.operate
+    - commerce.tax.assess
+    - commerce.policy.validate
+    - commerce.marketplace.validate

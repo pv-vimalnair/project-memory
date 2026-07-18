@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.content.media-library.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for content.media-library.
+  normalized_features:
+    root.kind: product
+    product.shape: content.media-library
+    product.exclusions:
+      - content.media-library
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - content.media-library
+    reason_codes:
+      - explicit-exclusion

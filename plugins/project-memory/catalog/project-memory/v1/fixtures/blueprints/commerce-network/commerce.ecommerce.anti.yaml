@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.commerce.ecommerce.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for commerce.ecommerce.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.ecommerce
+    product.exclusions:
+      - commerce.ecommerce
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - commerce.ecommerce
+    reason_codes:
+      - explicit-exclusion

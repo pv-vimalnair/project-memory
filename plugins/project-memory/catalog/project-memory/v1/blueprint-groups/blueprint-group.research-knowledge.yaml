@@ -1,0 +1,17 @@
+blueprint_group:
+  id: blueprint-group.research-knowledge
+  version: 1.0.0
+  status: active
+  name: Research Knowledge
+  purpose: Classify enduring research knowledge roots before workstreams are planned.
+  primary_archetype: research-knowledge
+  allowed_root_kinds:
+    - program
+    - shared-system
+  blueprint_ids:
+    - research.ongoing-program
+    - research.evidence-corpus
+    - research.market-intelligence
+    - research.policy-standards
+    - research.experimental-program
+    - knowledge.organizational-base

@@ -1,0 +1,21 @@
+component_definition:
+  id: component.reliability
+  version: 1.0.0
+  status: active
+  name: Reliability
+  type: shared-system
+  purpose: Own the reliability boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by reliability.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with reliability.
+  required_documents:
+    - docs/components/reliability.md
+  default_domains:
+    - domain.qa-reliability-performance
+  tags:
+    - assurance-platform
+    - shared-system
+    - reliability
+  positive_examples:
+    - A task changes or validates the project's reliability capability.
+  negative_examples:
+    - A task merely mentions reliability without changing or validating it.

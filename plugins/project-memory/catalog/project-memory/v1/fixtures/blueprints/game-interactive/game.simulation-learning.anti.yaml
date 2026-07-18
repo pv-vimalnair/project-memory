@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.game.simulation-learning.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for game.simulation-learning.
+  normalized_features:
+    root.kind: product
+    product.shape: game.simulation-learning
+    product.exclusions:
+      - game.simulation-learning
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - game.simulation-learning
+    reason_codes:
+      - explicit-exclusion

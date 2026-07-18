@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.game.xr-immersive.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for game.xr-immersive.
+  normalized_features:
+    root.kind: product
+    product.shape: game.xr-immersive
+    product.exclusions:
+      - game.xr-immersive
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - game.xr-immersive
+    reason_codes:
+      - explicit-exclusion

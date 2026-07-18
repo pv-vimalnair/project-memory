@@ -1,0 +1,21 @@
+component_definition:
+  id: component.performance
+  version: 1.0.0
+  status: active
+  name: Performance
+  type: shared-system
+  purpose: Own the performance boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by performance.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with performance.
+  required_documents:
+    - docs/components/performance.md
+  default_domains:
+    - domain.qa-reliability-performance
+  tags:
+    - assurance-platform
+    - shared-system
+    - performance
+  positive_examples:
+    - A task changes or validates the project's performance capability.
+  negative_examples:
+    - A task merely mentions performance without changing or validating it.

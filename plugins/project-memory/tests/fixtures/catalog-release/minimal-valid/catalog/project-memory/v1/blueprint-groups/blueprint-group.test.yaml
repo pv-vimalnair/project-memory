@@ -1,0 +1,11 @@
+blueprint_group:
+  id: blueprint-group.test
+  version: 1.0.0
+  status: active
+  name: Test Applications
+  purpose: Exercise the profile compiler catalog boundary.
+  primary_archetype: application-service
+  allowed_root_kinds:
+    - product
+  blueprint_ids:
+    - application.test

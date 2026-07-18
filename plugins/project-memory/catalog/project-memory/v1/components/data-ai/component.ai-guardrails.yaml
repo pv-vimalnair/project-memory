@@ -1,0 +1,21 @@
+component_definition:
+  id: component.ai-guardrails
+  version: 1.0.0
+  status: active
+  name: Ai Guardrails
+  type: shared-system
+  purpose: Own the ai guardrails boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by ai guardrails.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with ai guardrails.
+  required_documents:
+    - docs/components/ai-guardrails.md
+  default_domains:
+    - domain.data-analytics-ai
+  tags:
+    - data-ai
+    - shared-system
+    - ai-guardrails
+  positive_examples:
+    - A task changes or validates the project's ai guardrails capability.
+  negative_examples:
+    - A task merely mentions ai guardrails without changing or validating it.

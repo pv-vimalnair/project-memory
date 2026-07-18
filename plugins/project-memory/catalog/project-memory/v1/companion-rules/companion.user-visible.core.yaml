@@ -1,0 +1,28 @@
+id: companion.user-visible
+version: 1.0.0
+status: active
+purpose: Narrow user visible work by adding mandatory validation and evidence without expanding authority.
+when:
+  all:
+    - id: companion.user-visible.when
+      feature: impact.user-visible
+      operator: equals
+      expected: true
+      evidence_required: true
+  any: []
+  none: []
+require_patterns:
+  - id: ux.visual.validate
+    version_range: 1.0.0
+    condition: true
+  - id: content.review.validate
+    version_range: 1.0.0
+    condition: true
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validated user visible evidence
+  - linked source references
+authority_effect: narrow-only
+conflict_policy: fail_closed

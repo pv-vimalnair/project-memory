@@ -1,0 +1,61 @@
+{
+  "name": "dino-escape",
+  "case_number": 3,
+  "repository": "repos/dino-escape",
+  "root": {
+    "namespace": "dino-escape.game",
+    "kind": "product",
+    "primary_archetype": "game-interactive",
+    "blueprint_id": "game.premium-single-player",
+    "lifecycle": "active",
+    "display_name": "Dino Escape",
+    "mission": "Deliver a focused premium single-player dinosaur escape game."
+  },
+  "overlays": [
+    "overlay.audience.consumer",
+    "overlay.lifecycle.active"
+  ],
+  "components": [
+    "component.api",
+    "component.backend-service",
+    "component.configuration",
+    "component.datastore",
+    "component.game-art",
+    "component.game-audio",
+    "component.game-design",
+    "component.game-runtime",
+    "component.operations-workflow",
+    "component.performance",
+    "component.product-management",
+    "component.product-strategy",
+    "component.qa",
+    "component.reliability"
+  ],
+  "domains": [
+    "domain.engineering-architecture",
+    "domain.game-design-art-audio-live-operations",
+    "domain.governance-coordination",
+    "domain.product-strategy",
+    "domain.qa-reliability-performance"
+  ],
+  "adapters": {
+    "agent": [{ "id": "adapter.codex", "version": "1.0.0" }],
+    "runtime": [{ "id": "adapter.unity", "version": "1.0.0" }],
+    "workflow": [{ "id": "adapter.github-ci", "version": "1.0.0" }]
+  },
+  "documents": [
+    {
+      "id": "document.game-design",
+      "relative_path": "docs/project-memory/source/GAME_DESIGN.md",
+      "title": "Dino Escape Game Design",
+      "purpose": "Capture the accepted single-player game boundary.",
+      "sections": [
+        {
+          "heading": "Experience",
+          "body": "The durable root owns design, runtime, art, audio, quality, and release decisions."
+        }
+      ]
+    }
+  ],
+  "relationship": null
+}

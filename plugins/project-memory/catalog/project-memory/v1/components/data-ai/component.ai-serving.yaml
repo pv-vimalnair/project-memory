@@ -1,0 +1,21 @@
+component_definition:
+  id: component.ai-serving
+  version: 1.0.0
+  status: active
+  name: Ai Serving
+  type: platform
+  purpose: Own the ai serving boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by ai serving.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with ai serving.
+  required_documents:
+    - docs/components/ai-serving.md
+  default_domains:
+    - domain.data-analytics-ai
+  tags:
+    - data-ai
+    - platform
+    - ai-serving
+  positive_examples:
+    - A task changes or validates the project's ai serving capability.
+  negative_examples:
+    - A task merely mentions ai serving without changing or validating it.

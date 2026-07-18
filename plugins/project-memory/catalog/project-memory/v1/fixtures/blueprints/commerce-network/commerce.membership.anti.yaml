@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.commerce.membership.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for commerce.membership.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.membership
+    product.exclusions:
+      - commerce.membership
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - commerce.membership
+    reason_codes:
+      - explicit-exclusion

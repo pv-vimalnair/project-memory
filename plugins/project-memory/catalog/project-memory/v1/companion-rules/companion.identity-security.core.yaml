@@ -1,0 +1,28 @@
+id: companion.identity-security
+version: 1.0.0
+status: active
+purpose: Narrow identity security work by adding mandatory validation and evidence without expanding authority.
+when:
+  all:
+    - id: companion.identity-security.when
+      feature: project.tags
+      operator: tag_present
+      expected: identity
+      evidence_required: true
+  any: []
+  none: []
+require_patterns:
+  - id: security.auth.assess
+    version_range: 1.0.0
+    condition: true
+  - id: security.finding.validate
+    version_range: 1.0.0
+    condition: true
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validated identity security evidence
+  - linked source references
+authority_effect: narrow-only
+conflict_policy: fail_closed

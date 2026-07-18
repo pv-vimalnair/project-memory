@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.research.evidence-corpus.positive
+  kind: blueprint-positive
+  description: Positive selection case for research.evidence-corpus.
+  normalized_features:
+    root.kind: program
+    product.shape: research.evidence-corpus
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: research.evidence-corpus
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

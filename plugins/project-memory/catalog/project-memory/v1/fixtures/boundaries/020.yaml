@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-020
+  kind: blueprint-boundary
+  description: Boundary case selecting learning.course-curriculum over content.documentation-portal.
+  normalized_features:
+    root.kind: product
+    product.shape: learning.course-curriculum
+    product.exclusions:
+      - content.documentation-portal
+  expected:
+    decision: selected
+    blueprint_id: learning.course-curriculum
+    prohibited_blueprint_ids:
+      - content.documentation-portal
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

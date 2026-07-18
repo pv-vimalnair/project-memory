@@ -1,0 +1,44 @@
+domain_definition:
+  id: domain.game-design-art-audio-live-operations
+  version: 1.0.0
+  status: active
+  name: Game Design Art Audio Live Operations
+  purpose: Preserve authoritative game design art audio live operations context across workstreams and agents.
+  inclusion_boundary: Include decisions, records, risks, and evidence whose primary owner is game design art audio live operations.
+  exclusion_boundary: Exclude facts whose canonical owner is another permanent domain.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  default_components:
+    - component.game-design
+    - component.game-runtime
+    - component.game-art
+    - component.game-audio
+  required_records:
+    - decision-log
+    - worklog
+    - evidence
+  required_documents:
+    - docs/domains/game-design-art-audio-live-operations.md
+  tags:
+    - permanent-domain
+    - game-design-art-audio-live-operations
+  positive_examples:
+    - A durable game design art audio live operations decision must remain available after handoff.
+  negative_examples:
+    - A temporary scratch note with no accepted game design art audio live operations fact.

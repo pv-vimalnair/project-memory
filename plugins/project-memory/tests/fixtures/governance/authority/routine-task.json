@@ -1,0 +1,10 @@
+{
+  "actor_authority": "worker",
+  "minimum_authority": "worker",
+  "actual_changed_paths": [
+    "lib/features/referral/referral_service.dart"
+  ],
+  "deleted_paths": [],
+  "directional_acceptance": null,
+  "external_action": null
+}

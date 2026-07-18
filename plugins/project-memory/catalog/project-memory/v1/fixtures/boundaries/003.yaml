@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-003
+  kind: blueprint-boundary
+  description: Boundary case selecting application.b2b-saas over application.internal-business.
+  normalized_features:
+    root.kind: product
+    product.shape: application.b2b-saas
+    product.exclusions:
+      - application.internal-business
+  expected:
+    decision: selected
+    blueprint_id: application.b2b-saas
+    prohibited_blueprint_ids:
+      - application.internal-business
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

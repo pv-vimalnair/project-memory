@@ -1,0 +1,21 @@
+component_definition:
+  id: component.api
+  version: 1.0.0
+  status: active
+  name: Api
+  type: service
+  purpose: Own the api boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by api.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with api.
+  required_documents:
+    - docs/components/api.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - service
+    - api
+  positive_examples:
+    - A task changes or validates the project's api capability.
+  negative_examples:
+    - A task merely mentions api without changing or validating it.

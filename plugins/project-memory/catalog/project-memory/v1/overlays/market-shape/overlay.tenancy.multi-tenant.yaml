@@ -1,0 +1,47 @@
+overlay_definition:
+  id: overlay.tenancy.multi-tenant
+  version: 1.0.0
+  status: active
+  name: Tenancy Multi Tenant
+  category: tenancy
+  purpose: Apply the tenancy multi tenant trait without changing the enduring project root.
+  inclusion_boundary: Include constraints and defaults caused specifically by the tenancy multi tenant trait.
+  exclusion_boundary: Do not use this overlay as a substitute for a blueprint, component, or temporary workstream.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  requires_overlays: []
+  conflicts_with:
+    - overlay.tenancy.single-tenant
+  default_components:
+    - component.identity
+  default_domains:
+    - domain.engineering-architecture
+  required_documents:
+    - docs/overlays/tenancy-multi-tenant.md
+  required_records:
+    - profile-lock
+    - decision-log
+  tags:
+    - market-shape
+    - tenancy
+    - multi-tenant
+  positive_examples:
+    - The project explicitly operates with the tenancy multi tenant trait.
+  negative_examples:
+    - A one-off task resembles tenancy multi tenant but does not change the project trait.

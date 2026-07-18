@@ -1,0 +1,10 @@
+inventory:
+  id: inventory.blueprints.portfolio
+  version: 1.0.0
+  expected_count: 5
+  ids:
+    - portfolio.product-family
+    - portfolio.company-brand-ecosystem
+    - portfolio.shared-platform
+    - portfolio.franchise-white-label
+    - program.organization-capability

@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.content.podcast-video-channel.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for content.podcast-video-channel.
+  normalized_features:
+    root.kind: product
+    product.shape: content.podcast-video-channel
+    product.exclusions:
+      - content.podcast-video-channel
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - content.podcast-video-channel
+    reason_codes:
+      - explicit-exclusion

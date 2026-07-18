@@ -1,0 +1,28 @@
+id: companion.commerce
+version: 1.0.0
+status: active
+purpose: Narrow commerce work by adding mandatory validation and evidence without expanding authority.
+when:
+  all:
+    - id: companion.commerce.when
+      feature: project.tags
+      operator: tag_present
+      expected: commerce
+      evidence_required: true
+  any: []
+  none: []
+require_patterns:
+  - id: commerce.policy.validate
+    version_range: 1.0.0
+    condition: true
+  - id: qa.integration.validate
+    version_range: 1.0.0
+    condition: true
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validated commerce evidence
+  - linked source references
+authority_effect: narrow-only
+conflict_policy: fail_closed

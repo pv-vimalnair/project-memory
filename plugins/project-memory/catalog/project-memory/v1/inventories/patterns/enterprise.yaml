@@ -1,0 +1,21 @@
+inventory:
+  id: inventory.patterns.enterprise
+  version: 1.0.0
+  expected_count: 16
+  ids:
+    - enterprise.requirement.plan
+    - enterprise.integration.design
+    - enterprise.integration.implement
+    - enterprise.identity.change
+    - enterprise.rbac.design
+    - enterprise.rbac.implement
+    - enterprise.audit.validate
+    - enterprise.compliance.validate
+    - enterprise.migration.plan
+    - enterprise.migration.implement
+    - enterprise.rollout.plan
+    - enterprise.training.implement
+    - enterprise.change-management.operate
+    - enterprise.sla.validate
+    - enterprise.procurement.assess
+    - enterprise.tenancy.design

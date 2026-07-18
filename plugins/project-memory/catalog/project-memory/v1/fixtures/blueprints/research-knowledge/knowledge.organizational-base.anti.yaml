@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.knowledge.organizational-base.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for knowledge.organizational-base.
+  normalized_features:
+    root.kind: program
+    product.shape: knowledge.organizational-base
+    product.exclusions:
+      - knowledge.organizational-base
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - knowledge.organizational-base
+    reason_codes:
+      - explicit-exclusion

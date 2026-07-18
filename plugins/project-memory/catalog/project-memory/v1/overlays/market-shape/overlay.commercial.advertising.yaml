@@ -1,0 +1,46 @@
+overlay_definition:
+  id: overlay.commercial.advertising
+  version: 1.0.0
+  status: active
+  name: Commercial Advertising
+  category: commercial
+  purpose: Apply the commercial advertising trait without changing the enduring project root.
+  inclusion_boundary: Include constraints and defaults caused specifically by the commercial advertising trait.
+  exclusion_boundary: Do not use this overlay as a substitute for a blueprint, component, or temporary workstream.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  requires_overlays: []
+  conflicts_with: []
+  default_components:
+    - component.growth-marketing
+  default_domains:
+    - domain.growth-marketing-commercial
+  required_documents:
+    - docs/overlays/commercial-advertising.md
+  required_records:
+    - profile-lock
+    - decision-log
+  tags:
+    - market-shape
+    - commercial
+    - advertising
+  positive_examples:
+    - The project explicitly operates with the commercial advertising trait.
+  negative_examples:
+    - A one-off task resembles commercial advertising but does not change the project trait.

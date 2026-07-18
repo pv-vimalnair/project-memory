@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.game.multiplayer-networked.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for game.multiplayer-networked.
+  normalized_features:
+    root.kind: product
+    product.shape: game.multiplayer-networked
+    product.exclusions:
+      - game.multiplayer-networked
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - game.multiplayer-networked
+    reason_codes:
+      - explicit-exclusion

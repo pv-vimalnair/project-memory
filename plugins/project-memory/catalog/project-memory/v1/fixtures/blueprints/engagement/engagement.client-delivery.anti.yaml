@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.engagement.client-delivery.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for engagement.client-delivery.
+  normalized_features:
+    root.kind: engagement
+    product.shape: engagement.client-delivery
+    product.exclusions:
+      - engagement.client-delivery
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - engagement.client-delivery
+    reason_codes:
+      - explicit-exclusion

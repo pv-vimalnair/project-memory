@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.portfolio.franchise-white-label.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for portfolio.franchise-white-label.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: portfolio.franchise-white-label
+    product.exclusions:
+      - portfolio.franchise-white-label
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - portfolio.franchise-white-label
+    reason_codes:
+      - explicit-exclusion

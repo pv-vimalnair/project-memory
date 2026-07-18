@@ -1,0 +1,21 @@
+component_definition:
+  id: component.identity
+  version: 1.0.0
+  status: active
+  name: Identity
+  type: service
+  purpose: Own the identity boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by identity.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with identity.
+  required_documents:
+    - docs/components/identity.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - service
+    - identity
+  positive_examples:
+    - A task changes or validates the project's identity capability.
+  negative_examples:
+    - A task merely mentions identity without changing or validating it.

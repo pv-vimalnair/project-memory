@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.operations.sop-library.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for operations.sop-library.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.sop-library
+    product.exclusions:
+      - operations.sop-library
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - operations.sop-library
+    reason_codes:
+      - explicit-exclusion

@@ -1,0 +1,16 @@
+blueprint_group:
+  id: blueprint-group.commerce-network
+  version: 1.0.0
+  status: active
+  name: Commerce Network
+  purpose: Classify enduring commerce network roots before workstreams are planned.
+  primary_archetype: commerce-network
+  allowed_root_kinds:
+    - product
+  blueprint_ids:
+    - commerce.ecommerce
+    - commerce.two-sided-marketplace
+    - commerce.booking-reservation
+    - network.community-social
+    - commerce.membership
+    - network.multi-party-transaction

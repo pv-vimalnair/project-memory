@@ -1,0 +1,1 @@
+{"blueprint_group":{"id":"blueprint-group.application-service","version":"1.0.0","status":"active","name":"Application service","purpose":"Exercise reference validation.","primary_archetype":"application-service","allowed_root_kinds":["product"],"blueprint_ids":["application.consumer-mobile"]}}

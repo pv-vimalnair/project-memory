@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.developer.api-product.positive
+  kind: blueprint-positive
+  description: Positive selection case for developer.api-product.
+  normalized_features:
+    root.kind: product
+    product.shape: developer.api-product
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: developer.api-product
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

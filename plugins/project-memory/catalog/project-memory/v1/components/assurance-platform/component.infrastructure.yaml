@@ -1,0 +1,21 @@
+component_definition:
+  id: component.infrastructure
+  version: 1.0.0
+  status: active
+  name: Infrastructure
+  type: platform
+  purpose: Own the infrastructure boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by infrastructure.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with infrastructure.
+  required_documents:
+    - docs/components/infrastructure.md
+  default_domains:
+    - domain.release-platform-operations
+  tags:
+    - assurance-platform
+    - platform
+    - infrastructure
+  positive_examples:
+    - A task changes or validates the project's infrastructure capability.
+  negative_examples:
+    - A task merely mentions infrastructure without changing or validating it.

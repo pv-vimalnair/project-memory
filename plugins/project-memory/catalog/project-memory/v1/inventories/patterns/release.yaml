@@ -1,0 +1,19 @@
+inventory:
+  id: inventory.patterns.release
+  version: 1.0.0
+  expected_count: 14
+  ids:
+    - release.readiness.validate
+    - release.execution.plan
+    - release.build.validate
+    - release.migration.validate
+    - release.rollback.plan
+    - release.notes.change
+    - release.deployment.release
+    - release.store.release
+    - release.feature-flag.operate
+    - release.monitor.operate
+    - release.communication.release
+    - release.hotfix.release
+    - release.postrelease.assess
+    - release.asset.retire

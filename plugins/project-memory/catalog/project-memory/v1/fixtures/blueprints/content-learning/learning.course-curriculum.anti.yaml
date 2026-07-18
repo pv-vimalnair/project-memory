@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.learning.course-curriculum.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for learning.course-curriculum.
+  normalized_features:
+    root.kind: product
+    product.shape: learning.course-curriculum
+    product.exclusions:
+      - learning.course-curriculum
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - learning.course-curriculum
+    reason_codes:
+      - explicit-exclusion

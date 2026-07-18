@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.operations.support-service.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for operations.support-service.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.support-service
+    product.exclusions:
+      - operations.support-service
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - operations.support-service
+    reason_codes:
+      - explicit-exclusion

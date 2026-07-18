@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "root": {
+    "id": "ROOT-01J00000000000000000000000",
+    "namespace": "lifeof.app",
+    "kind": "product",
+    "primary_archetype": "application-service",
+    "blueprint": { "id": "application.consumer-mobile", "version": "1.0.0" },
+    "lifecycle": "production"
+  },
+  "overlays": ["overlay.surface.mobile"],
+  "components": [{
+    "instance_id": "CMP-01J00000000000000000000000",
+    "definition": { "id": "component.mobile-client", "version": "1.0.0" },
+    "slug": "mobile-client",
+    "source_revision": 1
+  }],
+  "domains": [{
+    "instance_id": "DOM-01J00000000000000000000000",
+    "definition": { "id": "domain.product-strategy", "version": "1.0.0" },
+    "slug": "product-strategy",
+    "source_revision": 1
+  }],
+  "adapters": {
+    "agent": [{ "id": "adapter.codex", "version": "1.0.0" }],
+    "runtime": [],
+    "workflow": []
+  },
+  "catalog": {
+    "release": "1.0.0",
+    "catalog_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "acceptance": {
+    "approval_id": "APR-01J00000000000000000000000",
+    "accepted_by": "Pitaji",
+    "accepted_at": "2026-07-15T03:45:00.000Z"
+  }
+}

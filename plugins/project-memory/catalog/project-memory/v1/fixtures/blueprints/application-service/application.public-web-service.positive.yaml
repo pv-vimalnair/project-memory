@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.application.public-web-service.positive
+  kind: blueprint-positive
+  description: Positive selection case for application.public-web-service.
+  normalized_features:
+    root.kind: product
+    product.shape: application.public-web-service
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: application.public-web-service
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

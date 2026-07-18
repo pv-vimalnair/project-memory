@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.engagement.client-delivery.positive
+  kind: blueprint-positive
+  description: Positive selection case for engagement.client-delivery.
+  normalized_features:
+    root.kind: engagement
+    product.shape: engagement.client-delivery
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: engagement.client-delivery
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

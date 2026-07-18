@@ -1,0 +1,46 @@
+overlay_definition:
+  id: overlay.capability.payments
+  version: 1.0.0
+  status: active
+  name: Capability Payments
+  category: capability
+  purpose: Apply the capability payments trait without changing the enduring project root.
+  inclusion_boundary: Include constraints and defaults caused specifically by the capability payments trait.
+  exclusion_boundary: Do not use this overlay as a substitute for a blueprint, component, or temporary workstream.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  requires_overlays: []
+  conflicts_with: []
+  default_components:
+    - component.payments
+  default_domains:
+    - domain.growth-marketing-commercial
+  required_documents:
+    - docs/overlays/capability-payments.md
+  required_records:
+    - profile-lock
+    - decision-log
+  tags:
+    - operating-shape
+    - capability
+    - payments
+  positive_examples:
+    - The project explicitly operates with the capability payments trait.
+  negative_examples:
+    - A one-off task resembles capability payments but does not change the project trait.

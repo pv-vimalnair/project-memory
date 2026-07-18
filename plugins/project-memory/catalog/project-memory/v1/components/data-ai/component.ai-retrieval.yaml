@@ -1,0 +1,21 @@
+component_definition:
+  id: component.ai-retrieval
+  version: 1.0.0
+  status: active
+  name: Ai Retrieval
+  type: data
+  purpose: Own the ai retrieval boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by ai retrieval.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with ai retrieval.
+  required_documents:
+    - docs/components/ai-retrieval.md
+  default_domains:
+    - domain.data-analytics-ai
+  tags:
+    - data-ai
+    - data
+    - ai-retrieval
+  positive_examples:
+    - A task changes or validates the project's ai retrieval capability.
+  negative_examples:
+    - A task merely mentions ai retrieval without changing or validating it.

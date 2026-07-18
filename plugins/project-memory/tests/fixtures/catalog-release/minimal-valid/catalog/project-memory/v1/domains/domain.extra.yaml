@@ -1,0 +1,23 @@
+domain_definition:
+  id: domain.extra
+  version: 1.0.0
+  status: active
+  name: Extra Domain
+  purpose: Prove transitive definitions are not silently omitted.
+  inclusion_boundary: Include the fixture extra dependency.
+  exclusion_boundary: Exclude unrelated fixture data.
+  compatible_root_kinds:
+    - product
+  compatible_archetypes:
+    - application-service
+  default_components: []
+  required_records:
+    - evidence
+  required_documents:
+    - docs/domains/extra.md
+  tags:
+    - fixture
+  positive_examples:
+    - A selected component requires the extra domain.
+  negative_examples:
+    - Nothing references the extra domain.

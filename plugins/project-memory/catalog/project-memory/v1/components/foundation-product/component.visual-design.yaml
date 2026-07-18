@@ -1,0 +1,21 @@
+component_definition:
+  id: component.visual-design
+  version: 1.0.0
+  status: active
+  name: Visual Design
+  type: content
+  purpose: Own the visual design boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by visual design.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with visual design.
+  required_documents:
+    - docs/components/visual-design.md
+  default_domains:
+    - domain.visual-brand-design-systems
+  tags:
+    - foundation-product
+    - content
+    - visual-design
+  positive_examples:
+    - A task changes or validates the project's visual design capability.
+  negative_examples:
+    - A task merely mentions visual design without changing or validating it.

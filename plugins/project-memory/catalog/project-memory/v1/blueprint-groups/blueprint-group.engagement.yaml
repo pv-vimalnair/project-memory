@@ -1,0 +1,13 @@
+blueprint_group:
+  id: blueprint-group.engagement
+  version: 1.0.0
+  status: active
+  name: Engagement
+  purpose: Classify enduring engagement roots before workstreams are planned.
+  primary_archetype: engagement
+  allowed_root_kinds:
+    - engagement
+  blueprint_ids:
+    - engagement.client-delivery
+    - engagement.standalone-internal
+    - engagement.one-off-deliverable

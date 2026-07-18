@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.operations.governance-compliance.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for operations.governance-compliance.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.governance-compliance
+    product.exclusions:
+      - operations.governance-compliance
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - operations.governance-compliance
+    reason_codes:
+      - explicit-exclusion

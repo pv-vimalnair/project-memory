@@ -1,0 +1,21 @@
+component_definition:
+  id: component.stores-aso
+  version: 1.0.0
+  status: active
+  name: Stores Aso
+  type: shared-system
+  purpose: Own the stores aso boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by stores aso.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with stores aso.
+  required_documents:
+    - docs/components/stores-aso.md
+  default_domains:
+    - domain.growth-marketing-commercial
+  tags:
+    - commercial-specialist
+    - shared-system
+    - stores-aso
+  positive_examples:
+    - A task changes or validates the project's stores aso capability.
+  negative_examples:
+    - A task merely mentions stores aso without changing or validating it.

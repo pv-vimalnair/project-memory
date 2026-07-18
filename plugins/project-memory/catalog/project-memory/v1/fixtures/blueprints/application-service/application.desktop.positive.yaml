@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.application.desktop.positive
+  kind: blueprint-positive
+  description: Positive selection case for application.desktop.
+  normalized_features:
+    root.kind: product
+    product.shape: application.desktop
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: application.desktop
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

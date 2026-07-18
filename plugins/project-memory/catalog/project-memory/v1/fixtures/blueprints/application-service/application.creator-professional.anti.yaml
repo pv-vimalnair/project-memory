@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.application.creator-professional.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for application.creator-professional.
+  normalized_features:
+    root.kind: product
+    product.shape: application.creator-professional
+    product.exclusions:
+      - application.creator-professional
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - application.creator-professional
+    reason_codes:
+      - explicit-exclusion

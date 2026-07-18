@@ -1,0 +1,21 @@
+component_definition:
+  id: component.knowledge-base
+  version: 1.0.0
+  status: active
+  name: Knowledge Base
+  type: content
+  purpose: Own the knowledge base boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by knowledge base.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with knowledge base.
+  required_documents:
+    - docs/components/knowledge-base.md
+  default_domains:
+    - domain.research-insight
+  tags:
+    - commercial-specialist
+    - content
+    - knowledge-base
+  positive_examples:
+    - A task changes or validates the project's knowledge base capability.
+  negative_examples:
+    - A task merely mentions knowledge base without changing or validating it.

@@ -1,0 +1,27 @@
+inventory:
+  id: inventory.patterns.engineering
+  version: 1.0.0
+  expected_count: 22
+  ids:
+    - engineering.feature.design
+    - engineering.feature.implement
+    - engineering.bug.implement
+    - engineering.refactor.implement
+    - engineering.repository.change
+    - engineering.architecture.design
+    - engineering.architecture.change
+    - engineering.code.retire
+    - engineering.api.design
+    - engineering.api.change
+    - engineering.schema.design
+    - engineering.schema.change
+    - engineering.migration.plan
+    - engineering.migration.implement
+    - engineering.migration.validate
+    - engineering.integration.implement
+    - engineering.dependency.change
+    - engineering.platform.change
+    - engineering.configuration.change
+    - engineering.feature-flag.operate
+    - engineering.build-tool.change
+    - engineering.automation.implement

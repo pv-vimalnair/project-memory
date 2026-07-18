@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.ai.data-platform.positive
+  kind: blueprint-positive
+  description: Positive selection case for ai.data-platform.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.data-platform
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: ai.data-platform
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

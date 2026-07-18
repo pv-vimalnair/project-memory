@@ -1,0 +1,70 @@
+adapter_definition:
+  id: adapter.maestro
+  version: 1.0.0
+  status: active
+  name: Maestro
+  kind: workflow
+  purpose: Translate canonical Project Memory context for Maestro without duplicating source-of-truth facts.
+  inclusion_boundary: Include detection, commands, gates, conventions, and handoff fields specific to Maestro.
+  exclusion_boundary: Exclude canonical product decisions and records that belong in Project Memory itself.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  detection_signals:
+    - maestro flows
+    - .maestro directory
+  relevant_files:
+    - .maestro
+    - README.md
+  repository_conventions:
+    - Read canonical Project Memory before work
+    - Write only within an accepted task scope
+  supported_commands:
+    - inspect project context
+    - validate task evidence
+    - prepare a completion packet
+  validation_gates:
+    - adapter inputs resolve
+    - canonical records are not duplicated
+    - handoff is evidence linked
+  default_components:
+    - component.operations-workflow
+  default_domains:
+    - domain.governance-coordination
+  required_documents:
+    - docs/adapters/maestro.md
+  required_records:
+    - worklog
+    - evidence
+    - handoff
+  risks:
+    - stale generated adapter view
+    - tool-specific text diverges from canonical memory
+  handoff_fields:
+    - task identifier
+    - base revision
+    - scope
+    - evidence
+    - remaining risks
+  tags:
+    - workflow
+    - maestro
+  positive_examples:
+    - The repository contains verified Maestro signals and the task uses that tool.
+  negative_examples:
+    - The task mentions Maestro but the repository has no matching runtime or workflow.

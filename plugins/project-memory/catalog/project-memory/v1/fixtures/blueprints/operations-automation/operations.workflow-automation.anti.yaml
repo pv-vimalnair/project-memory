@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.operations.workflow-automation.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for operations.workflow-automation.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.workflow-automation
+    product.exclusions:
+      - operations.workflow-automation
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - operations.workflow-automation
+    reason_codes:
+      - explicit-exclusion

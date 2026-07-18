@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.ai.model-service.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for ai.model-service.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.model-service
+    product.exclusions:
+      - ai.model-service
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - ai.model-service
+    reason_codes:
+      - explicit-exclusion

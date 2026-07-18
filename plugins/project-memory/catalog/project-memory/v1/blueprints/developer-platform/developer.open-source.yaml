@@ -1,0 +1,76 @@
+blueprint:
+  id: developer.open-source
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.developer-platform
+  allowed_root_kinds:
+    - product
+    - shared-system
+  primary_archetype: developer-platform
+  purpose: Use when the enduring root is best described as developer open source, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: developer.open-source.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - product
+          - shared-system
+        evidence_required: true
+    positive_signals:
+      - id: developer.open-source.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: developer.open-source
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: developer.open-source.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: developer.open-source
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: developer.open-source.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: developer.open-source
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 105
+    precedence: 995
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+      - overlay.commercial.open-source
+    forbidden: []
+  default_components:
+    - component.api
+    - component.sdk
+    - component.cli
+    - component.shared-platform
+  default_domains:
+    - domain.engineering-architecture
+    - domain.release-platform-operations
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable developer open source root containing many different workstreams.
+  negative_examples:
+    - A temporary developer open source-related deliverable inside another enduring product.
+  name: Developer Open Source
+  inclusion_boundary: Include the enduring capabilities and governance of the developer open source root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

@@ -1,0 +1,21 @@
+component_definition:
+  id: component.datastore
+  version: 1.0.0
+  status: active
+  name: Datastore
+  type: data
+  purpose: Own the datastore boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by datastore.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with datastore.
+  required_documents:
+    - docs/components/datastore.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - data
+    - datastore
+  positive_examples:
+    - A task changes or validates the project's datastore capability.
+  negative_examples:
+    - A task merely mentions datastore without changing or validating it.

@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.developer.integration-ecosystem.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for developer.integration-ecosystem.
+  normalized_features:
+    root.kind: product
+    product.shape: developer.integration-ecosystem
+    product.exclusions:
+      - developer.integration-ecosystem
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - developer.integration-ecosystem
+    reason_codes:
+      - explicit-exclusion

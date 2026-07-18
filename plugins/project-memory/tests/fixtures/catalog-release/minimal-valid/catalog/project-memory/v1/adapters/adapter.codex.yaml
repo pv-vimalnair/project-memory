@@ -1,0 +1,39 @@
+adapter_definition:
+  id: adapter.codex
+  version: 1.0.0
+  status: active
+  name: Codex
+  kind: agent
+  purpose: Give Codex the project-memory startup contract.
+  inclusion_boundary: Include repository-scoped Codex instructions.
+  exclusion_boundary: Exclude runtime implementation details.
+  compatible_root_kinds:
+    - product
+  compatible_archetypes:
+    - application-service
+  detection_signals:
+    - AGENTS.md is supported
+  relevant_files:
+    - AGENTS.md
+  repository_conventions:
+    - Read PROJECT_CONTEXT.md first
+  supported_commands:
+    - project-memory verify
+  validation_gates:
+    - startup contract present
+  default_components: []
+  default_domains: []
+  required_documents:
+    - AGENTS.md
+  required_records:
+    - handoff
+  risks:
+    - stale generated instructions
+  handoff_fields:
+    - current work
+  tags:
+    - agent
+  positive_examples:
+    - Codex works inside the repository.
+  negative_examples:
+    - The repository has no agent integration.

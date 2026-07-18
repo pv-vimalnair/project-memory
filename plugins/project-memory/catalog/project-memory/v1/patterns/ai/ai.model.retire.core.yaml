@@ -1,0 +1,88 @@
+id: ai.model.retire
+version: 1.0.0
+status: active
+purpose: Retire bounded model work in the ai family with explicit evidence and authority.
+selection:
+  feature_schema_version: 1.0.0
+  required_signals:
+    - id: ai.model.retire.family
+      feature: work.family
+      operator: equals
+      expected: ai
+      evidence_required: true
+    - id: ai.model.retire.mode
+      feature: action.mode
+      operator: equals
+      expected: retire
+      evidence_required: true
+  positive_signals:
+    - id: ai.model.retire.object
+      feature: work.object
+      operator: equals
+      expected: model
+      evidence_required: true
+      weight: 100
+  negative_signals:
+    - id: ai.model.retire.negative
+      feature: work.anti-patterns
+      operator: tag_present
+      expected: ai.model.retire
+      evidence_required: false
+      penalty: 100
+  exclusions:
+    - id: ai.model.retire.exclusion
+      feature: work.exclusions
+      operator: tag_present
+      expected: ai.model.retire
+      evidence_required: false
+  max_positive_weight: 100
+  specificity_rank: 100
+  precedence: 100
+composition:
+  allowed_primary_pattern_ids: []
+  mandatory_companion_rule_ids:
+    - companion.retirement
+  incompatible_pattern_ids: []
+  triggers_companions: true
+duties:
+  - inspect
+  - modify
+  - validate
+  - approve
+  - record
+write_scope:
+  - accepted-task-owned-paths
+authorization:
+  mutation: approval-required
+  task_result_submission: worker
+  factual_integration: integrator
+  workstream_activation: Pitaji
+  directional_acceptance: Pitaji
+  external_action: none
+inputs:
+  - accepted workstream outcome
+  - current canonical snapshot
+  - task-scoped evidence
+outputs:
+  - ai model retire result
+  - completion evidence
+evidence:
+  - source references
+  - validation results
+  - changed-path inventory
+gates:
+  - scope is accepted
+  - authority covers every duty
+  - required evidence is current
+memory_updates:
+  - worklog
+  - evidence
+  - handoff
+completion_conditions:
+  - all declared duties are resolved
+  - required gates pass
+  - remaining risks are recorded
+fallback_and_escalation:
+  - fail closed on missing evidence
+  - return semantic ambiguity to the integrator
+  - request Pitaji approval for directional change

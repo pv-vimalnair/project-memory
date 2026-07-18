@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.network.community-social.positive
+  kind: blueprint-positive
+  description: Positive selection case for network.community-social.
+  normalized_features:
+    root.kind: product
+    product.shape: network.community-social
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: network.community-social
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

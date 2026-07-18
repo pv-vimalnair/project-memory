@@ -1,0 +1,16 @@
+blueprint_group:
+  id: blueprint-group.portfolio
+  version: 1.0.0
+  status: active
+  name: Portfolio
+  purpose: Classify enduring portfolio roots before workstreams are planned.
+  primary_archetype: portfolio
+  allowed_root_kinds:
+    - portfolio
+    - program
+  blueprint_ids:
+    - portfolio.product-family
+    - portfolio.company-brand-ecosystem
+    - portfolio.shared-platform
+    - portfolio.franchise-white-label
+    - program.organization-capability

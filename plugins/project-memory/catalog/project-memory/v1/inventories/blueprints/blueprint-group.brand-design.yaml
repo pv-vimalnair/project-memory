@@ -1,0 +1,9 @@
+inventory:
+  id: inventory.blueprints.brand-design
+  version: 1.0.0
+  expected_count: 4
+  ids:
+    - design.brand-system
+    - design.product-design-system
+    - design.multi-brand-language
+    - design.creative-asset-system

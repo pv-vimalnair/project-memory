@@ -1,0 +1,21 @@
+component_definition:
+  id: component.search
+  version: 1.0.0
+  status: active
+  name: Search
+  type: service
+  purpose: Own the search boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by search.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with search.
+  required_documents:
+    - docs/components/search.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - service
+    - search
+  positive_examples:
+    - A task changes or validates the project's search capability.
+  negative_examples:
+    - A task merely mentions search without changing or validating it.

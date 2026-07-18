@@ -1,0 +1,19 @@
+catalog:
+  id: project-memory
+  release: 1.0.0
+  schema_version: 1.0.0
+  source_root: catalog/project-memory/v1
+  expected_counts:
+    blueprint_groups: 1
+    blueprints: 1
+    pattern_families: 1
+    patterns: 1
+    companion_rules: 1
+    blueprint_fixtures:
+      positive: 0
+      anti: 0
+      boundary: 0
+      total: 0
+  generated_paths:
+    schemas: schemas/project-memory/v1
+    release: dist/catalog/project-memory/1.0.0

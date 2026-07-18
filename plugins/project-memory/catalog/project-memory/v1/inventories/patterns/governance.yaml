@@ -1,0 +1,20 @@
+inventory:
+  id: inventory.patterns.governance
+  version: 1.0.0
+  expected_count: 15
+  ids:
+    - governance.context.assess
+    - governance.scope.plan
+    - governance.task.plan
+    - governance.claim.operate
+    - governance.decision.plan
+    - governance.evidence.validate
+    - governance.handoff.change
+    - governance.integration.change
+    - governance.documentation.change
+    - governance.documentation.validate
+    - governance.finding.change
+    - governance.archive.operate
+    - governance.postmortem.assess
+    - governance.profile.change
+    - governance.catalog.change

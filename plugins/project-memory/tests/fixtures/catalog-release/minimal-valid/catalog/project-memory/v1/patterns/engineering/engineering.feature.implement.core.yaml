@@ -1,0 +1,57 @@
+id: engineering.feature.implement
+version: 1.0.0
+status: active
+purpose: Implement one bounded fixture feature.
+selection:
+  feature_schema_version: 1.0.0
+  required_signals:
+    - id: engineering.feature.implement.mode
+      feature: action.mode
+      operator: equals
+      expected: implement
+      evidence_required: true
+  positive_signals:
+    - id: engineering.feature.implement.object
+      feature: work.object
+      operator: equals
+      expected: feature
+      evidence_required: true
+      weight: 100
+  negative_signals: []
+  exclusions: []
+  max_positive_weight: 100
+  specificity_rank: 100
+  precedence: 100
+composition:
+  allowed_primary_pattern_ids: []
+  mandatory_companion_rule_ids:
+    - companion.mutation
+  incompatible_pattern_ids: []
+  triggers_companions: true
+duties:
+  - inspect
+  - modify
+  - validate
+write_scope:
+  - accepted-task-owned-paths
+authorization:
+  mutation: task-scoped
+  task_result_submission: worker
+  factual_integration: integrator
+  workstream_activation: integrator
+  directional_acceptance: Pitaji
+  external_action: none
+inputs:
+  - accepted task packet
+outputs:
+  - implementation result
+evidence:
+  - validation results
+gates:
+  - tests pass
+memory_updates:
+  - worklog
+completion_conditions:
+  - requested behavior is verified
+fallback_and_escalation:
+  - fail closed on missing evidence

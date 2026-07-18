@@ -1,0 +1,75 @@
+blueprint:
+  id: commerce.booking-reservation
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.commerce-network
+  allowed_root_kinds:
+    - product
+  primary_archetype: commerce-network
+  purpose: Use when the enduring root is best described as commerce booking reservation, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: commerce.booking-reservation.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - product
+        evidence_required: true
+    positive_signals:
+      - id: commerce.booking-reservation.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: commerce.booking-reservation
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: commerce.booking-reservation.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: commerce.booking-reservation
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: commerce.booking-reservation.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: commerce.booking-reservation
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 102
+    precedence: 998
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+      - overlay.surface.web
+      - overlay.capability.payments
+    forbidden: []
+  default_components:
+    - component.commerce-catalog
+    - component.checkout
+    - component.payments
+    - component.entitlements
+  default_domains:
+    - domain.growth-marketing-commercial
+    - domain.security-privacy-compliance-trust
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable commerce booking reservation root containing many different workstreams.
+  negative_examples:
+    - A temporary commerce booking reservation-related deliverable inside another enduring product.
+  name: Commerce Booking Reservation
+  inclusion_boundary: Include the enduring capabilities and governance of the commerce booking reservation root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

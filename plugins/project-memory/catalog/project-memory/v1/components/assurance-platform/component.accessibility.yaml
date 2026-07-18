@@ -1,0 +1,21 @@
+component_definition:
+  id: component.accessibility
+  version: 1.0.0
+  status: active
+  name: Accessibility
+  type: shared-system
+  purpose: Own the accessibility boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by accessibility.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with accessibility.
+  required_documents:
+    - docs/components/accessibility.md
+  default_domains:
+    - domain.qa-reliability-performance
+  tags:
+    - assurance-platform
+    - shared-system
+    - accessibility
+  positive_examples:
+    - A task changes or validates the project's accessibility capability.
+  negative_examples:
+    - A task merely mentions accessibility without changing or validating it.

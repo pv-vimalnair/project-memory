@@ -1,0 +1,6 @@
+interface:
+  display_name: "Project Memory"
+  short_description: "Automatic project context and agent handoffs"
+  default_prompt: "Use $project-memory to initialize or resume this project before substantive work."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,28 @@
+id: companion.ui
+version: 1.0.0
+status: active
+purpose: Narrow ui work by adding mandatory validation and evidence without expanding authority.
+when:
+  all:
+    - id: companion.ui.when
+      feature: artifact.classes
+      operator: tag_present
+      expected: ui
+      evidence_required: true
+  any: []
+  none: []
+require_patterns:
+  - id: ux.responsive.validate
+    version_range: 1.0.0
+    condition: true
+  - id: qa.accessibility.validate
+    version_range: 1.0.0
+    condition: true
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validated ui evidence
+  - linked source references
+authority_effect: narrow-only
+conflict_policy: fail_closed

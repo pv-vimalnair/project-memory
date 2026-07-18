@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-019
+  kind: blueprint-boundary
+  description: Boundary case selecting content.media-library over content.documentation-portal.
+  normalized_features:
+    root.kind: product
+    product.shape: content.media-library
+    product.exclusions:
+      - content.documentation-portal
+  expected:
+    decision: selected
+    blueprint_id: content.media-library
+    prohibited_blueprint_ids:
+      - content.documentation-portal
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

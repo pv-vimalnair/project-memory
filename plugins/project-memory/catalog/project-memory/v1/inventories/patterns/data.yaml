@@ -1,0 +1,21 @@
+inventory:
+  id: inventory.patterns.data
+  version: 1.0.0
+  expected_count: 16
+  ids:
+    - data.requirement.plan
+    - data.instrumentation.design
+    - data.instrumentation.implement
+    - data.instrumentation.validate
+    - data.quality.assess
+    - data.pipeline.design
+    - data.pipeline.implement
+    - data.schema.change
+    - data.migration.validate
+    - data.analysis.assess
+    - data.metric.design
+    - data.dashboard.implement
+    - data.experiment.design
+    - data.experiment.validate
+    - data.governance.assess
+    - data.retention.change

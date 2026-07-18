@@ -1,0 +1,17 @@
+blueprint_group:
+  id: blueprint-group.ai-data
+  version: 1.0.0
+  status: active
+  name: Ai Data
+  purpose: Classify enduring ai data roots before workstreams are planned.
+  primary_archetype: ai-data
+  allowed_root_kinds:
+    - product
+    - shared-system
+  blueprint_ids:
+    - ai.assistant-agent
+    - ai.model-service
+    - ai.analytics-decision-support
+    - ai.data-platform
+    - ai.benchmark-evaluation
+    - ai.recommendation-personalization

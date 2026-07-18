@@ -1,0 +1,11 @@
+inventory:
+  id: inventory.blueprints.developer-platform
+  version: 1.0.0
+  expected_count: 6
+  ids:
+    - developer.api-product
+    - developer.sdk-library
+    - developer.cli-tool
+    - developer.shared-infrastructure
+    - developer.integration-ecosystem
+    - developer.open-source

@@ -1,0 +1,46 @@
+overlay_definition:
+  id: overlay.risk.child-directed
+  version: 1.0.0
+  status: active
+  name: Risk Child Directed
+  category: risk
+  purpose: Apply the risk child directed trait without changing the enduring project root.
+  inclusion_boundary: Include constraints and defaults caused specifically by the risk child directed trait.
+  exclusion_boundary: Do not use this overlay as a substitute for a blueprint, component, or temporary workstream.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  requires_overlays: []
+  conflicts_with: []
+  default_components:
+    - component.security
+  default_domains:
+    - domain.security-privacy-compliance-trust
+  required_documents:
+    - docs/overlays/risk-child-directed.md
+  required_records:
+    - profile-lock
+    - decision-log
+  tags:
+    - operating-shape
+    - risk
+    - child-directed
+  positive_examples:
+    - The project explicitly operates with the risk child directed trait.
+  negative_examples:
+    - A one-off task resembles risk child directed but does not change the project trait.

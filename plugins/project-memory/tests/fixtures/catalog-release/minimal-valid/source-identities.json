@@ -1,0 +1,14 @@
+[
+  {"relative_path":"adapters/adapter.codex.yaml","definition_id":"adapter.codex","version":"1.0.0","schema_id":"project-memory/v1/adapter-definition"},
+  {"relative_path":"blueprint-groups/blueprint-group.test.yaml","definition_id":"blueprint-group.test","version":"1.0.0","schema_id":"project-memory/v1/blueprint-group-definition"},
+  {"relative_path":"blueprints/application-service/application.test.yaml","definition_id":"application.test","version":"1.0.0","schema_id":"project-memory/v1/blueprint-definition"},
+  {"relative_path":"companion-rules/companion.mutation.core.yaml","definition_id":"companion.mutation","version":"1.0.0","schema_id":"project-memory/v1/companion-rule-core"},
+  {"relative_path":"companion-rules/companion.mutation.taxonomy.yaml","definition_id":"companion.mutation","version":"1.0.0","schema_id":"project-memory/v1/companion-taxonomy"},
+  {"relative_path":"components/component.mobile.yaml","definition_id":"component.mobile","version":"1.0.0","schema_id":"project-memory/v1/component-definition"},
+  {"relative_path":"domains/domain.extra.yaml","definition_id":"domain.extra","version":"1.0.0","schema_id":"project-memory/v1/domain-definition"},
+  {"relative_path":"domains/domain.product.yaml","definition_id":"domain.product","version":"1.0.0","schema_id":"project-memory/v1/domain-definition"},
+  {"relative_path":"manifest.yaml","definition_id":null,"version":"1.0.0","schema_id":"project-memory/v1/catalog-manifest"},
+  {"relative_path":"overlays/overlay.surface.mobile.yaml","definition_id":"overlay.surface.mobile","version":"1.0.0","schema_id":"project-memory/v1/overlay-definition"},
+  {"relative_path":"patterns/engineering/engineering.feature.implement.core.yaml","definition_id":"engineering.feature.implement","version":"1.0.0","schema_id":"project-memory/v1/pattern-core"},
+  {"relative_path":"patterns/engineering/engineering.feature.implement.taxonomy.yaml","definition_id":"engineering.feature.implement","version":"1.0.0","schema_id":"project-memory/v1/pattern-taxonomy"}
+]

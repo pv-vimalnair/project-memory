@@ -1,0 +1,19 @@
+inventory:
+  id: inventory.components.assurance-platform
+  version: 1.0.0
+  expected_count: 14
+  ids:
+    - component.security
+    - component.privacy
+    - component.compliance
+    - component.trust-safety
+    - component.qa
+    - component.accessibility
+    - component.performance
+    - component.reliability
+    - component.ci-cd
+    - component.infrastructure
+    - component.observability
+    - component.release
+    - component.distribution
+    - component.incident-response

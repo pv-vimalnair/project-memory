@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-007
+  kind: blueprint-boundary
+  description: Boundary case selecting developer.cli-tool over developer.sdk-library.
+  normalized_features:
+    root.kind: product
+    product.shape: developer.cli-tool
+    product.exclusions:
+      - developer.sdk-library
+  expected:
+    decision: selected
+    blueprint_id: developer.cli-tool
+    prohibited_blueprint_ids:
+      - developer.sdk-library
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

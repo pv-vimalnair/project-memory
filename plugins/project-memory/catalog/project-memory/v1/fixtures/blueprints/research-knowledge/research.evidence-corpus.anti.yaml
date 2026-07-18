@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.research.evidence-corpus.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for research.evidence-corpus.
+  normalized_features:
+    root.kind: program
+    product.shape: research.evidence-corpus
+    product.exclusions:
+      - research.evidence-corpus
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - research.evidence-corpus
+    reason_codes:
+      - explicit-exclusion

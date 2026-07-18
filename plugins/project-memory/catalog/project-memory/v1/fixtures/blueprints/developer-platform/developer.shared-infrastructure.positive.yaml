@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.developer.shared-infrastructure.positive
+  kind: blueprint-positive
+  description: Positive selection case for developer.shared-infrastructure.
+  normalized_features:
+    root.kind: product
+    product.shape: developer.shared-infrastructure
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: developer.shared-infrastructure
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

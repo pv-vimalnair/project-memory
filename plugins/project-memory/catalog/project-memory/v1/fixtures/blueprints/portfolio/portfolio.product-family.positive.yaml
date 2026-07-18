@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.portfolio.product-family.positive
+  kind: blueprint-positive
+  description: Positive selection case for portfolio.product-family.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: portfolio.product-family
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: portfolio.product-family
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.application.creator-professional.positive
+  kind: blueprint-positive
+  description: Positive selection case for application.creator-professional.
+  normalized_features:
+    root.kind: product
+    product.shape: application.creator-professional
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: application.creator-professional
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

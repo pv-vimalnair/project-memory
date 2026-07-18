@@ -1,0 +1,6098 @@
+cases:
+  - brief: "Explicit anti-signal case for ai.analytics-decision-support."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.analytics-decision-support.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "ai.analytics-decision-support"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.analytics-decision-support.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "ai.analytics-decision-support"
+      product.shape: "ai.analytics-decision-support"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for ai.analytics-decision-support."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "ai.analytics-decision-support"
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.analytics-decision-support.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.analytics-decision-support.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "ai.analytics-decision-support"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for ai.assistant-agent."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.assistant-agent.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "ai.assistant-agent"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.assistant-agent.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "ai.assistant-agent"
+      product.shape: "ai.assistant-agent"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for ai.assistant-agent."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "ai.assistant-agent"
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.assistant-agent.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.assistant-agent.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "ai.assistant-agent"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for ai.benchmark-evaluation."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.benchmark-evaluation.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "ai.benchmark-evaluation"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.benchmark-evaluation.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "ai.benchmark-evaluation"
+      product.shape: "ai.benchmark-evaluation"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for ai.benchmark-evaluation."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "ai.benchmark-evaluation"
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.benchmark-evaluation.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.benchmark-evaluation.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "ai.benchmark-evaluation"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for ai.data-platform."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.data-platform.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "ai.data-platform"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.data-platform.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "ai.data-platform"
+      product.shape: "ai.data-platform"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for ai.data-platform."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "ai.data-platform"
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.data-platform.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.data-platform.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "ai.data-platform"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for ai.model-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.model-service.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "ai.model-service"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.model-service.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "ai.model-service"
+      product.shape: "ai.model-service"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for ai.model-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "ai.model-service"
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.model-service.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.model-service.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "ai.model-service"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for ai.recommendation-personalization."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.recommendation-personalization.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "ai.recommendation-personalization"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.recommendation-personalization.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "ai.recommendation-personalization"
+      product.shape: "ai.recommendation-personalization"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for ai.recommendation-personalization."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "ai.recommendation-personalization"
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.ai.recommendation-personalization.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.ai.recommendation-personalization.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "ai.recommendation-personalization"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for application.b2b-saas."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.b2b-saas.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.b2b"
+        - "overlay.commercial.subscription"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "application.b2b-saas"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.b2b-saas.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.b2b-saas"
+      product.shape: "application.b2b-saas"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for application.b2b-saas."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.b2b-saas"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.b2b-saas.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.b2b"
+        - "overlay.commercial.subscription"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.b2b-saas.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "application.b2b-saas"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for application.consumer-mobile."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.backend-service"
+        - "component.mobile-client"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.consumer-mobile.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.mobile"
+      patterns: []
+      prohibited_blueprints:
+        - "application.consumer-mobile"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.consumer-mobile.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.consumer-mobile"
+      product.shape: "application.consumer-mobile"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for application.consumer-mobile."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.consumer-mobile"
+      components:
+        - "component.backend-service"
+        - "component.mobile-client"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.consumer-mobile.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.mobile"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.consumer-mobile.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "application.consumer-mobile"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for application.consumer-multisurface."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.consumer-multisurface.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.multisurface"
+      patterns: []
+      prohibited_blueprints:
+        - "application.consumer-multisurface"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.consumer-multisurface.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.consumer-multisurface"
+      product.shape: "application.consumer-multisurface"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for application.consumer-multisurface."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.consumer-multisurface"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.consumer-multisurface.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.multisurface"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.consumer-multisurface.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "application.consumer-multisurface"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for application.creator-professional."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.creator-professional.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.multisurface"
+      patterns: []
+      prohibited_blueprints:
+        - "application.creator-professional"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.creator-professional.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.creator-professional"
+      product.shape: "application.creator-professional"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for application.creator-professional."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.creator-professional"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.creator-professional.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.multisurface"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.creator-professional.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "application.creator-professional"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for application.desktop."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.backend-service"
+        - "component.desktop-client"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.desktop.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.desktop"
+      patterns: []
+      prohibited_blueprints:
+        - "application.desktop"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.desktop.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.desktop"
+      product.shape: "application.desktop"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for application.desktop."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.desktop"
+      components:
+        - "component.backend-service"
+        - "component.desktop-client"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.desktop.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.desktop"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.desktop.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "application.desktop"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for application.internal-business."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.internal-business.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.internal"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "application.internal-business"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.internal-business.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.internal-business"
+      product.shape: "application.internal-business"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for application.internal-business."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.internal-business"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.internal-business.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.internal"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.internal-business.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "application.internal-business"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for application.public-web-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.public-web-service.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "application.public-web-service"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.public-web-service.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.public-web-service"
+      product.shape: "application.public-web-service"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for application.public-web-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.public-web-service"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.application.public-web-service.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.application.public-web-service.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "application.public-web-service"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting application.consumer-mobile over developer.sdk-library."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.consumer-mobile"
+      components:
+        - "component.backend-service"
+        - "component.mobile-client"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-001"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.mobile"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.sdk-library"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.boundary.case-001"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.sdk-library"
+      product.shape: "application.consumer-mobile"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting application.consumer-multisurface over application.public-web-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.consumer-multisurface"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-002"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.multisurface"
+      patterns: []
+      prohibited_blueprints:
+        - "application.public-web-service"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.boundary.case-002"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.public-web-service"
+      product.shape: "application.consumer-multisurface"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting application.b2b-saas over application.internal-business."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.b2b-saas"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-003"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.b2b"
+        - "overlay.commercial.subscription"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "application.internal-business"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.boundary.case-003"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.internal-business"
+      product.shape: "application.b2b-saas"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting application.desktop over application.creator-professional."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.desktop"
+      components:
+        - "component.backend-service"
+        - "component.desktop-client"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-004"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.desktop"
+      patterns: []
+      prohibited_blueprints:
+        - "application.creator-professional"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.boundary.case-004"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.creator-professional"
+      product.shape: "application.desktop"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting service.managed over application.b2b-saas."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "service.managed"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-005"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.commercial.managed-service"
+        - "overlay.lifecycle.active"
+        - "overlay.runtime.hosted"
+      patterns: []
+      prohibited_blueprints:
+        - "application.b2b-saas"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.boundary.case-005"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.b2b-saas"
+      product.shape: "service.managed"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting developer.api-product over developer.integration-ecosystem."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "developer.api-product"
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-006"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.developer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.api"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.integration-ecosystem"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.boundary.case-006"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.integration-ecosystem"
+      product.shape: "developer.api-product"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting developer.cli-tool over developer.sdk-library."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "developer.cli-tool"
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-007"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.cli"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.sdk-library"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.boundary.case-007"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.sdk-library"
+      product.shape: "developer.cli-tool"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting developer.shared-infrastructure over developer.open-source."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "developer.shared-infrastructure"
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-008"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.open-source"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.boundary.case-008"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.open-source"
+      product.shape: "developer.shared-infrastructure"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting game.casual-mobile over game.free-to-play-live-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "game.casual-mobile"
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+        - "component.mobile-client"
+      decision: "selected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-009"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.mobile"
+      patterns: []
+      prohibited_blueprints:
+        - "game.free-to-play-live-service"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.boundary.case-009"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "game.free-to-play-live-service"
+      product.shape: "game.casual-mobile"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting game.premium-single-player over game.multiplayer-networked."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "game.premium-single-player"
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "selected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-010"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "game.multiplayer-networked"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.boundary.case-010"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "game.multiplayer-networked"
+      product.shape: "game.premium-single-player"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting game.simulation-learning over game.xr-immersive."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "game.simulation-learning"
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "selected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-011"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "game.xr-immersive"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.boundary.case-011"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "game.xr-immersive"
+      product.shape: "game.simulation-learning"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting ai.assistant-agent over ai.model-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "ai.assistant-agent"
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-012"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "ai.model-service"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.boundary.case-012"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "ai.model-service"
+      product.shape: "ai.assistant-agent"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting ai.analytics-decision-support over ai.data-platform."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "ai.analytics-decision-support"
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-013"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "ai.data-platform"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.boundary.case-013"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "ai.data-platform"
+      product.shape: "ai.analytics-decision-support"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting ai.benchmark-evaluation over ai.recommendation-personalization."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "ai.benchmark-evaluation"
+      components:
+        - "component.ai-evaluation"
+        - "component.ai-guardrails"
+        - "component.ai-model"
+        - "component.data-pipeline"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-014"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.ai"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "ai.recommendation-personalization"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "ai-data"
+    id: "fixture.boundary.case-014"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "ai.recommendation-personalization"
+      product.shape: "ai.benchmark-evaluation"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting commerce.ecommerce over commerce.two-sided-marketplace."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "commerce.ecommerce"
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "selected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-015"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "commerce.two-sided-marketplace"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.boundary.case-015"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "commerce.two-sided-marketplace"
+      product.shape: "commerce.ecommerce"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting commerce.booking-reservation over network.multi-party-transaction."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "commerce.booking-reservation"
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "selected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-016"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "network.multi-party-transaction"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.boundary.case-016"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "network.multi-party-transaction"
+      product.shape: "commerce.booking-reservation"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting commerce.membership over network.community-social."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "commerce.membership"
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "selected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-017"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.commercial.subscription"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "network.community-social"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.boundary.case-017"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "network.community-social"
+      product.shape: "commerce.membership"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting content.publication-newsletter over content.creator-property."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "content.publication-newsletter"
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "selected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-018"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "content.creator-property"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.boundary.case-018"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "content.creator-property"
+      product.shape: "content.publication-newsletter"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting content.media-library over content.documentation-portal."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "content.media-library"
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "selected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-019"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "content.documentation-portal"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.boundary.case-019"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "content.documentation-portal"
+      product.shape: "content.media-library"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting learning.course-curriculum over content.documentation-portal."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "learning.course-curriculum"
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "selected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-020"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "content.documentation-portal"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.boundary.case-020"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "content.documentation-portal"
+      product.shape: "learning.course-curriculum"
+      root.kind: "product"
+    supported: true
+  - brief: "Boundary case selecting design.brand-system over design.product-design-system."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "design.brand-system"
+      components:
+        - "component.brand"
+        - "component.content-design"
+        - "component.design-system"
+        - "component.visual-design"
+      decision: "selected"
+      domains:
+        - "domain.ux-content-design"
+        - "domain.visual-brand-design-systems"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-021"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "design.product-design-system"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "brand-design"
+    id: "fixture.boundary.case-021"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "design.product-design-system"
+      product.shape: "design.brand-system"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Boundary case selecting research.ongoing-program over research.evidence-corpus."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "research.ongoing-program"
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-022"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "research.evidence-corpus"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.boundary.case-022"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "research.evidence-corpus"
+      product.shape: "research.ongoing-program"
+      root.kind: "program"
+    supported: true
+  - brief: "Boundary case selecting operations.workflow-automation over operations.business-process."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "operations.workflow-automation"
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-023"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "operations.business-process"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.boundary.case-023"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "operations.business-process"
+      product.shape: "operations.workflow-automation"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Boundary case selecting portfolio.product-family over portfolio.shared-platform."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "portfolio.product-family"
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-024"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "portfolio.shared-platform"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.boundary.case-024"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "portfolio.shared-platform"
+      product.shape: "portfolio.product-family"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Boundary case selecting engagement.client-delivery over application.b2b-saas."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "engagement.client-delivery"
+      components:
+        - "component.operations-workflow"
+        - "component.product-management"
+        - "component.reporting"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-025"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "application.b2b-saas"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "engagement"
+        primary_archetype: "engagement"
+    id: "fixture.boundary.case-025"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "application.b2b-saas"
+      product.shape: "engagement.client-delivery"
+      root.kind: "engagement"
+    supported: true
+  - brief: "Boundary case selecting application.consumer-multisurface over engagement.one-off-deliverable."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "application.consumer-multisurface"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.boundary.case-026"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.multisurface"
+      patterns: []
+      prohibited_blueprints:
+        - "engagement.one-off-deliverable"
+      reason_codes:
+        - "boundary-primary-match"
+        - "competitor-excluded"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.boundary.case-026"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "engagement.one-off-deliverable"
+      product.shape: "application.consumer-multisurface"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for commerce.booking-reservation."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "rejected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.commerce.booking-reservation.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "commerce.booking-reservation"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.commerce.booking-reservation.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "commerce.booking-reservation"
+      product.shape: "commerce.booking-reservation"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for commerce.booking-reservation."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "commerce.booking-reservation"
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "selected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.commerce.booking-reservation.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.commerce.booking-reservation.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "commerce.booking-reservation"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for commerce.ecommerce."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "rejected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.commerce.ecommerce.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "commerce.ecommerce"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.commerce.ecommerce.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "commerce.ecommerce"
+      product.shape: "commerce.ecommerce"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for commerce.ecommerce."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "commerce.ecommerce"
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "selected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.commerce.ecommerce.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.commerce.ecommerce.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "commerce.ecommerce"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for commerce.membership."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "rejected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.commerce.membership.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.commercial.subscription"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "commerce.membership"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.commerce.membership.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "commerce.membership"
+      product.shape: "commerce.membership"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for commerce.membership."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "commerce.membership"
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "selected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.commerce.membership.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.commercial.subscription"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.commerce.membership.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "commerce.membership"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for commerce.two-sided-marketplace."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "rejected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.commerce.two-sided-marketplace.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.commercial.marketplace"
+        - "overlay.commercial.transactional"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "commerce.two-sided-marketplace"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.commerce.two-sided-marketplace.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "commerce.two-sided-marketplace"
+      product.shape: "commerce.two-sided-marketplace"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for commerce.two-sided-marketplace."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "commerce.two-sided-marketplace"
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "selected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.commerce.two-sided-marketplace.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.commercial.marketplace"
+        - "overlay.commercial.transactional"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.commerce.two-sided-marketplace.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "commerce.two-sided-marketplace"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for content.creator-property."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "rejected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.creator-property.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.capability.community-ugc"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "content.creator-property"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.creator-property.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "content.creator-property"
+      product.shape: "content.creator-property"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for content.creator-property."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "content.creator-property"
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "selected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.creator-property.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.capability.community-ugc"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.creator-property.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "content.creator-property"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for content.documentation-portal."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "rejected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.documentation-portal.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "content.documentation-portal"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.documentation-portal.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "content.documentation-portal"
+      product.shape: "content.documentation-portal"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for content.documentation-portal."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "content.documentation-portal"
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "selected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.documentation-portal.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.documentation-portal.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "content.documentation-portal"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for content.media-library."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "rejected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.media-library.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "content.media-library"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.media-library.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "content.media-library"
+      product.shape: "content.media-library"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for content.media-library."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "content.media-library"
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "selected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.media-library.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.media-library.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "content.media-library"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for content.podcast-video-channel."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "rejected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.podcast-video-channel.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "content.podcast-video-channel"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.podcast-video-channel.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "content.podcast-video-channel"
+      product.shape: "content.podcast-video-channel"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for content.podcast-video-channel."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "content.podcast-video-channel"
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "selected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.podcast-video-channel.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.podcast-video-channel.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "content.podcast-video-channel"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for content.publication-newsletter."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "rejected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.publication-newsletter.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "content.publication-newsletter"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.publication-newsletter.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "content.publication-newsletter"
+      product.shape: "content.publication-newsletter"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for content.publication-newsletter."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "content.publication-newsletter"
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "selected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.content.publication-newsletter.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.content.publication-newsletter.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "content.publication-newsletter"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for design.brand-system."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.brand"
+        - "component.content-design"
+        - "component.design-system"
+        - "component.visual-design"
+      decision: "rejected"
+      domains:
+        - "domain.ux-content-design"
+        - "domain.visual-brand-design-systems"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.design.brand-system.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "design.brand-system"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "brand-design"
+    id: "fixture.design.brand-system.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "design.brand-system"
+      product.shape: "design.brand-system"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for design.brand-system."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "design.brand-system"
+      components:
+        - "component.brand"
+        - "component.content-design"
+        - "component.design-system"
+        - "component.visual-design"
+      decision: "selected"
+      domains:
+        - "domain.ux-content-design"
+        - "domain.visual-brand-design-systems"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.design.brand-system.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "brand-design"
+    id: "fixture.design.brand-system.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "design.brand-system"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for design.creative-asset-system."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.brand"
+        - "component.content-design"
+        - "component.design-system"
+        - "component.visual-design"
+      decision: "rejected"
+      domains:
+        - "domain.ux-content-design"
+        - "domain.visual-brand-design-systems"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.design.creative-asset-system.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "design.creative-asset-system"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "brand-design"
+    id: "fixture.design.creative-asset-system.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "design.creative-asset-system"
+      product.shape: "design.creative-asset-system"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for design.creative-asset-system."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "design.creative-asset-system"
+      components:
+        - "component.brand"
+        - "component.content-design"
+        - "component.design-system"
+        - "component.visual-design"
+      decision: "selected"
+      domains:
+        - "domain.ux-content-design"
+        - "domain.visual-brand-design-systems"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.design.creative-asset-system.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "brand-design"
+    id: "fixture.design.creative-asset-system.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "design.creative-asset-system"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for design.multi-brand-language."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.brand"
+        - "component.content-design"
+        - "component.design-system"
+        - "component.visual-design"
+      decision: "rejected"
+      domains:
+        - "domain.ux-content-design"
+        - "domain.visual-brand-design-systems"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.design.multi-brand-language.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "design.multi-brand-language"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "brand-design"
+    id: "fixture.design.multi-brand-language.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "design.multi-brand-language"
+      product.shape: "design.multi-brand-language"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for design.multi-brand-language."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "design.multi-brand-language"
+      components:
+        - "component.brand"
+        - "component.content-design"
+        - "component.design-system"
+        - "component.visual-design"
+      decision: "selected"
+      domains:
+        - "domain.ux-content-design"
+        - "domain.visual-brand-design-systems"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.design.multi-brand-language.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "brand-design"
+    id: "fixture.design.multi-brand-language.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "design.multi-brand-language"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for design.product-design-system."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.brand"
+        - "component.content-design"
+        - "component.design-system"
+        - "component.visual-design"
+      decision: "rejected"
+      domains:
+        - "domain.ux-content-design"
+        - "domain.visual-brand-design-systems"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.design.product-design-system.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "design.product-design-system"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "brand-design"
+    id: "fixture.design.product-design-system.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "design.product-design-system"
+      product.shape: "design.product-design-system"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for design.product-design-system."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "design.product-design-system"
+      components:
+        - "component.brand"
+        - "component.content-design"
+        - "component.design-system"
+        - "component.visual-design"
+      decision: "selected"
+      domains:
+        - "domain.ux-content-design"
+        - "domain.visual-brand-design-systems"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.design.product-design-system.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "brand-design"
+    id: "fixture.design.product-design-system.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "design.product-design-system"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for developer.api-product."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.api-product.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.developer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.api"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.api-product"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.api-product.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.api-product"
+      product.shape: "developer.api-product"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for developer.api-product."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "developer.api-product"
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.api-product.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.developer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.api"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.api-product.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "developer.api-product"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for developer.cli-tool."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.cli-tool.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.cli"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.cli-tool"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.cli-tool.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.cli-tool"
+      product.shape: "developer.cli-tool"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for developer.cli-tool."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "developer.cli-tool"
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.cli-tool.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+        - "overlay.surface.cli"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.cli-tool.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "developer.cli-tool"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for developer.integration-ecosystem."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.integration-ecosystem.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.integration-ecosystem"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.integration-ecosystem.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.integration-ecosystem"
+      product.shape: "developer.integration-ecosystem"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for developer.integration-ecosystem."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "developer.integration-ecosystem"
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.integration-ecosystem.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.integration-ecosystem.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "developer.integration-ecosystem"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for developer.open-source."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.open-source.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.commercial.open-source"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.open-source"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.open-source.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.open-source"
+      product.shape: "developer.open-source"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for developer.open-source."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "developer.open-source"
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.open-source.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.commercial.open-source"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.open-source.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "developer.open-source"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for developer.sdk-library."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.sdk-library.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.sdk-library"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.sdk-library.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.sdk-library"
+      product.shape: "developer.sdk-library"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for developer.sdk-library."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "developer.sdk-library"
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.sdk-library.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.sdk-library.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "developer.sdk-library"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for developer.shared-infrastructure."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.shared-infrastructure.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "developer.shared-infrastructure"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.shared-infrastructure.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "developer.shared-infrastructure"
+      product.shape: "developer.shared-infrastructure"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for developer.shared-infrastructure."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "developer.shared-infrastructure"
+      components:
+        - "component.api"
+        - "component.cli"
+        - "component.sdk"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.developer.shared-infrastructure.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "developer-platform"
+    id: "fixture.developer.shared-infrastructure.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "developer.shared-infrastructure"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for engagement.client-delivery."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.operations-workflow"
+        - "component.product-management"
+        - "component.reporting"
+      decision: "rejected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.engagement.client-delivery.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "engagement.client-delivery"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "engagement"
+        primary_archetype: "engagement"
+    id: "fixture.engagement.client-delivery.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "engagement.client-delivery"
+      product.shape: "engagement.client-delivery"
+      root.kind: "engagement"
+    supported: true
+  - brief: "Positive selection case for engagement.client-delivery."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "engagement.client-delivery"
+      components:
+        - "component.operations-workflow"
+        - "component.product-management"
+        - "component.reporting"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.engagement.client-delivery.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "engagement"
+        primary_archetype: "engagement"
+    id: "fixture.engagement.client-delivery.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "engagement.client-delivery"
+      root.kind: "engagement"
+    supported: true
+  - brief: "Explicit anti-signal case for engagement.one-off-deliverable."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.operations-workflow"
+        - "component.product-management"
+        - "component.reporting"
+      decision: "rejected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.engagement.one-off-deliverable.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "engagement.one-off-deliverable"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "engagement"
+        primary_archetype: "engagement"
+    id: "fixture.engagement.one-off-deliverable.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "engagement.one-off-deliverable"
+      product.shape: "engagement.one-off-deliverable"
+      root.kind: "engagement"
+    supported: true
+  - brief: "Positive selection case for engagement.one-off-deliverable."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "engagement.one-off-deliverable"
+      components:
+        - "component.operations-workflow"
+        - "component.product-management"
+        - "component.reporting"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.engagement.one-off-deliverable.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "engagement"
+        primary_archetype: "engagement"
+    id: "fixture.engagement.one-off-deliverable.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "engagement.one-off-deliverable"
+      root.kind: "engagement"
+    supported: true
+  - brief: "Explicit anti-signal case for engagement.standalone-internal."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.operations-workflow"
+        - "component.product-management"
+        - "component.reporting"
+      decision: "rejected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.engagement.standalone-internal.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.internal"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "engagement.standalone-internal"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "engagement"
+        primary_archetype: "engagement"
+    id: "fixture.engagement.standalone-internal.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "engagement.standalone-internal"
+      product.shape: "engagement.standalone-internal"
+      root.kind: "engagement"
+    supported: true
+  - brief: "Positive selection case for engagement.standalone-internal."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "engagement.standalone-internal"
+      components:
+        - "component.operations-workflow"
+        - "component.product-management"
+        - "component.reporting"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.engagement.standalone-internal.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.internal"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "engagement"
+        primary_archetype: "engagement"
+    id: "fixture.engagement.standalone-internal.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "engagement.standalone-internal"
+      root.kind: "engagement"
+    supported: true
+  - brief: "Explicit anti-signal case for game.casual-mobile."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+        - "component.mobile-client"
+      decision: "rejected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.casual-mobile.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.mobile"
+      patterns: []
+      prohibited_blueprints:
+        - "game.casual-mobile"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.casual-mobile.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "game.casual-mobile"
+      product.shape: "game.casual-mobile"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for game.casual-mobile."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "game.casual-mobile"
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+        - "component.mobile-client"
+      decision: "selected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.casual-mobile.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.mobile"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.casual-mobile.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "game.casual-mobile"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for game.free-to-play-live-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "rejected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.free-to-play-live-service.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "game.free-to-play-live-service"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.free-to-play-live-service.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "game.free-to-play-live-service"
+      product.shape: "game.free-to-play-live-service"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for game.free-to-play-live-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "game.free-to-play-live-service"
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "selected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.free-to-play-live-service.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.free-to-play-live-service.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "game.free-to-play-live-service"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for game.multiplayer-networked."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "rejected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.multiplayer-networked.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "game.multiplayer-networked"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.multiplayer-networked.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "game.multiplayer-networked"
+      product.shape: "game.multiplayer-networked"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for game.multiplayer-networked."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "game.multiplayer-networked"
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "selected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.multiplayer-networked.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.multiplayer-networked.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "game.multiplayer-networked"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for game.premium-single-player."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "rejected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.premium-single-player.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "game.premium-single-player"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.premium-single-player.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "game.premium-single-player"
+      product.shape: "game.premium-single-player"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for game.premium-single-player."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "game.premium-single-player"
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "selected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.premium-single-player.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.premium-single-player.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "game.premium-single-player"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for game.simulation-learning."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "rejected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.simulation-learning.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "game.simulation-learning"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.simulation-learning.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "game.simulation-learning"
+      product.shape: "game.simulation-learning"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for game.simulation-learning."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "game.simulation-learning"
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "selected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.simulation-learning.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.simulation-learning.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "game.simulation-learning"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for game.xr-immersive."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "rejected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.xr-immersive.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.xr"
+      patterns: []
+      prohibited_blueprints:
+        - "game.xr-immersive"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.xr-immersive.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "game.xr-immersive"
+      product.shape: "game.xr-immersive"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for game.xr-immersive."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "game.xr-immersive"
+      components:
+        - "component.game-art"
+        - "component.game-audio"
+        - "component.game-design"
+        - "component.game-runtime"
+      decision: "selected"
+      domains:
+        - "domain.game-design-art-audio-live-operations"
+        - "domain.qa-reliability-performance"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.game.xr-immersive.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.audience.consumer"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.xr"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "game-interactive"
+    id: "fixture.game.xr-immersive.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "game.xr-immersive"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for knowledge.organizational-base."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.knowledge.organizational-base.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "knowledge.organizational-base"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.knowledge.organizational-base.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "knowledge.organizational-base"
+      product.shape: "knowledge.organizational-base"
+      root.kind: "program"
+    supported: true
+  - brief: "Positive selection case for knowledge.organizational-base."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "knowledge.organizational-base"
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.knowledge.organizational-base.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.knowledge.organizational-base.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "knowledge.organizational-base"
+      root.kind: "program"
+    supported: true
+  - brief: "Explicit anti-signal case for learning.course-curriculum."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "rejected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.learning.course-curriculum.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "learning.course-curriculum"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.learning.course-curriculum.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "learning.course-curriculum"
+      product.shape: "learning.course-curriculum"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for learning.course-curriculum."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "learning.course-curriculum"
+      components:
+        - "component.content-design"
+        - "component.editorial-content"
+        - "component.knowledge-base"
+        - "component.localization"
+      decision: "selected"
+      domains:
+        - "domain.content-communications-localization"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.learning.course-curriculum.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "content-learning"
+    id: "fixture.learning.course-curriculum.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "learning.course-curriculum"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for network.community-social."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "rejected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.network.community-social.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.community-ugc"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints:
+        - "network.community-social"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.network.community-social.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "network.community-social"
+      product.shape: "network.community-social"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for network.community-social."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "network.community-social"
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "selected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.network.community-social.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.community-ugc"
+        - "overlay.lifecycle.active"
+        - "overlay.surface.web"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.network.community-social.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "network.community-social"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for network.multi-party-transaction."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "rejected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.network.multi-party-transaction.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.commercial.marketplace"
+        - "overlay.commercial.transactional"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "network.multi-party-transaction"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.network.multi-party-transaction.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "network.multi-party-transaction"
+      product.shape: "network.multi-party-transaction"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for network.multi-party-transaction."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "network.multi-party-transaction"
+      components:
+        - "component.checkout"
+        - "component.commerce-catalog"
+        - "component.entitlements"
+        - "component.payments"
+      decision: "selected"
+      domains:
+        - "domain.growth-marketing-commercial"
+        - "domain.security-privacy-compliance-trust"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.network.multi-party-transaction.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.capability.payments"
+        - "overlay.commercial.marketplace"
+        - "overlay.commercial.transactional"
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "commerce-network"
+    id: "fixture.network.multi-party-transaction.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "network.multi-party-transaction"
+      root.kind: "product"
+    supported: true
+  - brief: "Explicit anti-signal case for operations.business-process."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "rejected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.business-process.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "operations.business-process"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.business-process.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "operations.business-process"
+      product.shape: "operations.business-process"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for operations.business-process."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "operations.business-process"
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.business-process.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.business-process.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "operations.business-process"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for operations.governance-compliance."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "rejected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.governance-compliance.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "operations.governance-compliance"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.governance-compliance.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "operations.governance-compliance"
+      product.shape: "operations.governance-compliance"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for operations.governance-compliance."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "operations.governance-compliance"
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.governance-compliance.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.governance-compliance.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "operations.governance-compliance"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for operations.marketing-growth."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "rejected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.marketing-growth.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "operations.marketing-growth"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.marketing-growth.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "operations.marketing-growth"
+      product.shape: "operations.marketing-growth"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for operations.marketing-growth."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "operations.marketing-growth"
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.marketing-growth.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.marketing-growth.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "operations.marketing-growth"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for operations.sop-library."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "rejected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.sop-library.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "operations.sop-library"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.sop-library.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "operations.sop-library"
+      product.shape: "operations.sop-library"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for operations.sop-library."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "operations.sop-library"
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.sop-library.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.sop-library.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "operations.sop-library"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for operations.support-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "rejected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.support-service.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "operations.support-service"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.support-service.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "operations.support-service"
+      product.shape: "operations.support-service"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for operations.support-service."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "operations.support-service"
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.support-service.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.support-service.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "operations.support-service"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for operations.workflow-automation."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "rejected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.workflow-automation.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "operations.workflow-automation"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.workflow-automation.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "operations.workflow-automation"
+      product.shape: "operations.workflow-automation"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Positive selection case for operations.workflow-automation."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "operations.workflow-automation"
+      components:
+        - "component.operations-workflow"
+        - "component.sop-training"
+      decision: "selected"
+      domains:
+        - "domain.governance-coordination"
+        - "domain.release-platform-operations"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.operations.workflow-automation.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "shared-system"
+        primary_archetype: "operations-automation"
+    id: "fixture.operations.workflow-automation.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "operations.workflow-automation"
+      root.kind: "shared-system"
+    supported: true
+  - brief: "Explicit anti-signal case for portfolio.company-brand-ecosystem."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.portfolio.company-brand-ecosystem.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "portfolio.company-brand-ecosystem"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.portfolio.company-brand-ecosystem.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "portfolio.company-brand-ecosystem"
+      product.shape: "portfolio.company-brand-ecosystem"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Positive selection case for portfolio.company-brand-ecosystem."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "portfolio.company-brand-ecosystem"
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.portfolio.company-brand-ecosystem.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.portfolio.company-brand-ecosystem.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "portfolio.company-brand-ecosystem"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Explicit anti-signal case for portfolio.franchise-white-label."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.portfolio.franchise-white-label.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "portfolio.franchise-white-label"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.portfolio.franchise-white-label.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "portfolio.franchise-white-label"
+      product.shape: "portfolio.franchise-white-label"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Positive selection case for portfolio.franchise-white-label."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "portfolio.franchise-white-label"
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.portfolio.franchise-white-label.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.portfolio.franchise-white-label.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "portfolio.franchise-white-label"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Explicit anti-signal case for portfolio.product-family."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.portfolio.product-family.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "portfolio.product-family"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.portfolio.product-family.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "portfolio.product-family"
+      product.shape: "portfolio.product-family"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Positive selection case for portfolio.product-family."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "portfolio.product-family"
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.portfolio.product-family.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.portfolio.product-family.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "portfolio.product-family"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Explicit anti-signal case for portfolio.shared-platform."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.portfolio.shared-platform.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "portfolio.shared-platform"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.portfolio.shared-platform.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "portfolio.shared-platform"
+      product.shape: "portfolio.shared-platform"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Positive selection case for portfolio.shared-platform."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "portfolio.shared-platform"
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.portfolio.shared-platform.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.portfolio.shared-platform.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "portfolio.shared-platform"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Explicit anti-signal case for program.organization-capability."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.program.organization-capability.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "program.organization-capability"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.program.organization-capability.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "program.organization-capability"
+      product.shape: "program.organization-capability"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Positive selection case for program.organization-capability."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "program.organization-capability"
+      components:
+        - "component.brand"
+        - "component.product-management"
+        - "component.shared-platform"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.governance-coordination"
+        - "domain.product-strategy"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.program.organization-capability.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "portfolio"
+        primary_archetype: "portfolio"
+    id: "fixture.program.organization-capability.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "program.organization-capability"
+      root.kind: "portfolio"
+    supported: true
+  - brief: "Explicit anti-signal case for research.evidence-corpus."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.evidence-corpus.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "research.evidence-corpus"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.evidence-corpus.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "research.evidence-corpus"
+      product.shape: "research.evidence-corpus"
+      root.kind: "program"
+    supported: true
+  - brief: "Positive selection case for research.evidence-corpus."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "research.evidence-corpus"
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.evidence-corpus.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.evidence-corpus.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "research.evidence-corpus"
+      root.kind: "program"
+    supported: true
+  - brief: "Explicit anti-signal case for research.experimental-program."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.experimental-program.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "research.experimental-program"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.experimental-program.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "research.experimental-program"
+      product.shape: "research.experimental-program"
+      root.kind: "program"
+    supported: true
+  - brief: "Positive selection case for research.experimental-program."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "research.experimental-program"
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.experimental-program.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.experimental-program.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "research.experimental-program"
+      root.kind: "program"
+    supported: true
+  - brief: "Explicit anti-signal case for research.market-intelligence."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.market-intelligence.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "research.market-intelligence"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.market-intelligence.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "research.market-intelligence"
+      product.shape: "research.market-intelligence"
+      root.kind: "program"
+    supported: true
+  - brief: "Positive selection case for research.market-intelligence."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "research.market-intelligence"
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.market-intelligence.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.market-intelligence.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "research.market-intelligence"
+      root.kind: "program"
+    supported: true
+  - brief: "Explicit anti-signal case for research.ongoing-program."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.ongoing-program.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "research.ongoing-program"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.ongoing-program.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "research.ongoing-program"
+      product.shape: "research.ongoing-program"
+      root.kind: "program"
+    supported: true
+  - brief: "Positive selection case for research.ongoing-program."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "research.ongoing-program"
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.ongoing-program.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.ongoing-program.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "research.ongoing-program"
+      root.kind: "program"
+    supported: true
+  - brief: "Explicit anti-signal case for research.policy-standards."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "rejected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.policy-standards.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints:
+        - "research.policy-standards"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.policy-standards.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "research.policy-standards"
+      product.shape: "research.policy-standards"
+      root.kind: "program"
+    supported: true
+  - brief: "Positive selection case for research.policy-standards."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "research.policy-standards"
+      components:
+        - "component.knowledge-base"
+        - "component.reporting"
+        - "component.research-program"
+        - "component.user-research"
+      decision: "selected"
+      domains:
+        - "domain.data-analytics-ai"
+        - "domain.research-insight"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.research.policy-standards.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.lifecycle.active"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "program"
+        primary_archetype: "research-knowledge"
+    id: "fixture.research.policy-standards.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "research.policy-standards"
+      root.kind: "program"
+    supported: true
+  - brief: "Explicit anti-signal case for service.managed."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: null
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "rejected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.service.managed.anti"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.commercial.managed-service"
+        - "overlay.lifecycle.active"
+        - "overlay.runtime.hosted"
+      patterns: []
+      prohibited_blueprints:
+        - "service.managed"
+      reason_codes:
+        - "explicit-exclusion"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.service.managed.anti"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions:
+        - "service.managed"
+      product.shape: "service.managed"
+      root.kind: "product"
+    supported: true
+  - brief: "Positive selection case for service.managed."
+    expected:
+      authority:
+        external_action: "none"
+        mutation: "none"
+      blueprint: "service.managed"
+      components:
+        - "component.backend-service"
+        - "component.product-strategy"
+        - "component.ux"
+        - "component.web-client"
+      decision: "selected"
+      domains:
+        - "domain.engineering-architecture"
+        - "domain.product-strategy"
+        - "domain.ux-content-design"
+      evidence:
+        required: true
+        source_fixture_id: "fixture.service.managed.positive"
+      gates:
+        - "anti-signals evaluated"
+        - "positive evidence recorded"
+        - "root boundary confirmed"
+      overlays:
+        - "overlay.commercial.managed-service"
+        - "overlay.lifecycle.active"
+        - "overlay.runtime.hosted"
+      patterns: []
+      prohibited_blueprints: []
+      reason_codes:
+        - "compatible-root"
+        - "exact-shape-match"
+      root_boundary:
+        kind: "product"
+        primary_archetype: "application-service"
+    id: "fixture.service.managed.positive"
+    max_clarification_questions: 0
+    normalized_features:
+      product.exclusions: []
+      product.shape: "service.managed"
+      root.kind: "product"
+    supported: true
+schema_version: "1.0.0"

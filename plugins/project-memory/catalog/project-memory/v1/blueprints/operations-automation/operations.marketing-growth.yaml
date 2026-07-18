@@ -1,0 +1,73 @@
+blueprint:
+  id: operations.marketing-growth
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.operations-automation
+  allowed_root_kinds:
+    - shared-system
+    - program
+  primary_archetype: operations-automation
+  purpose: Use when the enduring root is best described as operations marketing growth, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: operations.marketing-growth.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - shared-system
+          - program
+        evidence_required: true
+    positive_signals:
+      - id: operations.marketing-growth.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: operations.marketing-growth
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: operations.marketing-growth.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: operations.marketing-growth
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: operations.marketing-growth.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: operations.marketing-growth
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 103
+    precedence: 997
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+    forbidden: []
+  default_components:
+    - component.operations-workflow
+    - component.sop-training
+  default_domains:
+    - domain.governance-coordination
+    - domain.release-platform-operations
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable operations marketing growth root containing many different workstreams.
+  negative_examples:
+    - A temporary operations marketing growth-related deliverable inside another enduring product.
+  name: Operations Marketing Growth
+  inclusion_boundary: Include the enduring capabilities and governance of the operations marketing growth root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

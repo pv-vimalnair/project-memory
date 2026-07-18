@@ -1,0 +1,29 @@
+inventory:
+  id: inventory.components.commercial-specialist
+  version: 1.0.0
+  expected_count: 24
+  ids:
+    - component.commerce-catalog
+    - component.checkout
+    - component.payments
+    - component.billing
+    - component.entitlements
+    - component.orders-bookings
+    - component.settlement-reconciliation
+    - component.fraud-disputes
+    - component.growth-marketing
+    - component.stores-aso
+    - component.seo
+    - component.editorial-content
+    - component.localization
+    - component.moderation-community
+    - component.support
+    - component.sop-training
+    - component.game-design
+    - component.game-runtime
+    - component.game-art
+    - component.game-audio
+    - component.game-live-operations
+    - component.research-program
+    - component.knowledge-base
+    - component.operations-workflow

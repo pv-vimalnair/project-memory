@@ -1,0 +1,18 @@
+inventory:
+  id: inventory.companion-rules
+  version: 1.0.0
+  expected_count: 13
+  ids:
+    - companion.mutation
+    - companion.user-visible
+    - companion.ui
+    - companion.identity-security
+    - companion.personal-data
+    - companion.commerce
+    - companion.contract-change
+    - companion.supply-chain
+    - companion.campaign
+    - companion.ai
+    - companion.game-system
+    - companion.production-release
+    - companion.retirement

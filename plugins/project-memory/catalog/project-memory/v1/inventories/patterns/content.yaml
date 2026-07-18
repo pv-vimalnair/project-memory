@@ -1,0 +1,18 @@
+inventory:
+  id: inventory.patterns.content
+  version: 1.0.0
+  expected_count: 13
+  ids:
+    - content.strategy.plan
+    - content.editorial.plan
+    - content.copy.design
+    - content.asset.implement
+    - content.review.validate
+    - content.publish.release
+    - content.localization.plan
+    - content.localization.implement
+    - content.accessibility.validate
+    - content.rights.assess
+    - content.taxonomy.design
+    - content.archive.operate
+    - content.material.retire

@@ -1,0 +1,46 @@
+overlay_definition:
+  id: overlay.lifecycle.prototype
+  version: 1.0.0
+  status: active
+  name: Lifecycle Prototype
+  category: lifecycle
+  purpose: Apply the lifecycle prototype trait without changing the enduring project root.
+  inclusion_boundary: Include constraints and defaults caused specifically by the lifecycle prototype trait.
+  exclusion_boundary: Do not use this overlay as a substitute for a blueprint, component, or temporary workstream.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  requires_overlays: []
+  conflicts_with: []
+  default_components:
+    - component.product-management
+  default_domains:
+    - domain.governance-coordination
+  required_documents:
+    - docs/overlays/lifecycle-prototype.md
+  required_records:
+    - profile-lock
+    - decision-log
+  tags:
+    - operating-shape
+    - lifecycle
+    - prototype
+  positive_examples:
+    - The project explicitly operates with the lifecycle prototype trait.
+  negative_examples:
+    - A one-off task resembles lifecycle prototype but does not change the project trait.

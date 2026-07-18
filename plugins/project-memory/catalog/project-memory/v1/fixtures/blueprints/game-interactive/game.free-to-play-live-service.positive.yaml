@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.game.free-to-play-live-service.positive
+  kind: blueprint-positive
+  description: Positive selection case for game.free-to-play-live-service.
+  normalized_features:
+    root.kind: product
+    product.shape: game.free-to-play-live-service
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: game.free-to-play-live-service
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

@@ -1,0 +1,7 @@
+{
+  "product": "Dino Escape",
+  "root_kind": "product",
+  "blueprint": "game.engine-unity",
+  "workstreams": ["player-movement"],
+  "external_action": "forbidden"
+}

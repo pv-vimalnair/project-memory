@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.commerce.two-sided-marketplace.positive
+  kind: blueprint-positive
+  description: Positive selection case for commerce.two-sided-marketplace.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.two-sided-marketplace
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: commerce.two-sided-marketplace
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

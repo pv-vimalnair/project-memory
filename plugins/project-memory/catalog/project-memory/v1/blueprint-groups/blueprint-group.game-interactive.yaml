@@ -1,0 +1,16 @@
+blueprint_group:
+  id: blueprint-group.game-interactive
+  version: 1.0.0
+  status: active
+  name: Game Interactive
+  purpose: Classify enduring game interactive roots before workstreams are planned.
+  primary_archetype: game-interactive
+  allowed_root_kinds:
+    - product
+  blueprint_ids:
+    - game.premium-single-player
+    - game.casual-mobile
+    - game.free-to-play-live-service
+    - game.multiplayer-networked
+    - game.simulation-learning
+    - game.xr-immersive

@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.application.consumer-mobile.positive
+  kind: blueprint-positive
+  description: Positive selection case for application.consumer-mobile.
+  normalized_features:
+    root.kind: product
+    product.shape: application.consumer-mobile
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: application.consumer-mobile
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

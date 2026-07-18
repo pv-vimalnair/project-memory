@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.content.podcast-video-channel.positive
+  kind: blueprint-positive
+  description: Positive selection case for content.podcast-video-channel.
+  normalized_features:
+    root.kind: product
+    product.shape: content.podcast-video-channel
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: content.podcast-video-channel
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

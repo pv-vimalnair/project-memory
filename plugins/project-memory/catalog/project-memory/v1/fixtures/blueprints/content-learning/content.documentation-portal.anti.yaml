@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.content.documentation-portal.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for content.documentation-portal.
+  normalized_features:
+    root.kind: product
+    product.shape: content.documentation-portal
+    product.exclusions:
+      - content.documentation-portal
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - content.documentation-portal
+    reason_codes:
+      - explicit-exclusion

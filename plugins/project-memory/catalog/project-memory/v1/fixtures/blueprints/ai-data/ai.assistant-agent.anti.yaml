@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.ai.assistant-agent.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for ai.assistant-agent.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.assistant-agent
+    product.exclusions:
+      - ai.assistant-agent
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - ai.assistant-agent
+    reason_codes:
+      - explicit-exclusion

@@ -1,0 +1,11 @@
+inventory:
+  id: inventory.blueprints.commerce-network
+  version: 1.0.0
+  expected_count: 6
+  ids:
+    - commerce.ecommerce
+    - commerce.two-sided-marketplace
+    - commerce.booking-reservation
+    - network.community-social
+    - commerce.membership
+    - network.multi-party-transaction

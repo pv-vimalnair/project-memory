@@ -1,0 +1,25 @@
+inventory:
+  id: inventory.patterns.ai
+  version: 1.0.0
+  expected_count: 20
+  ids:
+    - ai.use-case.plan
+    - ai.data.assess
+    - ai.model.assess
+    - ai.model.implement
+    - ai.prompt.design
+    - ai.prompt.change
+    - ai.retrieval.design
+    - ai.retrieval.implement
+    - ai.tooling.implement
+    - ai.evaluation.design
+    - ai.evaluation.validate
+    - ai.safety.assess
+    - ai.guardrail.implement
+    - ai.human-review.design
+    - ai.serving.implement
+    - ai.cost.assess
+    - ai.latency.assess
+    - ai.drift.operate
+    - ai.monitoring.operate
+    - ai.model.retire

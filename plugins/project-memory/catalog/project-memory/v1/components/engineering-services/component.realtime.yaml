@@ -1,0 +1,21 @@
+component_definition:
+  id: component.realtime
+  version: 1.0.0
+  status: active
+  name: Realtime
+  type: service
+  purpose: Own the realtime boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by realtime.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with realtime.
+  required_documents:
+    - docs/components/realtime.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - service
+    - realtime
+  positive_examples:
+    - A task changes or validates the project's realtime capability.
+  negative_examples:
+    - A task merely mentions realtime without changing or validating it.

@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.application.public-web-service.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for application.public-web-service.
+  normalized_features:
+    root.kind: product
+    product.shape: application.public-web-service
+    product.exclusions:
+      - application.public-web-service
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - application.public-web-service
+    reason_codes:
+      - explicit-exclusion

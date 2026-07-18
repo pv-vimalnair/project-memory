@@ -1,0 +1,10 @@
+inventory:
+  id: inventory.adapters.workflow
+  version: 1.0.0
+  expected_count: 5
+  ids:
+    - adapter.figma
+    - adapter.notion
+    - adapter.maestro
+    - adapter.playwright
+    - adapter.github-ci

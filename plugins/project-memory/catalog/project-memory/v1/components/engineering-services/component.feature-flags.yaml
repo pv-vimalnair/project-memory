@@ -1,0 +1,21 @@
+component_definition:
+  id: component.feature-flags
+  version: 1.0.0
+  status: active
+  name: Feature Flags
+  type: platform
+  purpose: Own the feature flags boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by feature flags.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with feature flags.
+  required_documents:
+    - docs/components/feature-flags.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - platform
+    - feature-flags
+  positive_examples:
+    - A task changes or validates the project's feature flags capability.
+  negative_examples:
+    - A task merely mentions feature flags without changing or validating it.

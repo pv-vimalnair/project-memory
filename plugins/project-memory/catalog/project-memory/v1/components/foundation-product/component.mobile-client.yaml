@@ -1,0 +1,21 @@
+component_definition:
+  id: component.mobile-client
+  version: 1.0.0
+  status: active
+  name: Mobile Client
+  type: surface
+  purpose: Own the mobile client boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by mobile client.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with mobile client.
+  required_documents:
+    - docs/components/mobile-client.md
+  default_domains:
+    - domain.product-strategy
+  tags:
+    - foundation-product
+    - surface
+    - mobile-client
+  positive_examples:
+    - A task changes or validates the project's mobile client capability.
+  negative_examples:
+    - A task merely mentions mobile client without changing or validating it.

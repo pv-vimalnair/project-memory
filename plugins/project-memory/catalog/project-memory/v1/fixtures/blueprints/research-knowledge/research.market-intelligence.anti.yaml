@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.research.market-intelligence.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for research.market-intelligence.
+  normalized_features:
+    root.kind: program
+    product.shape: research.market-intelligence
+    product.exclusions:
+      - research.market-intelligence
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - research.market-intelligence
+    reason_codes:
+      - explicit-exclusion

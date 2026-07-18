@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.portfolio.shared-platform.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for portfolio.shared-platform.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: portfolio.shared-platform
+    product.exclusions:
+      - portfolio.shared-platform
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - portfolio.shared-platform
+    reason_codes:
+      - explicit-exclusion

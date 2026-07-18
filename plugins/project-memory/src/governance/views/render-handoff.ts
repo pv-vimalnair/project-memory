@@ -1,0 +1,45 @@
+import {
+  activeWorkstreams,
+  blockerRecords,
+  documentLine,
+  linesOrNone,
+  markdownView,
+  nextActionLines,
+  recordLine,
+  type ViewRenderContext,
+} from "./view-rendering.js";
+
+export function renderHandoff(context: ViewRenderContext): string {
+  return markdownView(context.metadata, [
+    "# Handoff",
+    "",
+    "## Canonical Position",
+    "",
+    `- Root: \`${context.snapshot.root_id}\``,
+    `- Source revision: \`${context.snapshot.source_revision}\``,
+    `- Profile lock: \`${context.snapshot.profile_lock_hash}\``,
+    "",
+    "## Startup Continuation Set",
+    "",
+    "1. Read `PROJECT_CONTEXT.md`.",
+    "2. Read `docs/project-memory/profile.lock.yaml`.",
+    "3. Read `docs/project-memory/views/NOW.md`.",
+    "4. Read the assigned workstream and task packet.",
+    "5. Read named component/domain documents and linked records.",
+    "",
+    "## Active Work",
+    "",
+    ...linesOrNone([
+      ...activeWorkstreams(context.snapshot).map(documentLine),
+      ...context.snapshot.tasks.map(documentLine),
+    ]),
+    "",
+    "## Blockers",
+    "",
+    ...linesOrNone(blockerRecords(context.snapshot).map(recordLine)),
+    "",
+    "## Next Actions",
+    "",
+    ...linesOrNone(nextActionLines(context.snapshot)),
+  ]);
+}

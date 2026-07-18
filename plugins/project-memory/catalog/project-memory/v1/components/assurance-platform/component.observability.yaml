@@ -1,0 +1,21 @@
+component_definition:
+  id: component.observability
+  version: 1.0.0
+  status: active
+  name: Observability
+  type: shared-system
+  purpose: Own the observability boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by observability.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with observability.
+  required_documents:
+    - docs/components/observability.md
+  default_domains:
+    - domain.release-platform-operations
+  tags:
+    - assurance-platform
+    - shared-system
+    - observability
+  positive_examples:
+    - A task changes or validates the project's observability capability.
+  negative_examples:
+    - A task merely mentions observability without changing or validating it.

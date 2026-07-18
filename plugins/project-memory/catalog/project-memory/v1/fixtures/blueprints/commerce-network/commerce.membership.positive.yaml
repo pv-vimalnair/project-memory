@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.commerce.membership.positive
+  kind: blueprint-positive
+  description: Positive selection case for commerce.membership.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.membership
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: commerce.membership
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

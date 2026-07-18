@@ -1,0 +1,21 @@
+component_definition:
+  id: component.brand
+  version: 1.0.0
+  status: active
+  name: Brand
+  type: content
+  purpose: Own the brand boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by brand.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with brand.
+  required_documents:
+    - docs/components/brand.md
+  default_domains:
+    - domain.visual-brand-design-systems
+  tags:
+    - foundation-product
+    - content
+    - brand
+  positive_examples:
+    - A task changes or validates the project's brand capability.
+  negative_examples:
+    - A task merely mentions brand without changing or validating it.

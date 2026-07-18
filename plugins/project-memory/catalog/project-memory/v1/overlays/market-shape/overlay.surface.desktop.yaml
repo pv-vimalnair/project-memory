@@ -1,0 +1,46 @@
+overlay_definition:
+  id: overlay.surface.desktop
+  version: 1.0.0
+  status: active
+  name: Surface Desktop
+  category: surface
+  purpose: Apply the surface desktop trait without changing the enduring project root.
+  inclusion_boundary: Include constraints and defaults caused specifically by the surface desktop trait.
+  exclusion_boundary: Do not use this overlay as a substitute for a blueprint, component, or temporary workstream.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  requires_overlays: []
+  conflicts_with: []
+  default_components:
+    - component.desktop-client
+  default_domains:
+    - domain.engineering-architecture
+  required_documents:
+    - docs/overlays/surface-desktop.md
+  required_records:
+    - profile-lock
+    - decision-log
+  tags:
+    - market-shape
+    - surface
+    - desktop
+  positive_examples:
+    - The project explicitly operates with the surface desktop trait.
+  negative_examples:
+    - A one-off task resembles surface desktop but does not change the project trait.

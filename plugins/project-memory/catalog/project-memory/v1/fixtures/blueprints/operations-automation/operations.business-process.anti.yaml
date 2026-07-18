@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.operations.business-process.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for operations.business-process.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: operations.business-process
+    product.exclusions:
+      - operations.business-process
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - operations.business-process
+    reason_codes:
+      - explicit-exclusion

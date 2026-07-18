@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.research.policy-standards.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for research.policy-standards.
+  normalized_features:
+    root.kind: program
+    product.shape: research.policy-standards
+    product.exclusions:
+      - research.policy-standards
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - research.policy-standards
+    reason_codes:
+      - explicit-exclusion

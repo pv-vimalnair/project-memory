@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.commerce.booking-reservation.positive
+  kind: blueprint-positive
+  description: Positive selection case for commerce.booking-reservation.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.booking-reservation
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: commerce.booking-reservation
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

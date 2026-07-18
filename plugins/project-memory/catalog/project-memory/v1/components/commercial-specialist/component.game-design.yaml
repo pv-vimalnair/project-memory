@@ -1,0 +1,21 @@
+component_definition:
+  id: component.game-design
+  version: 1.0.0
+  status: active
+  name: Game Design
+  type: shared-system
+  purpose: Own the game design boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by game design.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with game design.
+  required_documents:
+    - docs/components/game-design.md
+  default_domains:
+    - domain.game-design-art-audio-live-operations
+  tags:
+    - commercial-specialist
+    - shared-system
+    - game-design
+  positive_examples:
+    - A task changes or validates the project's game design capability.
+  negative_examples:
+    - A task merely mentions game design without changing or validating it.

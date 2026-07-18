@@ -1,0 +1,28 @@
+id: companion.game-system
+version: 1.0.0
+status: active
+purpose: Narrow game system work by adding mandatory validation and evidence without expanding authority.
+when:
+  all:
+    - id: companion.game-system.when
+      feature: project.tags
+      operator: tag_present
+      expected: game
+      evidence_required: true
+  any: []
+  none: []
+require_patterns:
+  - id: game.balance.assess
+    version_range: 1.0.0
+    condition: true
+  - id: game.playtest.validate
+    version_range: 1.0.0
+    condition: true
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validated game system evidence
+  - linked source references
+authority_effect: narrow-only
+conflict_policy: fail_closed

@@ -1,0 +1,56 @@
+pattern_taxonomy:
+  pattern_id: ai.monitoring.operate
+  pattern_version: 1.0.0
+  compatibility:
+    root_kinds:
+      - product
+      - shared-system
+      - program
+      - portfolio
+      - engagement
+    primary_archetypes:
+      - application-service
+      - developer-platform
+      - game-interactive
+      - ai-data
+      - commerce-network
+      - content-learning
+      - brand-design
+      - research-knowledge
+      - operations-automation
+      - portfolio
+      - engagement
+    required_overlays: []
+    forbidden_overlays: []
+  overlay_applicability:
+    baked: []
+    allowed:
+      - overlay.lifecycle.active
+    forbidden: []
+  component_impacts:
+    - selector:
+        tag: ai
+      duties:
+        - inspect
+        - validate
+        - record
+      requirement: conditional
+      condition: affected_component_matches_family
+      reason: The selected component owns affected ai artifacts.
+      write_scope: []
+      responsible_role: validator
+  domain_impacts:
+    - selector:
+        id: domain.data-analytics-ai
+      duties:
+        - inspect
+        - validate
+        - record
+      requirement: required
+      condition: true
+      reason: The ai domain owns durable oversight and evidence for this pattern.
+      write_scope: []
+      required_records:
+        - worklog
+        - evidence
+      responsible_role: validator

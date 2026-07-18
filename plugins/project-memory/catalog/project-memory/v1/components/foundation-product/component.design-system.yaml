@@ -1,0 +1,21 @@
+component_definition:
+  id: component.design-system
+  version: 1.0.0
+  status: active
+  name: Design System
+  type: shared-system
+  purpose: Own the design system boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by design system.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with design system.
+  required_documents:
+    - docs/components/design-system.md
+  default_domains:
+    - domain.visual-brand-design-systems
+  tags:
+    - foundation-product
+    - shared-system
+    - design-system
+  positive_examples:
+    - A task changes or validates the project's design system capability.
+  negative_examples:
+    - A task merely mentions design system without changing or validating it.

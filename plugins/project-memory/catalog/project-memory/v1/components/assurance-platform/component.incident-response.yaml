@@ -1,0 +1,21 @@
+component_definition:
+  id: component.incident-response
+  version: 1.0.0
+  status: active
+  name: Incident Response
+  type: workflow
+  purpose: Own the incident response boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by incident response.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with incident response.
+  required_documents:
+    - docs/components/incident-response.md
+  default_domains:
+    - domain.release-platform-operations
+  tags:
+    - assurance-platform
+    - workflow
+    - incident-response
+  positive_examples:
+    - A task changes or validates the project's incident response capability.
+  negative_examples:
+    - A task merely mentions incident response without changing or validating it.

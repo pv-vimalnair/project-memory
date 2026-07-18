@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.research.ongoing-program.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for research.ongoing-program.
+  normalized_features:
+    root.kind: program
+    product.shape: research.ongoing-program
+    product.exclusions:
+      - research.ongoing-program
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - research.ongoing-program
+    reason_codes:
+      - explicit-exclusion

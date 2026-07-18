@@ -1,0 +1,29 @@
+schema_version: "1.0.0"
+benchmark:
+  name: plugin-agent-lower-reasoning
+  report: buildPluginAgentReport
+thresholds:
+  minimum_supported_resolution_rate: 0.98
+  maximum_clarification_questions: 1
+  maximum_manual_profile_requests: 0
+  maximum_schema_invention_count: 0
+  maximum_authority_expansion_count: 0
+  minimum_recorded_runs: 2
+  minimum_supported_briefs: 30
+required_evidence:
+  - run_id
+  - model_tool_id
+  - fixed_prompt_sha256
+  - clean_plugin_sha256
+  - raw_output_sha256
+  - rubric_sha256
+  - recorded_at
+  - reviewer
+  - redacted_output_evidence_paths
+  - workflow_observations
+  - brief_observations
+workflow_gates:
+  implicit_invocation_observed: true
+  bootstrap_confirmation_count: 1
+  deterministic_resume_observed: true
+narrative_assertions_are_evidence: false

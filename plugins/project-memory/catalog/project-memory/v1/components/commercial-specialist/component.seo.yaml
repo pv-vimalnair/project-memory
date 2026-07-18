@@ -1,0 +1,21 @@
+component_definition:
+  id: component.seo
+  version: 1.0.0
+  status: active
+  name: Seo
+  type: shared-system
+  purpose: Own the seo boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by seo.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with seo.
+  required_documents:
+    - docs/components/seo.md
+  default_domains:
+    - domain.growth-marketing-commercial
+  tags:
+    - commercial-specialist
+    - shared-system
+    - seo
+  positive_examples:
+    - A task changes or validates the project's seo capability.
+  negative_examples:
+    - A task merely mentions seo without changing or validating it.

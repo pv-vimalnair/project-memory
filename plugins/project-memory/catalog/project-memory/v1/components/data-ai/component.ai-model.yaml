@@ -1,0 +1,21 @@
+component_definition:
+  id: component.ai-model
+  version: 1.0.0
+  status: active
+  name: Ai Model
+  type: data
+  purpose: Own the ai model boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by ai model.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with ai model.
+  required_documents:
+    - docs/components/ai-model.md
+  default_domains:
+    - domain.data-analytics-ai
+  tags:
+    - data-ai
+    - data
+    - ai-model
+  positive_examples:
+    - A task changes or validates the project's ai model capability.
+  negative_examples:
+    - A task merely mentions ai model without changing or validating it.

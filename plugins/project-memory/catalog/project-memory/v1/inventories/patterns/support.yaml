@@ -1,0 +1,17 @@
+inventory:
+  id: inventory.patterns.support
+  version: 1.0.0
+  expected_count: 12
+  ids:
+    - support.request.assess
+    - support.issue.assess
+    - support.incident.operate
+    - support.problem.assess
+    - support.knowledge.change
+    - support.sop.change
+    - support.escalation.operate
+    - support.service.validate
+    - support.root-cause.assess
+    - support.remediation.change
+    - support.maintenance.operate
+    - support.deprecation.retire

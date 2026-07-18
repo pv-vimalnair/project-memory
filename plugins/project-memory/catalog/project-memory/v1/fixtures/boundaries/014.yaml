@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-014
+  kind: blueprint-boundary
+  description: Boundary case selecting ai.benchmark-evaluation over ai.recommendation-personalization.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.benchmark-evaluation
+    product.exclusions:
+      - ai.recommendation-personalization
+  expected:
+    decision: selected
+    blueprint_id: ai.benchmark-evaluation
+    prohibited_blueprint_ids:
+      - ai.recommendation-personalization
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

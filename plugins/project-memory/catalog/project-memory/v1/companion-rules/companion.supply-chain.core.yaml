@@ -1,0 +1,28 @@
+id: companion.supply-chain
+version: 1.0.0
+status: active
+purpose: Narrow supply chain work by adding mandatory validation and evidence without expanding authority.
+when:
+  all:
+    - id: companion.supply-chain.when
+      feature: project.tags
+      operator: tag_present
+      expected: supply-chain
+      evidence_required: true
+  any: []
+  none: []
+require_patterns:
+  - id: security.supply-chain.assess
+    version_range: 1.0.0
+    condition: true
+  - id: release.build.validate
+    version_range: 1.0.0
+    condition: true
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validated supply chain evidence
+  - linked source references
+authority_effect: narrow-only
+conflict_policy: fail_closed

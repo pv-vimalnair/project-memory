@@ -1,0 +1,63 @@
+name: Project Memory Release Candidate
+
+# Builds ephemeral unsigned CI artifacts only. It never publishes a package or release.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-unsigned:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: plugins/project-memory
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: plugins/project-memory/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm audit --omit=dev
+      - run: npm run check
+      - run: node scripts/verify-generated.mjs
+      - run: npm run plugin:verify
+      - run: npm run public-runtime:build
+      - run: >-
+          git diff --exit-code --
+          dist/project-memory.mjs
+          dist/project-memory.mjs.sha256
+          dist/project-memory-mcp.mjs
+          dist/project-memory-mcp.mjs.sha256
+          dist/catalog/project-memory/1.0.0
+      - run: node scripts/verify-package.mjs --output .tmp/release-candidate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-candidate-${{ runner.os }}
+          path: plugins/project-memory/.tmp/release-candidate
+          if-no-files-found: error
+          retention-days: 7
+
+  compare-logical-manifests:
+    needs: build-unsigned
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-candidate-Windows
+          path: windows
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-candidate-Linux
+          path: linux
+      - run: diff --no-index windows/logical-manifest.json linux/logical-manifest.json

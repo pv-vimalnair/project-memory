@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-015
+  kind: blueprint-boundary
+  description: Boundary case selecting commerce.ecommerce over commerce.two-sided-marketplace.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.ecommerce
+    product.exclusions:
+      - commerce.two-sided-marketplace
+  expected:
+    decision: selected
+    blueprint_id: commerce.ecommerce
+    prohibited_blueprint_ids:
+      - commerce.two-sided-marketplace
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

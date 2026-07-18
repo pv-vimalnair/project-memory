@@ -1,0 +1,11 @@
+inventory:
+  id: inventory.blueprints.game-interactive
+  version: 1.0.0
+  expected_count: 6
+  ids:
+    - game.premium-single-player
+    - game.casual-mobile
+    - game.free-to-play-live-service
+    - game.multiplayer-networked
+    - game.simulation-learning
+    - game.xr-immersive

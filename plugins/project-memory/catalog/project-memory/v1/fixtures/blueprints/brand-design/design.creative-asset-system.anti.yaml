@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.design.creative-asset-system.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for design.creative-asset-system.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: design.creative-asset-system
+    product.exclusions:
+      - design.creative-asset-system
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - design.creative-asset-system
+    reason_codes:
+      - explicit-exclusion

@@ -1,0 +1,21 @@
+component_definition:
+  id: component.compliance
+  version: 1.0.0
+  status: active
+  name: Compliance
+  type: shared-system
+  purpose: Own the compliance boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by compliance.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with compliance.
+  required_documents:
+    - docs/components/compliance.md
+  default_domains:
+    - domain.security-privacy-compliance-trust
+  tags:
+    - assurance-platform
+    - shared-system
+    - compliance
+  positive_examples:
+    - A task changes or validates the project's compliance capability.
+  negative_examples:
+    - A task merely mentions compliance without changing or validating it.

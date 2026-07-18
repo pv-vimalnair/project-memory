@@ -1,0 +1,17 @@
+inventory:
+  id: inventory.patterns.research
+  version: 1.0.0
+  expected_count: 12
+  ids:
+    - research.question.plan
+    - research.protocol.design
+    - research.source.assess
+    - research.user.assess
+    - research.market.assess
+    - research.competitor.assess
+    - research.literature.assess
+    - research.experiment.implement
+    - research.analysis.assess
+    - research.finding.validate
+    - research.synthesis.change
+    - research.reproducibility.validate

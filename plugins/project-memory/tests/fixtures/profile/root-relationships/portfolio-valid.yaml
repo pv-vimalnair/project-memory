@@ -1,0 +1,20 @@
+kind: portfolio-child
+relationship_id: relationship.portfolio.lifeof
+revision: 1
+portfolio:
+  namespace: acme.portfolio
+  root_id: ROOT-01J00000000000000000000000
+  canonical_repository: https://github.com/acme/portfolio-memory
+  profile_lock_hash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+child:
+  namespace: lifeof.app
+  root_id: ROOT-01J00000000000000000000001
+  canonical_repository: https://github.com/acme/lifeof
+  profile_lock_hash: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+relationship_owner_root_id: ROOT-01J00000000000000000000000
+child_truth_owner_root_id: ROOT-01J00000000000000000000001
+relationship_status: active
+dependency_kinds:
+  - product-family
+approval_refs:
+  - APR-01J00000000000000000000000

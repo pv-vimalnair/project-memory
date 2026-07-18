@@ -1,0 +1,5 @@
+root:
+  id: ROOT-01J00000000000000000000001
+  kind: product
+  primary_archetype: application-service
+  blueprint: application.consumer-mobile

@@ -1,0 +1,28 @@
+id: companion.retirement
+version: 1.0.0
+status: active
+purpose: Narrow retirement work by adding mandatory validation and evidence without expanding authority.
+when:
+  all:
+    - id: companion.retirement.when
+      feature: action.mode
+      operator: equals
+      expected: retire
+      evidence_required: true
+  any: []
+  none: []
+require_patterns:
+  - id: governance.archive.operate
+    version_range: 1.0.0
+    condition: true
+  - id: content.material.retire
+    version_range: 1.0.0
+    condition: true
+require_duties:
+  - validate
+  - record
+require_evidence:
+  - validated retirement evidence
+  - linked source references
+authority_effect: narrow-only
+conflict_policy: fail_closed

@@ -1,0 +1,21 @@
+component_definition:
+  id: component.research-program
+  version: 1.0.0
+  status: active
+  name: Research Program
+  type: service
+  purpose: Own the research program boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by research program.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with research program.
+  required_documents:
+    - docs/components/research-program.md
+  default_domains:
+    - domain.research-insight
+  tags:
+    - commercial-specialist
+    - service
+    - research-program
+  positive_examples:
+    - A task changes or validates the project's research program capability.
+  negative_examples:
+    - A task merely mentions research program without changing or validating it.

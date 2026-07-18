@@ -1,0 +1,11 @@
+inventory:
+  id: inventory.blueprints.ai-data
+  version: 1.0.0
+  expected_count: 6
+  ids:
+    - ai.assistant-agent
+    - ai.model-service
+    - ai.analytics-decision-support
+    - ai.data-platform
+    - ai.benchmark-evaluation
+    - ai.recommendation-personalization

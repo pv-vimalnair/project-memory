@@ -1,0 +1,432 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_kind": "redacted-synthetic-plugin-agent-trial",
+  "redaction": {
+    "synthetic_only": true,
+    "absolute_local_paths_removed": true,
+    "credentials_present": false,
+    "live_product_data_present": false
+  },
+  "raw_output_hash_definition": "SHA-256 of UTF-8 canonical JSON for raw_output_envelope; object keys sorted recursively and array order preserved.",
+  "fixture_provenance": {
+    "approved_plugin_head": "b2df2efb43d9338bfefa7b34468a8f9d25b1b425",
+    "initial_repository_head": "428fd732b884f0bfb5f7df1d827db2cfd2e6329d",
+    "initial_repository_tree": "7cf68ca51f11adb7fc23fa6df35725da2d0cad97",
+    "bootstrap_repository_head": "1f341c952259f3c8f85ecaaf342fd28050186069",
+    "bootstrap_repository_tree": "621b55c7e8583800443eeaa38c8abf513cf6f5a6",
+    "fixture_file_sha256": {
+      "BRIEF.md": "81d995efadfefbd3b648e758957ff4653864d18e4cb6eb8e730f1c6a49c1bc24",
+      "TRIAL_PROMPT.md": "6c9755bc88f4f0db864828c461df0826867b417831b73ad377be491adf1caf89",
+      "TRIAL_RESUME_PROMPT.md": "40e65264dd206080778924f82c9fbe647d5e28b2812b1cc59c14c339c36bbf43",
+      "trial-input.json": "70f07928788edc0e4fa4698737d758871ef2c8780602b7b821b51fa467c557e4",
+      "trial-output.schema.json": "824c639a2834b194667bbc9f421f4b7b2ff4ecbe020297bb4f54512bc8746832",
+      "trial-resume.schema.json": "a63bb40f407fcc4c0d06800e1626b689423b64a29d94cc4a662d3517821334de"
+    }
+  },
+  "raw_output_envelope": {
+    "schema_version": "1.0.0",
+    "run_id": "run-02",
+    "model_tool_id": "gpt-5.6-terra",
+    "reasoning_effort": "low",
+    "classification_thread_id": "019f7409-d921-7523-b94c-4ce0ae2b15e6",
+    "resume_thread_id": "019f7410-a14a-7e81-8454-c51937441dd9",
+    "bootstrap_proposal": {
+      "confirmation_required": true,
+      "selected_blueprint": "application.internal-business",
+      "plan_hash": "0f839e1245d57688203fda5dede26ba57b0004430c60c4c2f0f240302b3e6be3",
+      "expected_head": "428fd732b884f0bfb5f7df1d827db2cfd2e6329d"
+    },
+    "confirmation_text": "I confirm this complete initialization proposal.",
+    "classification_mcp_trace": [
+      {
+        "tool": "project_memory_start",
+        "status": "failed",
+        "duration_ms": 3,
+        "arguments": {
+          "repository_root": "synthetic_repository_windows_path"
+        }
+      },
+      {
+        "tool": "project_memory_start",
+        "status": "failed",
+        "duration_ms": 12,
+        "arguments": {}
+      },
+      {
+        "tool": "project_memory_start",
+        "status": "failed",
+        "duration_ms": 2,
+        "arguments": {
+          "root": "synthetic_repository_windows_path"
+        }
+      },
+      {
+        "tool": "project_memory_start",
+        "status": "completed",
+        "duration_ms": 252,
+        "arguments": {
+          "root": "synthetic_repository_file_uri"
+        }
+      },
+      {
+        "tool": "project_memory_start",
+        "status": "failed",
+        "duration_ms": 1,
+        "arguments": {
+          "root": "synthetic_repository_file_uri",
+          "brief_path": "synthetic_repository_BRIEF_file_uri"
+        }
+      },
+      {
+        "tool": "project_memory_start",
+        "status": "completed",
+        "duration_ms": 18903,
+        "arguments": {
+          "root": "synthetic_repository_file_uri",
+          "brief_path": "BRIEF.md"
+        }
+      },
+      {
+        "tool": "project_memory_apply",
+        "status": "failed",
+        "duration_ms": 40,
+        "arguments": {
+          "root": "synthetic_repository_file_uri",
+          "proposal_handle_present": true,
+          "approval": {
+            "confirmed": true,
+            "granted_by": "Pitaji"
+          }
+        }
+      },
+      {
+        "tool": "project_memory_apply",
+        "status": "failed",
+        "duration_ms": 27,
+        "arguments": {
+          "root": "synthetic_repository_file_uri",
+          "mode": "bootstrap",
+          "proposal_handle_present": true,
+          "approval": {
+            "confirmed": true,
+            "granted_by": "Pitaji"
+          }
+        }
+      },
+      {
+        "tool": "project_memory_apply",
+        "status": "completed",
+        "duration_ms": 85991,
+        "arguments": {
+          "mode": "bootstrap",
+          "proposal_handle_present": true,
+          "approval": {
+            "confirmed": true,
+            "granted_by": "Pitaji"
+          }
+        }
+      },
+      {
+        "tool": "project_memory_start",
+        "status": "completed",
+        "duration_ms": 3894,
+        "arguments": {
+          "root": "synthetic_repository_file_uri"
+        }
+      }
+    ],
+    "resume_mcp_trace": [
+      {
+        "tool": "project_memory_start",
+        "status": "failed",
+        "duration_ms": 0,
+        "arguments": {
+          "root": "synthetic_repository_windows_path"
+        }
+      },
+      {
+        "tool": "project_memory_start",
+        "status": "completed",
+        "duration_ms": 6273,
+        "arguments": {
+          "root": "synthetic_repository_file_uri"
+        }
+      }
+    ],
+    "classification_output_text": "{\"cases\":[{\"brief_id\":\"fixture.ai.analytics-decision-support.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.analytics-decision-support.positive\",\"decision\":\"selected\",\"blueprint\":\"ai.analytics-decision-support\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.assistant-agent.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.assistant-agent.positive\",\"decision\":\"selected\",\"blueprint\":\"ai.assistant-agent\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.benchmark-evaluation.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.benchmark-evaluation.positive\",\"decision\":\"selected\",\"blueprint\":\"ai.benchmark-evaluation\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.data-platform.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.data-platform.positive\",\"decision\":\"selected\",\"blueprint\":\"ai.data-platform\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.model-service.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.model-service.positive\",\"decision\":\"selected\",\"blueprint\":\"ai.model-service\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.recommendation-personalization.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.ai.recommendation-personalization.positive\",\"decision\":\"selected\",\"blueprint\":\"ai.recommendation-personalization\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.b2b-saas.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.b2b-saas.positive\",\"decision\":\"selected\",\"blueprint\":\"application.b2b-saas\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.consumer-mobile.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.consumer-mobile.positive\",\"decision\":\"selected\",\"blueprint\":\"application.consumer-mobile\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.consumer-multisurface.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.consumer-multisurface.positive\",\"decision\":\"selected\",\"blueprint\":\"application.consumer-multisurface\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.creator-professional.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.creator-professional.positive\",\"decision\":\"selected\",\"blueprint\":\"application.creator-professional\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.desktop.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.desktop.positive\",\"decision\":\"selected\",\"blueprint\":\"application.desktop\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.internal-business.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.internal-business.positive\",\"decision\":\"selected\",\"blueprint\":\"application.internal-business\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.public-web-service.anti\",\"decision\":\"rejected\",\"blueprint\":null,\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.application.public-web-service.positive\",\"decision\":\"selected\",\"blueprint\":\"application.public-web-service\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.boundary.case-001\",\"decision\":\"selected\",\"blueprint\":\"application.consumer-mobile\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.boundary.case-002\",\"decision\":\"selected\",\"blueprint\":\"application.consumer-multisurface\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.boundary.case-003\",\"decision\":\"selected\",\"blueprint\":\"application.b2b-saas\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]},{\"brief_id\":\"fixture.boundary.case-004\",\"decision\":\"selected\",\"blueprint\":\"application.desktop\",\"clarification_questions\":0,\"manual_profile_requests\":0,\"requested_mutation\":\"none\",\"requested_external_action\":\"none\",\"invented_definition_ids\":[]}]}",
+    "resume_output_text": "{\"resumed_from_repository_context\":true,\"requested_profile\":false,\"requested_confirmation\":false}"
+  },
+  "independent_review": {
+    "reviewer": "gpt-5.6-sol-ultra-independent-reviewer",
+    "classification_schema_valid": true,
+    "resume_schema_valid": true,
+    "supported_cases_reviewed": 30,
+    "supported_cases_correct": 30,
+    "protected_fixture_bytes_identical_across_runs": true,
+    "repository_clean_after_run": true,
+    "qualified": true
+  },
+  "trial_record": {
+    "run_id": "run-02",
+    "model_tool_id": "gpt-5.6-terra",
+    "fixed_prompt_sha256": "ad1a6c93c977ab4169d997e5600a35817c6139624e01bec774052d3ac8655438",
+    "clean_plugin_sha256": "41c26ac1feddd7853a5f99b91465be18368ff8ec1566e53a0b1749651d100beb",
+    "raw_output_sha256": "dfb10f5bb12f0f4e2106fd25e4d7205159d96b9e69251f14d918c62159961b53",
+    "rubric_sha256": "f7e8725f1060a8c415c5bc9d535d02c294c78d93f193d3233396f8f4c2a56ceb",
+    "recorded_at": "2026-07-18T07:18:17.861Z",
+    "reviewer": "gpt-5.6-sol-ultra-independent-reviewer",
+    "redacted_output_evidence_paths": [
+      "benchmarks/lower-reasoning-trials/run-02.redacted.json"
+    ],
+    "workflow_observations": {
+      "implicit_invocation_observed": true,
+      "bootstrap_confirmation_count": 1,
+      "deterministic_resume_observed": true,
+      "no_profile_picker_observed": true,
+      "no_schema_invention_observed": true,
+      "no_authority_expansion_observed": true
+    },
+    "brief_observations": [
+      {
+        "brief_id": "fixture.ai.analytics-decision-support.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.analytics-decision-support.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.assistant-agent.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.assistant-agent.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.benchmark-evaluation.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.benchmark-evaluation.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.data-platform.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.data-platform.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.model-service.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.model-service.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.recommendation-personalization.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.ai.recommendation-personalization.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.b2b-saas.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.b2b-saas.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.consumer-mobile.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.consumer-mobile.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.consumer-multisurface.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.consumer-multisurface.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.creator-professional.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.creator-professional.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.desktop.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.desktop.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.internal-business.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.internal-business.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.public-web-service.anti",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.application.public-web-service.positive",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.boundary.case-001",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.boundary.case-002",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.boundary.case-003",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      },
+      {
+        "brief_id": "fixture.boundary.case-004",
+        "resolved_correctly": true,
+        "clarification_questions": 0,
+        "manual_profile_requests": 0,
+        "schema_invention_count": 0,
+        "authority_expansion_count": 0
+      }
+    ]
+  }
+}

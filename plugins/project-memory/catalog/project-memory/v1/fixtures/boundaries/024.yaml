@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-024
+  kind: blueprint-boundary
+  description: Boundary case selecting portfolio.product-family over portfolio.shared-platform.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: portfolio.product-family
+    product.exclusions:
+      - portfolio.shared-platform
+  expected:
+    decision: selected
+    blueprint_id: portfolio.product-family
+    prohibited_blueprint_ids:
+      - portfolio.shared-platform
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.content.publication-newsletter.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for content.publication-newsletter.
+  normalized_features:
+    root.kind: product
+    product.shape: content.publication-newsletter
+    product.exclusions:
+      - content.publication-newsletter
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - content.publication-newsletter
+    reason_codes:
+      - explicit-exclusion

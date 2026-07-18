@@ -1,0 +1,21 @@
+component_definition:
+  id: component.editorial-content
+  version: 1.0.0
+  status: active
+  name: Editorial Content
+  type: content
+  purpose: Own the editorial content boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by editorial content.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with editorial content.
+  required_documents:
+    - docs/components/editorial-content.md
+  default_domains:
+    - domain.content-communications-localization
+  tags:
+    - commercial-specialist
+    - content
+    - editorial-content
+  positive_examples:
+    - A task changes or validates the project's editorial content capability.
+  negative_examples:
+    - A task merely mentions editorial content without changing or validating it.

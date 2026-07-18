@@ -1,0 +1,21 @@
+component_definition:
+  id: component.ci-cd
+  version: 1.0.0
+  status: active
+  name: Ci Cd
+  type: platform
+  purpose: Own the ci cd boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by ci cd.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with ci cd.
+  required_documents:
+    - docs/components/ci-cd.md
+  default_domains:
+    - domain.release-platform-operations
+  tags:
+    - assurance-platform
+    - platform
+    - ci-cd
+  positive_examples:
+    - A task changes or validates the project's ci cd capability.
+  negative_examples:
+    - A task merely mentions ci cd without changing or validating it.

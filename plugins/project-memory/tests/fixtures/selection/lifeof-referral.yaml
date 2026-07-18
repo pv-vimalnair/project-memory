@@ -1,0 +1,75 @@
+schema_version: 1.0.0
+scenario_id: lifeof-referral
+root:
+  id: ROOT-01J00000000000000000000011
+  profile_lock_hash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  catalog_release: 1.0.0
+  catalog_hash: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  kind: product
+  primary_archetype: application-service
+  profile_id: profile.lifeof
+  overlay_ids: [overlay.lifecycle.active]
+initiative_id: null
+repository: lifeof
+original_base_revision: 0123456789abcdef0123456789abcdef01234567
+integrator_id: agent.integrator
+worker_id: agent.codex-worker-1
+artifact_types: [code/runtime, campaign-config]
+artifact_refs: [profile.lock.yaml, docs/product/referral.md]
+feature_flags:
+  release.production: true
+components:
+  - instance_id: CMP-01J00000000000000000000011
+    definition_id: component.mobile-app
+    type: surface
+    tags: [engineering, growth, qa, release]
+    dependency_rules: []
+    paths: [lib/features/referral/**]
+outcomes:
+  - id: outcome.lifeof-referral-launch
+    statement: Release the accepted in-app LifeOf referral campaign
+    mode: release
+    family: growth
+    object: campaign
+    acceptance_criteria: [Referral launch is validated and reversible]
+    authority_class: integrator
+    release_fate: production
+    can_complete_independently: true
+    depends_on: []
+    paths: [lib/features/referral/**]
+    exclusions: [firebase/**]
+approvals:
+  - id: APR-01J00000000000000000000011
+    kind: mutation
+    granted_by: Pitaji
+    issued_at: "2026-07-14T11:55:00.000Z"
+    expires_at: "2026-07-14T13:00:00.000Z"
+    target: outcome.lifeof-referral-launch
+    environment: production
+    scope: [lib/features/referral/**]
+    timing: once
+    invalidation_conditions: [scope-change, base-change]
+  - id: APR-01J00000000000000000000012
+    kind: external
+    granted_by: Pitaji
+    issued_at: "2026-07-14T11:55:00.000Z"
+    expires_at: "2026-07-14T13:00:00.000Z"
+    target: lifeof-referral-campaign
+    environment: production
+    scope: [lib/features/referral/**]
+    timing: once
+    invalidation_conditions: [target-change, scope-change, timing-change]
+external_authorizations:
+  outcome.lifeof-referral-launch:
+    allowed: true
+    approval_ids: [APR-01J00000000000000000000012]
+    target: lifeof-referral-campaign
+    environment: production
+    scope: [lib/features/referral/**]
+    timing: once
+accepted_decision_ids: [DEC-01J00000000000000000000011]
+proposed_decision_ids: []
+claim:
+  ttl_ms: 900000
+  heartbeat_interval: PT5M
+  renewal_policy: claim.same-scope-only

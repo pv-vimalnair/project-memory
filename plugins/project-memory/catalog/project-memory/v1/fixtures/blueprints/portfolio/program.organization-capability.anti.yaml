@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.program.organization-capability.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for program.organization-capability.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: program.organization-capability
+    product.exclusions:
+      - program.organization-capability
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - program.organization-capability
+    reason_codes:
+      - explicit-exclusion

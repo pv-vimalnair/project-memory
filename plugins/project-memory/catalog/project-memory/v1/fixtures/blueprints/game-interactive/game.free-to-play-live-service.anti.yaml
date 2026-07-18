@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.game.free-to-play-live-service.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for game.free-to-play-live-service.
+  normalized_features:
+    root.kind: product
+    product.shape: game.free-to-play-live-service
+    product.exclusions:
+      - game.free-to-play-live-service
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - game.free-to-play-live-service
+    reason_codes:
+      - explicit-exclusion

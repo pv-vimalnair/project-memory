@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.commerce.two-sided-marketplace.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for commerce.two-sided-marketplace.
+  normalized_features:
+    root.kind: product
+    product.shape: commerce.two-sided-marketplace
+    product.exclusions:
+      - commerce.two-sided-marketplace
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - commerce.two-sided-marketplace
+    reason_codes:
+      - explicit-exclusion

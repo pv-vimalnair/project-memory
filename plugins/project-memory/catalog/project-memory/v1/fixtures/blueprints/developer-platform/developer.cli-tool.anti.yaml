@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.developer.cli-tool.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for developer.cli-tool.
+  normalized_features:
+    root.kind: product
+    product.shape: developer.cli-tool
+    product.exclusions:
+      - developer.cli-tool
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - developer.cli-tool
+    reason_codes:
+      - explicit-exclusion

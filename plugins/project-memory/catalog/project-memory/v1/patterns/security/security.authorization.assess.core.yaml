@@ -1,0 +1,84 @@
+id: security.authorization.assess
+version: 1.0.0
+status: active
+purpose: Assess bounded authorization work in the security family with explicit evidence and authority.
+selection:
+  feature_schema_version: 1.0.0
+  required_signals:
+    - id: security.authorization.assess.family
+      feature: work.family
+      operator: equals
+      expected: security
+      evidence_required: true
+    - id: security.authorization.assess.mode
+      feature: action.mode
+      operator: equals
+      expected: assess
+      evidence_required: true
+  positive_signals:
+    - id: security.authorization.assess.object
+      feature: work.object
+      operator: equals
+      expected: authorization
+      evidence_required: true
+      weight: 100
+  negative_signals:
+    - id: security.authorization.assess.negative
+      feature: work.anti-patterns
+      operator: tag_present
+      expected: security.authorization.assess
+      evidence_required: false
+      penalty: 100
+  exclusions:
+    - id: security.authorization.assess.exclusion
+      feature: work.exclusions
+      operator: tag_present
+      expected: security.authorization.assess
+      evidence_required: false
+  max_positive_weight: 100
+  specificity_rank: 100
+  precedence: 100
+composition:
+  allowed_primary_pattern_ids: []
+  mandatory_companion_rule_ids: []
+  incompatible_pattern_ids: []
+  triggers_companions: true
+duties:
+  - inspect
+  - validate
+  - record
+write_scope: []
+authorization:
+  mutation: none
+  task_result_submission: worker
+  factual_integration: integrator
+  workstream_activation: automatic-by-rule
+  directional_acceptance: Pitaji
+  external_action: none
+inputs:
+  - accepted workstream outcome
+  - current canonical snapshot
+  - task-scoped evidence
+outputs:
+  - security authorization assess result
+  - completion evidence
+evidence:
+  - source references
+  - validation results
+  - changed-path inventory
+gates:
+  - scope is accepted
+  - authority covers every duty
+  - required evidence is current
+memory_updates:
+  - worklog
+  - evidence
+  - handoff
+completion_conditions:
+  - all declared duties are resolved
+  - required gates pass
+  - remaining risks are recorded
+fallback_and_escalation:
+  - fail closed on missing evidence
+  - return semantic ambiguity to the integrator
+  - request Pitaji approval for directional change

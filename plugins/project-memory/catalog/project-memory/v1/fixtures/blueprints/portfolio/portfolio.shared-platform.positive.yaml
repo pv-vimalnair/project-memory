@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.portfolio.shared-platform.positive
+  kind: blueprint-positive
+  description: Positive selection case for portfolio.shared-platform.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: portfolio.shared-platform
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: portfolio.shared-platform
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

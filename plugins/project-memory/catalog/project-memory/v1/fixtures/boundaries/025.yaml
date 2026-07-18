@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-025
+  kind: blueprint-boundary
+  description: Boundary case selecting engagement.client-delivery over application.b2b-saas.
+  normalized_features:
+    root.kind: engagement
+    product.shape: engagement.client-delivery
+    product.exclusions:
+      - application.b2b-saas
+  expected:
+    decision: selected
+    blueprint_id: engagement.client-delivery
+    prohibited_blueprint_ids:
+      - application.b2b-saas
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

@@ -1,0 +1,84 @@
+id: growth.partnership.plan
+version: 1.0.0
+status: active
+purpose: Plan bounded partnership work in the growth family with explicit evidence and authority.
+selection:
+  feature_schema_version: 1.0.0
+  required_signals:
+    - id: growth.partnership.plan.family
+      feature: work.family
+      operator: equals
+      expected: growth
+      evidence_required: true
+    - id: growth.partnership.plan.mode
+      feature: action.mode
+      operator: equals
+      expected: plan
+      evidence_required: true
+  positive_signals:
+    - id: growth.partnership.plan.object
+      feature: work.object
+      operator: equals
+      expected: partnership
+      evidence_required: true
+      weight: 100
+  negative_signals:
+    - id: growth.partnership.plan.negative
+      feature: work.anti-patterns
+      operator: tag_present
+      expected: growth.partnership.plan
+      evidence_required: false
+      penalty: 100
+  exclusions:
+    - id: growth.partnership.plan.exclusion
+      feature: work.exclusions
+      operator: tag_present
+      expected: growth.partnership.plan
+      evidence_required: false
+  max_positive_weight: 100
+  specificity_rank: 100
+  precedence: 100
+composition:
+  allowed_primary_pattern_ids: []
+  mandatory_companion_rule_ids: []
+  incompatible_pattern_ids: []
+  triggers_companions: true
+duties:
+  - inspect
+  - propose
+  - record
+write_scope: []
+authorization:
+  mutation: none
+  task_result_submission: worker
+  factual_integration: integrator
+  workstream_activation: automatic-by-rule
+  directional_acceptance: Pitaji
+  external_action: none
+inputs:
+  - accepted workstream outcome
+  - current canonical snapshot
+  - task-scoped evidence
+outputs:
+  - growth partnership plan result
+  - completion evidence
+evidence:
+  - source references
+  - validation results
+  - changed-path inventory
+gates:
+  - scope is accepted
+  - authority covers every duty
+  - required evidence is current
+memory_updates:
+  - worklog
+  - evidence
+  - handoff
+completion_conditions:
+  - all declared duties are resolved
+  - required gates pass
+  - remaining risks are recorded
+fallback_and_escalation:
+  - fail closed on missing evidence
+  - return semantic ambiguity to the integrator
+  - request Pitaji approval for directional change

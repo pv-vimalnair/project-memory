@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.network.multi-party-transaction.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for network.multi-party-transaction.
+  normalized_features:
+    root.kind: product
+    product.shape: network.multi-party-transaction
+    product.exclusions:
+      - network.multi-party-transaction
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - network.multi-party-transaction
+    reason_codes:
+      - explicit-exclusion

@@ -1,0 +1,42 @@
+domain_definition:
+  id: domain.growth-marketing-commercial
+  version: 1.0.0
+  status: active
+  name: Growth Marketing Commercial
+  purpose: Preserve authoritative growth marketing commercial context across workstreams and agents.
+  inclusion_boundary: Include decisions, records, risks, and evidence whose primary owner is growth marketing commercial.
+  exclusion_boundary: Exclude facts whose canonical owner is another permanent domain.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  default_components:
+    - component.growth-marketing
+    - component.stores-aso
+  required_records:
+    - decision-log
+    - worklog
+    - evidence
+  required_documents:
+    - docs/domains/growth-marketing-commercial.md
+  tags:
+    - permanent-domain
+    - growth-marketing-commercial
+  positive_examples:
+    - A durable growth marketing commercial decision must remain available after handoff.
+  negative_examples:
+    - A temporary scratch note with no accepted growth marketing commercial fact.

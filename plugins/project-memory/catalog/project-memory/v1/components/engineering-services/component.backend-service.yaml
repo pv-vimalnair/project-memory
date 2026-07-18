@@ -1,0 +1,21 @@
+component_definition:
+  id: component.backend-service
+  version: 1.0.0
+  status: active
+  name: Backend Service
+  type: service
+  purpose: Own the backend service boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by backend service.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with backend service.
+  required_documents:
+    - docs/components/backend-service.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - service
+    - backend-service
+  positive_examples:
+    - A task changes or validates the project's backend service capability.
+  negative_examples:
+    - A task merely mentions backend service without changing or validating it.

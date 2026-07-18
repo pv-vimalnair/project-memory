@@ -1,0 +1,21 @@
+component_definition:
+  id: component.checkout
+  version: 1.0.0
+  status: active
+  name: Checkout
+  type: service
+  purpose: Own the checkout boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by checkout.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with checkout.
+  required_documents:
+    - docs/components/checkout.md
+  default_domains:
+    - domain.growth-marketing-commercial
+  tags:
+    - commercial-specialist
+    - service
+    - checkout
+  positive_examples:
+    - A task changes or validates the project's checkout capability.
+  negative_examples:
+    - A task merely mentions checkout without changing or validating it.

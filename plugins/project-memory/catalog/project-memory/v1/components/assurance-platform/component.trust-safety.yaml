@@ -1,0 +1,21 @@
+component_definition:
+  id: component.trust-safety
+  version: 1.0.0
+  status: active
+  name: Trust Safety
+  type: shared-system
+  purpose: Own the trust safety boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by trust safety.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with trust safety.
+  required_documents:
+    - docs/components/trust-safety.md
+  default_domains:
+    - domain.security-privacy-compliance-trust
+  tags:
+    - assurance-platform
+    - shared-system
+    - trust-safety
+  positive_examples:
+    - A task changes or validates the project's trust safety capability.
+  negative_examples:
+    - A task merely mentions trust safety without changing or validating it.

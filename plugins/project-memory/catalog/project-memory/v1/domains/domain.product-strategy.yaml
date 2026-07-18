@@ -1,0 +1,41 @@
+domain_definition:
+  id: domain.product-strategy
+  version: 1.0.0
+  status: active
+  name: Product Strategy
+  purpose: Preserve authoritative product strategy context across workstreams and agents.
+  inclusion_boundary: Include decisions, records, risks, and evidence whose primary owner is product strategy.
+  exclusion_boundary: Exclude facts whose canonical owner is another permanent domain.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  default_components:
+    - component.product-strategy
+  required_records:
+    - decision-log
+    - worklog
+    - evidence
+  required_documents:
+    - docs/domains/product-strategy.md
+  tags:
+    - permanent-domain
+    - product-strategy
+  positive_examples:
+    - A durable product strategy decision must remain available after handoff.
+  negative_examples:
+    - A temporary scratch note with no accepted product strategy fact.

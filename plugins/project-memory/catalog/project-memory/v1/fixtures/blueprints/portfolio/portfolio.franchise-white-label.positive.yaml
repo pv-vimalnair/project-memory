@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.portfolio.franchise-white-label.positive
+  kind: blueprint-positive
+  description: Positive selection case for portfolio.franchise-white-label.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: portfolio.franchise-white-label
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: portfolio.franchise-white-label
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

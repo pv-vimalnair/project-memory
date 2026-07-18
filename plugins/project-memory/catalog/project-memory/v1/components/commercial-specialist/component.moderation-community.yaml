@@ -1,0 +1,21 @@
+component_definition:
+  id: component.moderation-community
+  version: 1.0.0
+  status: active
+  name: Moderation Community
+  type: workflow
+  purpose: Own the moderation community boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by moderation community.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with moderation community.
+  required_documents:
+    - docs/components/moderation-community.md
+  default_domains:
+    - domain.support-community
+  tags:
+    - commercial-specialist
+    - workflow
+    - moderation-community
+  positive_examples:
+    - A task changes or validates the project's moderation community capability.
+  negative_examples:
+    - A task merely mentions moderation community without changing or validating it.

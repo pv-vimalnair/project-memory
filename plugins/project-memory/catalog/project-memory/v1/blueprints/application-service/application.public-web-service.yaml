@@ -1,0 +1,75 @@
+blueprint:
+  id: application.public-web-service
+  version: 1.0.0
+  status: active
+  group_id: blueprint-group.application-service
+  allowed_root_kinds:
+    - product
+  primary_archetype: application-service
+  purpose: Use when the enduring root is best described as application public web service, independent of its temporary workstreams.
+  selection:
+    feature_schema_version: 1.0.0
+    required_signals:
+      - id: application.public-web-service.required-root
+        feature: root.kind
+        operator: in
+        expected:
+          - product
+        evidence_required: true
+    positive_signals:
+      - id: application.public-web-service.positive-shape
+        feature: product.shape
+        operator: equals
+        expected: application.public-web-service
+        evidence_required: true
+        weight: 100
+    negative_signals:
+      - id: application.public-web-service.negative-shape
+        feature: product.anti-shapes
+        operator: tag_present
+        expected: application.public-web-service
+        evidence_required: false
+        penalty: 100
+    exclusions:
+      - id: application.public-web-service.explicit-exclusion
+        feature: product.exclusions
+        operator: tag_present
+        expected: application.public-web-service
+        evidence_required: false
+    max_positive_weight: 100
+    specificity_rank: 105
+    precedence: 995
+  overlays:
+    baked: []
+    defaults:
+      - overlay.lifecycle.active
+      - overlay.surface.web
+    forbidden: []
+  default_components:
+    - component.product-strategy
+    - component.ux
+    - component.web-client
+    - component.backend-service
+  default_domains:
+    - domain.product-strategy
+    - domain.ux-content-design
+    - domain.engineering-architecture
+  adapter_slots:
+    - agent
+    - runtime
+    - workflow
+  required_documents:
+    - PROJECT.md
+    - PRODUCT.md
+    - ARCHITECTURE.md
+  validation_gates:
+    - root boundary confirmed
+    - positive evidence recorded
+    - anti-signals evaluated
+  positive_examples:
+    - A durable application public web service root containing many different workstreams.
+  negative_examples:
+    - A temporary application public web service-related deliverable inside another enduring product.
+  name: Application Public Web Service
+  inclusion_boundary: Include the enduring capabilities and governance of the application public web service root.
+  exclusion_boundary: Exclude short-lived campaigns, audits, refactors, and checks; represent those as workstreams.

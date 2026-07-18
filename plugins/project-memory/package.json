@@ -1,0 +1,79 @@
+{
+  "name": "@pitaji/project-memory",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "homepage": "https://github.com/pv-vimalnair/project-memory",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pv-vimalnair/project-memory.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pv-vimalnair/project-memory/issues"
+  },
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
+  "bin": {
+    "project-memory": "./dist/cli.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Pv Vimal Nair",
+    "url": "https://github.com/pv-vimalnair"
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "catalog",
+    "templates",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "bundle:plugin": "node scripts/build-plugin-bundle.mjs",
+    "plugin:verify": "node scripts/verify-plugin-contents.mjs",
+    "publication:check": "node scripts/verify-publication-readiness.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prelint": "npm run build",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:ci": "vitest run --maxWorkers=1",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "schemas:emit": "tsc -p tsconfig.build.json && node dist/schema/emit.js",
+    "catalog:validate": "tsc -p tsconfig.build.json && node dist/catalog/commands/build-tool.js validate",
+    "catalog:inventory": "tsc -p tsconfig.build.json && node dist/catalog/commands/build-tool.js inventory",
+    "catalog:fixtures": "tsc -p tsconfig.build.json && node dist/catalog/commands/build-tool.js fixtures",
+    "catalog:lock": "tsc -p tsconfig.build.json && node dist/catalog/commands/build-tool.js lock",
+    "catalog:bundle": "tsc -p tsconfig.build.json && node dist/catalog/commands/build-tool.js bundle --release 1.0.0",
+    "benchmark:generate": "npm run build && node scripts/generate-benchmark-briefs.mjs",
+    "benchmark:verify": "npm run build && node dist/cli.js benchmark run --input benchmarks/briefs --output .tmp/benchmark-report.json --json",
+    "generated:verify": "npm run build && node scripts/verify-generated.mjs",
+    "package:verify": "npm run build && npm run bundle:plugin && node scripts/verify-package.mjs",
+    "public-runtime:build": "npm run build && npm run bundle:plugin && node dist/catalog/commands/build-tool.js bundle --release 1.0.0",
+    "check": "npm run typecheck && npm run lint && npm run test:ci"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "0.34.52",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "semver": "7.8.5",
+    "ulidx": "2.4.1",
+    "yaml": "2.9.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.13.3",
+    "@types/semver": "7.7.1",
+    "@vitest/coverage-v8": "4.1.10",
+    "esbuild": "0.28.1",
+    "eslint": "10.7.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.64.0",
+    "vitest": "4.1.10"
+  }
+}

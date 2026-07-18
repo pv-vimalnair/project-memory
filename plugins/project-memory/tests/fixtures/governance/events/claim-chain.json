@@ -1,0 +1,60 @@
+{
+  "issued": {
+    "aggregate_id": "CLAIM-01J00000000000000000000000",
+    "event_type": "claim_issued",
+    "occurred_at": "2026-07-14T14:00:00.000Z",
+    "actor_id": "integrator-a",
+    "authority_class": "integrator",
+    "evidence_ids": [],
+    "payload": {
+      "claim_id": "CLAIM-01J00000000000000000000000",
+      "assignee_id": "worker-a",
+      "status": "active",
+      "expires_at": "2026-07-14T14:30:00.000Z"
+    }
+  },
+  "heartbeat": {
+    "aggregate_id": "CLAIM-01J00000000000000000000000",
+    "event_type": "claim_heartbeat",
+    "occurred_at": "2026-07-14T14:05:00.000Z",
+    "actor_id": "worker-a",
+    "authority_class": "worker",
+    "evidence_ids": [],
+    "payload": {
+      "heartbeat_at": "2026-07-14T14:05:00.000Z"
+    }
+  },
+  "renewed": {
+    "aggregate_id": "CLAIM-01J00000000000000000000000",
+    "event_type": "claim_renewed",
+    "occurred_at": "2026-07-14T14:10:00.000Z",
+    "actor_id": "integrator-a",
+    "authority_class": "integrator",
+    "evidence_ids": [],
+    "payload": {
+      "expires_at": "2026-07-14T15:00:00.000Z"
+    }
+  },
+  "expired": {
+    "aggregate_id": "CLAIM-01J00000000000000000000000",
+    "event_type": "claim_expired",
+    "occurred_at": "2026-07-14T15:00:00.000Z",
+    "actor_id": "integrator-a",
+    "authority_class": "integrator",
+    "evidence_ids": [],
+    "payload": {
+      "expired_at": "2026-07-14T15:00:00.000Z"
+    }
+  },
+  "unknown": {
+    "aggregate_id": "CLAIM-01J00000000000000000000000",
+    "event_type": "future_claim_observed",
+    "occurred_at": "2026-07-14T14:15:00.000Z",
+    "actor_id": "validator-a",
+    "authority_class": "validator",
+    "evidence_ids": [],
+    "payload": {
+      "status": "must-not-overwrite-effective-state"
+    }
+  }
+}

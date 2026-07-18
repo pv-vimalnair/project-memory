@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.application.b2b-saas.positive
+  kind: blueprint-positive
+  description: Positive selection case for application.b2b-saas.
+  normalized_features:
+    root.kind: product
+    product.shape: application.b2b-saas
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: application.b2b-saas
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

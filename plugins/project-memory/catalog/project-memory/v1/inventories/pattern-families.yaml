@@ -1,0 +1,21 @@
+inventory:
+  id: inventory.pattern-families
+  version: 1.0.0
+  expected_count: 16
+  ids:
+    - governance
+    - product
+    - engineering
+    - ux
+    - security
+    - qa
+    - data
+    - growth
+    - content
+    - research
+    - release
+    - support
+    - game
+    - ai
+    - commerce
+    - enterprise

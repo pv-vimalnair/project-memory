@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.ai.recommendation-personalization.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for ai.recommendation-personalization.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.recommendation-personalization
+    product.exclusions:
+      - ai.recommendation-personalization
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - ai.recommendation-personalization
+    reason_codes:
+      - explicit-exclusion

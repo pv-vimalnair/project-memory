@@ -1,0 +1,20 @@
+component_definition:
+  id: component.mobile
+  version: 1.0.0
+  status: active
+  name: Mobile Client
+  type: surface
+  purpose: Own the fixture mobile client boundary.
+  inclusion_boundary: Include fixture mobile client work.
+  exclusion_boundary: Exclude unrelated fixture work.
+  required_documents:
+    - docs/components/mobile.md
+  default_domains:
+    - domain.product
+  tags:
+    - surface
+    - mobile
+  positive_examples:
+    - Work changes the mobile client.
+  negative_examples:
+    - Work only mentions a mobile client.

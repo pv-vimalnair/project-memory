@@ -1,0 +1,11 @@
+inventory:
+  id: inventory.blueprints.content-learning
+  version: 1.0.0
+  expected_count: 6
+  ids:
+    - content.publication-newsletter
+    - content.podcast-video-channel
+    - content.media-library
+    - learning.course-curriculum
+    - content.documentation-portal
+    - content.creator-property

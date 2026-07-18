@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "status": "approved",
+  "publication_authorized": true,
+  "approved_by": "Pv Vimal Nair",
+  "approved_at": "2026-07-18T08:26:45.001Z",
+  "repository_url": "https://github.com/pv-vimalnair/project-memory",
+  "license": "MIT",
+  "first_public_version": "0.1.0",
+  "public_author_name": "Pv Vimal Nair",
+  "public_contact": "https://github.com/pv-vimalnair",
+  "security_reporting_route": "https://github.com/pv-vimalnair/project-memory/security/advisories/new",
+  "release_channel": "GitHub repository and GitHub release",
+  "final_readme_approved": true,
+  "privacy_statement_approved": true,
+  "contribution_policy_approved": true,
+  "security_policy_approved": true,
+  "authorization_target": "https://github.com/pv-vimalnair/project-memory",
+  "authorization_environment": "public",
+  "authorized_actions": [
+    "repository.push",
+    "github.release.create"
+  ],
+  "authorization_scope": {
+    "repository_url": "https://github.com/pv-vimalnair/project-memory",
+    "version": "0.1.0",
+    "artifacts": [
+      "repository_source",
+      "github_release"
+    ]
+  },
+  "authorization_starts_at": "2026-07-18T08:21:45.001Z",
+  "authorization_expires_at": "2026-07-25T08:26:45.001Z"
+}

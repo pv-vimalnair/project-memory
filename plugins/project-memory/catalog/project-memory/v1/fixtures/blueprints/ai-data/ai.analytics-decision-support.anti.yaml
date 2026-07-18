@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.ai.analytics-decision-support.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for ai.analytics-decision-support.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.analytics-decision-support
+    product.exclusions:
+      - ai.analytics-decision-support
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - ai.analytics-decision-support
+    reason_codes:
+      - explicit-exclusion

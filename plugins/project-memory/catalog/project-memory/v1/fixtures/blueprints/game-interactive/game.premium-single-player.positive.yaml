@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.game.premium-single-player.positive
+  kind: blueprint-positive
+  description: Positive selection case for game.premium-single-player.
+  normalized_features:
+    root.kind: product
+    product.shape: game.premium-single-player
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: game.premium-single-player
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

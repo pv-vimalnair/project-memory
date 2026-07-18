@@ -1,0 +1,21 @@
+component_definition:
+  id: component.ai-agent-tools
+  version: 1.0.0
+  status: active
+  name: Ai Agent Tools
+  type: shared-system
+  purpose: Own the ai agent tools boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by ai agent tools.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with ai agent tools.
+  required_documents:
+    - docs/components/ai-agent-tools.md
+  default_domains:
+    - domain.data-analytics-ai
+  tags:
+    - data-ai
+    - shared-system
+    - ai-agent-tools
+  positive_examples:
+    - A task changes or validates the project's ai agent tools capability.
+  negative_examples:
+    - A task merely mentions ai agent tools without changing or validating it.

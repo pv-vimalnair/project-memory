@@ -1,0 +1,43 @@
+domain_definition:
+  id: domain.qa-reliability-performance
+  version: 1.0.0
+  status: active
+  name: Qa Reliability Performance
+  purpose: Preserve authoritative qa reliability performance context across workstreams and agents.
+  inclusion_boundary: Include decisions, records, risks, and evidence whose primary owner is qa reliability performance.
+  exclusion_boundary: Exclude facts whose canonical owner is another permanent domain.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  default_components:
+    - component.qa
+    - component.reliability
+    - component.performance
+  required_records:
+    - decision-log
+    - worklog
+    - evidence
+  required_documents:
+    - docs/domains/qa-reliability-performance.md
+  tags:
+    - permanent-domain
+    - qa-reliability-performance
+  positive_examples:
+    - A durable qa reliability performance decision must remain available after handoff.
+  negative_examples:
+    - A temporary scratch note with no accepted qa reliability performance fact.

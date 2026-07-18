@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.engagement.standalone-internal.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for engagement.standalone-internal.
+  normalized_features:
+    root.kind: engagement
+    product.shape: engagement.standalone-internal
+    product.exclusions:
+      - engagement.standalone-internal
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - engagement.standalone-internal
+    reason_codes:
+      - explicit-exclusion

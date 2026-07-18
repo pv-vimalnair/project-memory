@@ -1,0 +1,21 @@
+component_definition:
+  id: component.privacy
+  version: 1.0.0
+  status: active
+  name: Privacy
+  type: shared-system
+  purpose: Own the privacy boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by privacy.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with privacy.
+  required_documents:
+    - docs/components/privacy.md
+  default_domains:
+    - domain.security-privacy-compliance-trust
+  tags:
+    - assurance-platform
+    - shared-system
+    - privacy
+  positive_examples:
+    - A task changes or validates the project's privacy capability.
+  negative_examples:
+    - A task merely mentions privacy without changing or validating it.

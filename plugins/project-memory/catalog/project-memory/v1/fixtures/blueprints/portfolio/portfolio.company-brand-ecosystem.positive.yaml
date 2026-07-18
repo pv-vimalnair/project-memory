@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.portfolio.company-brand-ecosystem.positive
+  kind: blueprint-positive
+  description: Positive selection case for portfolio.company-brand-ecosystem.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: portfolio.company-brand-ecosystem
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: portfolio.company-brand-ecosystem
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

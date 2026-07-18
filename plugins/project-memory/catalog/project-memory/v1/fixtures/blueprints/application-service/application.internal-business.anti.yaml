@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.application.internal-business.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for application.internal-business.
+  normalized_features:
+    root.kind: product
+    product.shape: application.internal-business
+    product.exclusions:
+      - application.internal-business
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - application.internal-business
+    reason_codes:
+      - explicit-exclusion

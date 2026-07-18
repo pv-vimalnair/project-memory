@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.content.documentation-portal.positive
+  kind: blueprint-positive
+  description: Positive selection case for content.documentation-portal.
+  normalized_features:
+    root.kind: product
+    product.shape: content.documentation-portal
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: content.documentation-portal
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

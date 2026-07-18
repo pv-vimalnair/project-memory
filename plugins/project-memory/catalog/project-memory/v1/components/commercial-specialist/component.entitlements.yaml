@@ -1,0 +1,21 @@
+component_definition:
+  id: component.entitlements
+  version: 1.0.0
+  status: active
+  name: Entitlements
+  type: service
+  purpose: Own the entitlements boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by entitlements.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with entitlements.
+  required_documents:
+    - docs/components/entitlements.md
+  default_domains:
+    - domain.finance-legal-partnerships
+  tags:
+    - commercial-specialist
+    - service
+    - entitlements
+  positive_examples:
+    - A task changes or validates the project's entitlements capability.
+  negative_examples:
+    - A task merely mentions entitlements without changing or validating it.

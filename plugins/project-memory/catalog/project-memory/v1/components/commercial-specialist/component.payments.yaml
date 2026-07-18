@@ -1,0 +1,21 @@
+component_definition:
+  id: component.payments
+  version: 1.0.0
+  status: active
+  name: Payments
+  type: service
+  purpose: Own the payments boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by payments.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with payments.
+  required_documents:
+    - docs/components/payments.md
+  default_domains:
+    - domain.growth-marketing-commercial
+  tags:
+    - commercial-specialist
+    - service
+    - payments
+  positive_examples:
+    - A task changes or validates the project's payments capability.
+  negative_examples:
+    - A task merely mentions payments without changing or validating it.

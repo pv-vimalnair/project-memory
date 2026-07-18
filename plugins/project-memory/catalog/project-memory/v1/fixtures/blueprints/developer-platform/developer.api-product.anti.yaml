@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.developer.api-product.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for developer.api-product.
+  normalized_features:
+    root.kind: product
+    product.shape: developer.api-product
+    product.exclusions:
+      - developer.api-product
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - developer.api-product
+    reason_codes:
+      - explicit-exclusion

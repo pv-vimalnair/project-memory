@@ -1,0 +1,42 @@
+domain_definition:
+  id: domain.support-community
+  version: 1.0.0
+  status: active
+  name: Support Community
+  purpose: Preserve authoritative support community context across workstreams and agents.
+  inclusion_boundary: Include decisions, records, risks, and evidence whose primary owner is support community.
+  exclusion_boundary: Exclude facts whose canonical owner is another permanent domain.
+  compatible_root_kinds:
+    - product
+    - shared-system
+    - program
+    - portfolio
+    - engagement
+  compatible_archetypes:
+    - application-service
+    - developer-platform
+    - game-interactive
+    - ai-data
+    - commerce-network
+    - content-learning
+    - brand-design
+    - research-knowledge
+    - operations-automation
+    - portfolio
+    - engagement
+  default_components:
+    - component.support
+    - component.moderation-community
+  required_records:
+    - decision-log
+    - worklog
+    - evidence
+  required_documents:
+    - docs/domains/support-community.md
+  tags:
+    - permanent-domain
+    - support-community
+  positive_examples:
+    - A durable support community decision must remain available after handoff.
+  negative_examples:
+    - A temporary scratch note with no accepted support community fact.

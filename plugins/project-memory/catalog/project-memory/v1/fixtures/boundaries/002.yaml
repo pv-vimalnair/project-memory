@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-002
+  kind: blueprint-boundary
+  description: Boundary case selecting application.consumer-multisurface over application.public-web-service.
+  normalized_features:
+    root.kind: product
+    product.shape: application.consumer-multisurface
+    product.exclusions:
+      - application.public-web-service
+  expected:
+    decision: selected
+    blueprint_id: application.consumer-multisurface
+    prohibited_blueprint_ids:
+      - application.public-web-service
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

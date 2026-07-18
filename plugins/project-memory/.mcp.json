@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "project-memory": {
+      "command": "node",
+      "args": [
+        "./dist/project-memory-mcp.mjs"
+      ],
+      "cwd": ".",
+      "tool_timeout_sec": 900
+    }
+  }
+}

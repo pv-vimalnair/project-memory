@@ -1,0 +1,21 @@
+component_definition:
+  id: component.support
+  version: 1.0.0
+  status: active
+  name: Support
+  type: workflow
+  purpose: Own the support boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by support.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with support.
+  required_documents:
+    - docs/components/support.md
+  default_domains:
+    - domain.support-community
+  tags:
+    - commercial-specialist
+    - workflow
+    - support
+  positive_examples:
+    - A task changes or validates the project's support capability.
+  negative_examples:
+    - A task merely mentions support without changing or validating it.

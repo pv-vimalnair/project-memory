@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.ai.analytics-decision-support.positive
+  kind: blueprint-positive
+  description: Positive selection case for ai.analytics-decision-support.
+  normalized_features:
+    root.kind: product
+    product.shape: ai.analytics-decision-support
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: ai.analytics-decision-support
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

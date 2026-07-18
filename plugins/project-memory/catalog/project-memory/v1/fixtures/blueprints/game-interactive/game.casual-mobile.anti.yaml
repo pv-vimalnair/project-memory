@@ -1,0 +1,15 @@
+fixture:
+  id: fixture.game.casual-mobile.anti
+  kind: blueprint-anti
+  description: Explicit anti-signal case for game.casual-mobile.
+  normalized_features:
+    root.kind: product
+    product.shape: game.casual-mobile
+    product.exclusions:
+      - game.casual-mobile
+  expected:
+    decision: rejected
+    prohibited_blueprint_ids:
+      - game.casual-mobile
+    reason_codes:
+      - explicit-exclusion

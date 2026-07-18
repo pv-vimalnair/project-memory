@@ -1,0 +1,67 @@
+{
+  "name": "shared-platform-provider",
+  "case_number": 5,
+  "repository": "repos/shared-platform",
+  "root": {
+    "namespace": "platform.shared",
+    "kind": "shared-system",
+    "primary_archetype": "developer-platform",
+    "blueprint_id": "developer.shared-infrastructure",
+    "lifecycle": "active",
+    "display_name": "Shared Platform Provider",
+    "mission": "Own shared platform interfaces and their authoritative lifecycle."
+  },
+  "overlays": ["overlay.lifecycle.active"],
+  "components": [
+    "component.api",
+    "component.backend-service",
+    "component.ci-cd",
+    "component.cli",
+    "component.configuration",
+    "component.datastore",
+    "component.infrastructure",
+    "component.operations-workflow",
+    "component.product-management",
+    "component.product-strategy",
+    "component.release",
+    "component.sdk",
+    "component.shared-platform"
+  ],
+  "domains": [
+    "domain.engineering-architecture",
+    "domain.governance-coordination",
+    "domain.product-strategy",
+    "domain.release-platform-operations"
+  ],
+  "adapters": {
+    "agent": [{ "id": "adapter.codex", "version": "1.0.0" }],
+    "runtime": [{ "id": "adapter.node-typescript", "version": "1.0.0" }],
+    "workflow": [{ "id": "adapter.github-ci", "version": "1.0.0" }]
+  },
+  "documents": [
+    {
+      "id": "document.platform-interfaces",
+      "relative_path": "docs/project-memory/source/INTERFACES.md",
+      "title": "Shared Platform Interfaces",
+      "purpose": "Own the authoritative provider interface contract.",
+      "sections": [
+        {
+          "heading": "Versioned interface",
+          "body": "The provider owns interface shape, versioning, compatibility, and deprecation truth."
+        }
+      ]
+    }
+  ],
+  "relationship": {
+    "kind": "shared-platform-provider",
+    "local_profile_lock_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+    "consumer": {
+      "case_number": 6,
+      "namespace": "platform-consumer.app",
+      "canonical_repository": "repos/platform-consumer",
+      "profile_lock_hash": "6666666666666666666666666666666666666666666666666666666666666666"
+    },
+    "interface_relative_path": "docs/project-memory/source/INTERFACES.md",
+    "interface_sha256": "5dbac9af9d4f1d43c39506997e3f75c3a0387e6062dbbdf72fde1b8ed8771af0"
+  }
+}

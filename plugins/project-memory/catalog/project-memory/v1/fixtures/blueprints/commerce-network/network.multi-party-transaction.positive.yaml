@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.network.multi-party-transaction.positive
+  kind: blueprint-positive
+  description: Positive selection case for network.multi-party-transaction.
+  normalized_features:
+    root.kind: product
+    product.shape: network.multi-party-transaction
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: network.multi-party-transaction
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

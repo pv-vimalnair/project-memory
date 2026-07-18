@@ -1,0 +1,25 @@
+inventory:
+  id: inventory.patterns.game
+  version: 1.0.0
+  expected_count: 20
+  ids:
+    - game.mechanic.design
+    - game.mechanic.implement
+    - game.loop.design
+    - game.progression.design
+    - game.economy.design
+    - game.economy.change
+    - game.balance.assess
+    - game.balance.change
+    - game.level.design
+    - game.narrative.design
+    - game.save.change
+    - game.save.validate
+    - game.multiplayer.implement
+    - game.telemetry.implement
+    - game.telemetry.validate
+    - game.playtest.validate
+    - game.content.release
+    - game.live-operations.operate
+    - game.anti-cheat.assess
+    - game.certification.validate

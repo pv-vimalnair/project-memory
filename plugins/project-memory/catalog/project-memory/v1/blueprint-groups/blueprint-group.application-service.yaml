@@ -1,0 +1,18 @@
+blueprint_group:
+  id: blueprint-group.application-service
+  version: 1.0.0
+  status: active
+  name: Application Service
+  purpose: Classify enduring application service roots before workstreams are planned.
+  primary_archetype: application-service
+  allowed_root_kinds:
+    - product
+  blueprint_ids:
+    - application.consumer-mobile
+    - application.consumer-multisurface
+    - application.b2b-saas
+    - application.internal-business
+    - application.desktop
+    - application.public-web-service
+    - application.creator-professional
+    - service.managed

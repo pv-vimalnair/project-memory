@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.design.brand-system.positive
+  kind: blueprint-positive
+  description: Positive selection case for design.brand-system.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: design.brand-system
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: design.brand-system
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.content.media-library.positive
+  kind: blueprint-positive
+  description: Positive selection case for content.media-library.
+  normalized_features:
+    root.kind: product
+    product.shape: content.media-library
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: content.media-library
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

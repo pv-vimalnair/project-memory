@@ -1,0 +1,21 @@
+component_definition:
+  id: component.notifications
+  version: 1.0.0
+  status: active
+  name: Notifications
+  type: service
+  purpose: Own the notifications boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by notifications.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with notifications.
+  required_documents:
+    - docs/components/notifications.md
+  default_domains:
+    - domain.engineering-architecture
+  tags:
+    - engineering-services
+    - service
+    - notifications
+  positive_examples:
+    - A task changes or validates the project's notifications capability.
+  negative_examples:
+    - A task merely mentions notifications without changing or validating it.

@@ -1,0 +1,16 @@
+inventory:
+  id: inventory.blueprint-groups
+  version: 1.0.0
+  expected_count: 11
+  ids:
+    - blueprint-group.application-service
+    - blueprint-group.developer-platform
+    - blueprint-group.game-interactive
+    - blueprint-group.ai-data
+    - blueprint-group.commerce-network
+    - blueprint-group.content-learning
+    - blueprint-group.brand-design
+    - blueprint-group.research-knowledge
+    - blueprint-group.operations-automation
+    - blueprint-group.portfolio
+    - blueprint-group.engagement

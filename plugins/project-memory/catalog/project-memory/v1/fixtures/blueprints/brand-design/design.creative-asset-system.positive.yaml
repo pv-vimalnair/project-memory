@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.design.creative-asset-system.positive
+  kind: blueprint-positive
+  description: Positive selection case for design.creative-asset-system.
+  normalized_features:
+    root.kind: shared-system
+    product.shape: design.creative-asset-system
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: design.creative-asset-system
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

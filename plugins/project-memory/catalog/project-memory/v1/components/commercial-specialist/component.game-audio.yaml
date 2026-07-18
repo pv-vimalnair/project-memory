@@ -1,0 +1,21 @@
+component_definition:
+  id: component.game-audio
+  version: 1.0.0
+  status: active
+  name: Game Audio
+  type: content
+  purpose: Own the game audio boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by game audio.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with game audio.
+  required_documents:
+    - docs/components/game-audio.md
+  default_domains:
+    - domain.game-design-art-audio-live-operations
+  tags:
+    - commercial-specialist
+    - content
+    - game-audio
+  positive_examples:
+    - A task changes or validates the project's game audio capability.
+  negative_examples:
+    - A task merely mentions game audio without changing or validating it.

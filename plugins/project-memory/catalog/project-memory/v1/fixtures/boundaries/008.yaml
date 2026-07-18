@@ -1,0 +1,17 @@
+fixture:
+  id: fixture.boundary.case-008
+  kind: blueprint-boundary
+  description: Boundary case selecting developer.shared-infrastructure over developer.open-source.
+  normalized_features:
+    root.kind: product
+    product.shape: developer.shared-infrastructure
+    product.exclusions:
+      - developer.open-source
+  expected:
+    decision: selected
+    blueprint_id: developer.shared-infrastructure
+    prohibited_blueprint_ids:
+      - developer.open-source
+    reason_codes:
+      - boundary-primary-match
+      - competitor-excluded

@@ -1,0 +1,14 @@
+fixture:
+  id: fixture.program.organization-capability.positive
+  kind: blueprint-positive
+  description: Positive selection case for program.organization-capability.
+  normalized_features:
+    root.kind: portfolio
+    product.shape: program.organization-capability
+    product.exclusions: []
+  expected:
+    decision: selected
+    blueprint_id: program.organization-capability
+    reason_codes:
+      - exact-shape-match
+      - compatible-root

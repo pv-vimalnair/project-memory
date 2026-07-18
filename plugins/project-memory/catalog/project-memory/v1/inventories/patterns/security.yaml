@@ -1,0 +1,23 @@
+inventory:
+  id: inventory.patterns.security
+  version: 1.0.0
+  expected_count: 18
+  ids:
+    - security.posture.assess
+    - security.threat-model.assess
+    - security.auth.assess
+    - security.auth.change
+    - security.authorization.assess
+    - security.authorization.change
+    - security.data.assess
+    - security.privacy.assess
+    - security.privacy.change
+    - security.consent.assess
+    - security.secrets.assess
+    - security.dependency.assess
+    - security.supply-chain.assess
+    - security.compliance.assess
+    - security.compliance.change
+    - security.finding.validate
+    - security.remediation.implement
+    - security.incident.operate

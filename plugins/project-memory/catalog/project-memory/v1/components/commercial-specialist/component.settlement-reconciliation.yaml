@@ -1,0 +1,21 @@
+component_definition:
+  id: component.settlement-reconciliation
+  version: 1.0.0
+  status: active
+  name: Settlement Reconciliation
+  type: service
+  purpose: Own the settlement reconciliation boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by settlement reconciliation.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with settlement reconciliation.
+  required_documents:
+    - docs/components/settlement-reconciliation.md
+  default_domains:
+    - domain.finance-legal-partnerships
+  tags:
+    - commercial-specialist
+    - service
+    - settlement-reconciliation
+  positive_examples:
+    - A task changes or validates the project's settlement reconciliation capability.
+  negative_examples:
+    - A task merely mentions settlement reconciliation without changing or validating it.

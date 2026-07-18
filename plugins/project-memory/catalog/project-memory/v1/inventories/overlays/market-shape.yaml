@@ -1,0 +1,27 @@
+inventory:
+  id: inventory.overlays.market-shape
+  version: 1.0.0
+  expected_count: 22
+  ids:
+    - overlay.audience.consumer
+    - overlay.audience.b2b
+    - overlay.audience.internal
+    - overlay.audience.public-sector
+    - overlay.audience.developer
+    - overlay.surface.mobile
+    - overlay.surface.web
+    - overlay.surface.desktop
+    - overlay.surface.cli
+    - overlay.surface.api
+    - overlay.surface.xr
+    - overlay.surface.multisurface
+    - overlay.commercial.free
+    - overlay.commercial.paid
+    - overlay.commercial.subscription
+    - overlay.commercial.transactional
+    - overlay.commercial.advertising
+    - overlay.commercial.marketplace
+    - overlay.commercial.managed-service
+    - overlay.commercial.open-source
+    - overlay.tenancy.single-tenant
+    - overlay.tenancy.multi-tenant

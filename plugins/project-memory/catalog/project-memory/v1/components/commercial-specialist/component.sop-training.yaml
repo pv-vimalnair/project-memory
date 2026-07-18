@@ -1,0 +1,21 @@
+component_definition:
+  id: component.sop-training
+  version: 1.0.0
+  status: active
+  name: Sop Training
+  type: workflow
+  purpose: Own the sop training boundary and its durable project memory.
+  inclusion_boundary: Include artifacts, decisions, evidence, and operations directly owned by sop training.
+  exclusion_boundary: Exclude unrelated work that has no ownership or dependency relationship with sop training.
+  required_documents:
+    - docs/components/sop-training.md
+  default_domains:
+    - domain.governance-coordination
+  tags:
+    - commercial-specialist
+    - workflow
+    - sop-training
+  positive_examples:
+    - A task changes or validates the project's sop training capability.
+  negative_examples:
+    - A task merely mentions sop training without changing or validating it.

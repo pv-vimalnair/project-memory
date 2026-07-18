@@ -1,0 +1,8 @@
+name: lifeof_sanitized_pilot
+description: Sanitized Flutter fixture for Project Memory acceptance tests.
+environment:
+  sdk: ">=3.8.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: 2.6.1
