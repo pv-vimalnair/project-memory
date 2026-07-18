@@ -1,11 +1,15 @@
 # Publication Checklist
 
-**Status: AUTHORIZED FOR v0.1.0 PUBLICATION - CI PENDING**
+**Status: AUTHORIZED FOR v0.1.0 PUBLICATION - CI PASSED**
 
 Pv Vimal Nair approved the MIT-licensed GitHub-only `v0.1.0` publication to
 `https://github.com/pv-vimalnair/project-memory`. The exact time-bounded action
 scope is recorded in `PUBLICATION_APPROVALS.json`. npm publication and a hosted
 service are outside this authorization.
+
+Public CI run [29640347646](https://github.com/pv-vimalnair/project-memory/actions/runs/29640347646)
+passed the complete Windows and Ubuntu matrix for public source commit
+`92969697a575ba4cfaf8580d24f71c26069efe79`.
 
 Run the read-only prerequisite check from `plugins/project-memory/`:
 
@@ -15,7 +19,7 @@ npm run publication:check
 
 ## Technical readiness
 
-- [ ] CI passes on Windows and Linux with read-only repository permissions and
+- [x] CI passes on Windows and Linux with read-only repository permissions and
   checkout credentials disabled. This is the final post-push release gate.
 - [x] Plugin and skill validators pass from a clean Plugin copy without network
   access.
