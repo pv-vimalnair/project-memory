@@ -1,11 +1,16 @@
+![Project Memory - Switch agents. Keep the context.](assets/brand/project-memory-banner.png)
+
 # Project Memory
 
-Automatic, repository-first context and governed history for coding agents.
+**Do you switch between AI agents and have to explain your project all over
+again?**
 
-Project Memory gives a new agent the accepted product context, decisions,
-plans, completed work, removals, constraints, evidence, and next actions stored
-in the repository itself. It keeps concise active context while preserving the
-full historical record.
+Project Memory keeps the important context inside your Git repository. When
+another agent takes over, it can see what was decided, what changed, what was
+completed, what was removed, and what to do next.
+
+You keep working normally. Project Memory gives each agent the same accepted
+project context and preserves the full history for later.
 
 The Codex Plugin works offline. It has no hosted backend, login, telemetry,
 cloud database, or mandatory external service.

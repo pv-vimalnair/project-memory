@@ -1,9 +1,11 @@
 # Project Memory Plugin
 
-Project Memory is an automatic, repository-first Codex Plugin for durable
-project context, planning, handoff, and governed history. People speak to the
-agent normally; they do not select profiles, choose document folders, or edit
-generated memory manually.
+Do you switch between AI agents and have to explain the project all over again?
+Project Memory keeps decisions, progress, completed work, removals, and next
+steps in the repository so the next agent knows where to continue.
+
+People speak to the agent normally. They do not select profiles, choose document
+folders, or edit generated memory manually.
 
 ## Install the Codex Plugin
 

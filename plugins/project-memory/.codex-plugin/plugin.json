@@ -1,7 +1,7 @@
 {
   "name": "project-memory",
   "version": "0.1.0",
-  "description": "Automatic repository-first context, planning, handoff, and governed history for coding agents.",
+  "description": "Keep project context when work moves from one AI coding agent to another.",
   "author": {
     "name": "Pv Vimal Nair",
     "url": "https://github.com/pv-vimalnair"
@@ -20,8 +20,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Project Memory",
-    "shortDescription": "Automatic project context and agent handoffs.",
-    "longDescription": "Initializes and maintains repository-first project memory so agents can resume work with accepted context, bounded tasks, evidence, and append-only history.",
+    "shortDescription": "Switch agents without losing project context.",
+    "longDescription": "Keeps decisions, progress, completed work, removals, and next steps in the repository so the next agent can continue where the last one stopped.",
     "developerName": "Pv Vimal Nair",
     "category": "Productivity",
     "websiteURL": "https://github.com/pv-vimalnair/project-memory",
