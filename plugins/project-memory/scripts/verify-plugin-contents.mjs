@@ -466,23 +466,38 @@ function findPython() {
   );
 }
 
+/**
+ * @param {string | undefined} configured
+ * @param {string} fallbackPath
+ * @returns {string}
+ */
+function configuredValidatorPath(configured, fallbackPath) {
+  return configured === undefined ? fallbackPath : path.resolve(configured);
+}
+
 async function runOfficialValidators() {
   const codexHome = process.env.CODEX_HOME ?? path.join(homedir(), ".codex");
-  const skillValidator = path.join(
-    codexHome,
-    "skills",
-    ".system",
-    "skill-creator",
-    "scripts",
-    "quick_validate.py",
+  const skillValidator = configuredValidatorPath(
+    process.env.PROJECT_MEMORY_SKILL_VALIDATOR,
+    path.join(
+      codexHome,
+      "skills",
+      ".system",
+      "skill-creator",
+      "scripts",
+      "quick_validate.py",
+    ),
   );
-  const pluginValidator = path.join(
-    codexHome,
-    "skills",
-    ".system",
-    "plugin-creator",
-    "scripts",
-    "validate_plugin.py",
+  const pluginValidator = configuredValidatorPath(
+    process.env.PROJECT_MEMORY_PLUGIN_VALIDATOR,
+    path.join(
+      codexHome,
+      "skills",
+      ".system",
+      "plugin-creator",
+      "scripts",
+      "validate_plugin.py",
+    ),
   );
   try {
     await Promise.all([access(skillValidator), access(pluginValidator)]);
