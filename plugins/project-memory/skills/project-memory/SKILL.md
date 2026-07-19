@@ -16,6 +16,10 @@ This skill directory is `<plugin-root>/skills/project-memory`; `<plugin-root>` i
 
 `node <plugin-root>/scripts/project-memory.mjs <command> --json`
 
+Any response from a registered MCP tool means the MCP server is available. Do not invoke the launcher fallback after an MCP response, including a bounded or runtime error; report the exact MCP issue instead.
+
+Never create `tools/project-memory/config.json` manually. Its absence before initialization is expected; the approved bootstrap materializes it.
+
 Do not search for or install dependencies. If neither the bundled MCP route nor the launcher and bundle are available, follow `references/agent-protocol.md` and remain worker-only.
 
 ## Start every substantive task

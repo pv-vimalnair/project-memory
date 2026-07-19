@@ -239,7 +239,29 @@ describe("ProjectMemoryMcpServer", () => {
     expect(developerCommand.run).not.toHaveBeenCalled();
   });
 
-  it("fails closed when the duplicated tool response would exceed 64 KiB", async () => {
+  it("preserves structured content when only its text duplication exceeds 64 KiB", async () => {
+    const { server } = harness({ readValue: { text: "x".repeat(33_000) } });
+
+    const result = await callTool(server, "project_memory_read", {
+      root: ROOT.href,
+      arguments: ["doctor"],
+    });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.structuredContent).toMatchObject({
+      command: "doctor",
+      status: "success",
+      data: { text: "x".repeat(33_000) },
+    });
+    expect(JSON.parse(result.content[0]?.text ?? "{}")).toMatchObject({
+      code: "MCP_STRUCTURED_CONTENT_AVAILABLE",
+      command: "doctor",
+      status: "success",
+    });
+    expect(Buffer.byteLength(JSON.stringify(result), "utf8")).toBeLessThanOrEqual(65_536);
+  });
+
+  it("fails closed when structured content itself exceeds 64 KiB", async () => {
     const { server } = harness({ readValue: { text: "x".repeat(70_000) } });
 
     const result = await callTool(server, "project_memory_read", {

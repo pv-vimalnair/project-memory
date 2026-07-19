@@ -38717,23 +38717,56 @@ function normalizedJson(value) {
   const serialized = JSON.stringify(value, (_key, item) => item instanceof Uint8Array ? { bytes_base64: Buffer.from(item).toString("base64") } : item);
   return JSON.parse(serialized);
 }
-function rawToolResult(value, isError2) {
-  const structuredContent = normalizedJson(value);
-  const content = [{ type: "text", text: JSON.stringify(structuredContent) }];
+function toolResult(structuredContent, text, isError2) {
+  const content = [{ type: "text", text }];
   return isError2 ? { content, structuredContent, isError: true } : { content, structuredContent };
+}
+function compactTextContent(structuredContent) {
+  const projection = {
+    code: "MCP_STRUCTURED_CONTENT_AVAILABLE",
+    message: "Complete Project Memory response is available in structuredContent."
+  };
+  if (typeof structuredContent !== "object" || structuredContent === null || Array.isArray(structuredContent)) {
+    return JSON.stringify(projection);
+  }
+  const record5 = structuredContent;
+  for (const key of [
+    "schema_version",
+    "command",
+    "status",
+    "kind",
+    "proposal_handle",
+    "confirmation_required",
+    "expires_at",
+    "summary",
+    "clarification"
+  ]) {
+    if (record5[key] !== void 0) projection[key] = record5[key];
+  }
+  return JSON.stringify(projection);
 }
 function toolFailure(code, message, details) {
   return boundedToolResult({ code, message, ...details === void 0 ? {} : { details } }, true);
 }
 function boundedToolResult(value, isError2 = false) {
-  const result = rawToolResult(value, isError2);
+  const structuredContent = normalizedJson(value);
+  const result = toolResult(structuredContent, JSON.stringify(structuredContent), isError2);
   if (Buffer.byteLength(JSON.stringify(result), "utf8") <= MAX_TOOL_RESPONSE_BYTES) {
     return result;
   }
-  return rawToolResult({
+  const compactResult = toolResult(
+    structuredContent,
+    compactTextContent(structuredContent),
+    isError2
+  );
+  if (Buffer.byteLength(JSON.stringify(compactResult), "utf8") <= MAX_TOOL_RESPONSE_BYTES) {
+    return compactResult;
+  }
+  const failure2 = {
     code: "MCP_RESPONSE_TOO_LARGE",
     message: "Project Memory tool response exceeds the 64 KiB transport limit"
-  }, true);
+  };
+  return toolResult(failure2, JSON.stringify(failure2), true);
 }
 function runtimeToolResult(result) {
   if (result.ok) return boundedToolResult(result.value);

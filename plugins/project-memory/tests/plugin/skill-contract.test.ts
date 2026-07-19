@@ -55,6 +55,12 @@ describe("Project Memory skill command contract", () => {
     expect(skill).toContain(
       "Use `scripts/project-memory.mjs` only when the bundled MCP server is unavailable.",
     );
+    expect(skill).toContain(
+      "Any response from a registered MCP tool means the MCP server is available.",
+    );
+    expect(skill).toContain(
+      "Never create `tools/project-memory/config.json` manually.",
+    );
     expect(skill).not.toContain("scripts/project-memory.mjs agent start");
   });
 
