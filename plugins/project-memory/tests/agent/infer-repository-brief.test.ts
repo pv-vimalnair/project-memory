@@ -79,6 +79,50 @@ describe("repository initialization inference", () => {
     });
   });
 
+  it("uses a nested Markdown project profile as initialization evidence", async () => {
+    const repository = await temporaryRoot();
+    const profileDirectory = path.join(repository.path, "docs", "marketing");
+    await mkdir(profileDirectory, { recursive: true });
+    await Promise.all([
+      writeFile(path.join(profileDirectory, "PROJECT_PROFILE.md"), [
+        "# LifeOf Marketing Project Profile",
+        "",
+        "## Ownership and verification",
+        "",
+        "- Project: LifeOf",
+        "- Owner: Pv Vimal Nair (Pitaji)",
+        "",
+        "## Product and business model",
+        "",
+        "LifeOf is a Flutter habit-tracking and financial-motivation product. Current source connects habit completion to game-like progression.",
+        "",
+      ].join("\n"), "utf8"),
+      writeFile(path.join(repository.path, "pubspec.yaml"), [
+        "name: lifeof",
+        "description: A new Flutter project.",
+        "dependencies:",
+        "  flutter:",
+        "    sdk: flutter",
+        "",
+      ].join("\n"), "utf8"),
+    ]);
+
+    const result = await inferRepositoryBrief(repository.url);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.source_paths).toEqual([
+      "docs/marketing/PROJECT_PROFILE.md",
+      "pubspec.yaml",
+    ]);
+    expect(parse(result.value.brief_text)).toMatchObject({
+      name: "LifeOf",
+      mission: "a Flutter habit-tracking and financial-motivation product",
+      owners: ["Pv Vimal Nair (Pitaji)"],
+      runtime_adapters: ["adapter.flutter"],
+    });
+  });
+
 
   it("records an empty workflow adapter set as repository evidence", async () => {
     const repository = await temporaryRoot();

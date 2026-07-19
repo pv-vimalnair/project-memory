@@ -1,4 +1,4 @@
-import { lstat, readFile } from "node:fs/promises";
+import { lstat, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -22,6 +22,18 @@ const STRUCTURED_BRIEF_CANDIDATES = [
   "BRIEF.yml",
   "BRIEF.md",
 ] as const;
+
+const MARKDOWN_PROFILE_FILENAMES = [
+  "PROJECT_PROFILE.md",
+  "PRODUCT_PROFILE.md",
+  "PROJECT.md",
+  "PRODUCT.md",
+] as const;
+const MARKDOWN_PROFILE_BASENAMES = new Set(
+  MARKDOWN_PROFILE_FILENAMES.map((name) => name.toLowerCase()),
+);
+const MAX_MARKDOWN_PROFILE_DEPTH = 4;
+const MAX_MARKDOWN_PROFILE_DIRECTORIES = 256;
 
 export interface InferredRepositoryBrief {
   readonly brief_path: string;
@@ -104,6 +116,56 @@ async function optionalDirectory(
   }
 }
 
+async function markdownProfilePaths(
+  root: URL,
+): Promise<RuntimeResult<readonly string[]>> {
+  const candidates = new Set<string>(MARKDOWN_PROFILE_FILENAMES);
+  const docsPresent = await optionalDirectory(root, "docs");
+  if (!docsPresent.ok) return docsPresent;
+  if (!docsPresent.value) return success([...candidates].sort(compareUtf8));
+
+  const docs = await resolveInside(root, "docs");
+  if (!docs.ok) return docs;
+  const pending: Array<{
+    readonly directory: URL;
+    readonly relativePath: string;
+    readonly depth: number;
+  }> = [{ directory: docs.value, relativePath: "docs", depth: 0 }];
+  let scannedDirectories = 0;
+  while (pending.length > 0 && scannedDirectories < MAX_MARKDOWN_PROFILE_DIRECTORIES) {
+    const current = pending.shift();
+    if (current === undefined) continue;
+    scannedDirectories += 1;
+    let entries;
+    try {
+      entries = await readdir(current.directory, { withFileTypes: true });
+    } catch (error: unknown) {
+      return failure(
+        "AGENT_REPOSITORY_EVIDENCE_READ_FAILED",
+        error instanceof Error ? error.message : String(error),
+        current.relativePath,
+      );
+    }
+    for (const entry of entries.sort((left, right) => compareUtf8(left.name, right.name))) {
+      if (entry.isSymbolicLink()) continue;
+      const relativePath = `${current.relativePath}/${entry.name}`;
+      if (entry.isFile() && MARKDOWN_PROFILE_BASENAMES.has(entry.name.toLowerCase())) {
+        candidates.add(relativePath);
+      }
+      if (
+        entry.isDirectory() &&
+        current.depth < MAX_MARKDOWN_PROFILE_DEPTH &&
+        relativePath !== "docs/project-memory"
+      ) {
+        const directory = await resolveInside(root, relativePath);
+        if (!directory.ok) return directory;
+        pending.push({ directory: directory.value, relativePath, depth: current.depth + 1 });
+      }
+    }
+  }
+  return success([...candidates].sort(compareUtf8));
+}
+
 function missionFrom(text: string): {
   readonly name: string | null;
   readonly mission: string | null;
@@ -118,10 +180,29 @@ function missionFrom(text: string): {
   return { name: null, mission: stringValue(direct?.[1]) };
 }
 
+function plainMarkdownValue(value: string | undefined): string | null {
+  const parsed = stringValue(value);
+  return parsed === null ? null : parsed.replaceAll(/[*_`]/gu, "").trim();
+}
+
+function projectNameFrom(text: string): string | null {
+  const field = /^\s*(?:[-*]\s*)?(?:project|product)(?:\s+name)?:\s+(.+?)\s*$/imu.exec(text);
+  return plainMarkdownValue(field?.[1]);
+}
+
+function missionSentenceFrom(text: string, projectName: string): string | null {
+  const escapedName = projectName.replaceAll(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  const sentence = new RegExp(
+    `^\\s*${escapedName}\\s+is\\s+([^\\r\\n.!?]+?)[.!?](?:\\s|$)`,
+    "imu",
+  ).exec(text);
+  return plainMarkdownValue(sentence?.[1]);
+}
+
 function ownerFrom(text: string): string | null {
+  const field = /^\s*(?:[-*]\s*)?owners?:\s+(.+?)\s*$/imu.exec(text);
   const heading = /^#{1,6}\s+Master:\s*(.+?)\s*$/imu.exec(text);
-  const owner = stringValue(heading?.[1]);
-  return owner === null ? null : owner.replaceAll("**", "").trim();
+  return plainMarkdownValue(field?.[1] ?? heading?.[1]);
 }
 
 function namespace(value: string): string {
@@ -190,6 +271,18 @@ export async function inferRepositoryBrief(
     }
   }
 
+  const profilePaths = await markdownProfilePaths(root);
+  if (!profilePaths.ok) return profilePaths;
+  for (const relativePath of profilePaths.value) {
+    if (documents.has(relativePath)) continue;
+    const text = await optionalText(root, relativePath);
+    if (!text.ok) return text;
+    if (text.value !== null) {
+      documents.set(relativePath, text.value);
+      sourcePaths.add(relativePath);
+    }
+  }
+
   const pubspecText = await optionalText(root, "pubspec.yaml");
   if (!pubspecText.ok) return pubspecText;
   let pubspec: Readonly<Record<string, unknown>> | null = null;
@@ -206,16 +299,16 @@ export async function inferRepositoryBrief(
   const allText = [...documents.values()].join("\n");
   const mission = missionFrom(allText);
   const packageName = stringValue(pubspec?.name);
-  const genericDescription = /^A new .+ project\.?$/iu;
-  const packageDescription = stringValue(pubspec?.description);
-  const resolvedMission = mission.mission ??
-    (packageDescription !== null && !genericDescription.test(packageDescription)
-      ? packageDescription
-      : null);
-  const resolvedName = mission.name ??
+  const resolvedName = mission.name ?? projectNameFrom(allText) ??
     (packageName === null
       ? humanName(path.basename(fileURLToPath(root)))
       : humanName(packageName));
+  const genericDescription = /^A new .+ project\.?$/iu;
+  const packageDescription = stringValue(pubspec?.description);
+  const resolvedMission = mission.mission ?? missionSentenceFrom(allText, resolvedName) ??
+    (packageDescription !== null && !genericDescription.test(packageDescription)
+      ? packageDescription
+      : null);
   const owner = ownerFrom(allText);
 
   const dependencies = dependencyKeys(pubspec);
