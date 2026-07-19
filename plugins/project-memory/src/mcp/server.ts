@@ -8,7 +8,9 @@ import { parseCliArguments } from "../cli/parse-args.js";
 import type { RuntimeResult } from "../contracts/runtime-result.js";
 import {
   createNodeProjectMemoryHost,
+  FileProposalStore,
   type ProjectMemoryHost,
+  type StoredBootstrapProposal,
 } from "../host/index.js";
 import { PACKAGE_VERSION } from "../version.js";
 const MAX_TOOL_RESPONSE_BYTES = 65_536;
@@ -143,6 +145,9 @@ export interface ProjectMemoryMcpServerDependencies {
   readonly createHost: (root: URL) => ProjectMemoryHostAdapter;
   readonly createRegistry: (root: URL) => CommandRegistry;
   readonly execute: typeof executeCli;
+  readonly resolveProposal?: (
+    handle: string,
+  ) => Promise<RuntimeResult<StoredBootstrapProposal>>;
 }
 
 interface ProjectMemoryRuntime {
@@ -151,10 +156,12 @@ interface ProjectMemoryRuntime {
 }
 
 function defaultDependencies(): ProjectMemoryMcpServerDependencies {
+  const proposals = new FileProposalStore();
   return {
     createHost: (root) => createNodeProjectMemoryHost(root),
     createRegistry: (root) => createNodeCommandRegistry(root),
     execute: executeCli,
+    resolveProposal: (handle) => proposals.resolve(handle),
   };
 }
 
@@ -388,12 +395,19 @@ export class ProjectMemoryMcpServer {
       if (typeof approval.confirmed !== "boolean") {
         throw new McpProtocolError(-32602, "approval.confirmed must be boolean");
       }
-      const host = this.#proposalHosts.get(proposalHandle);
+      let host = this.#proposalHosts.get(proposalHandle);
       if (host === undefined) {
-        return toolFailure(
-          "HOST_PROPOSAL_NOT_FOUND",
-          "proposal handle is unknown, expired, or belongs to another MCP process",
-        );
+        const resolveProposal = this.dependencies.resolveProposal;
+        if (resolveProposal === undefined) {
+          return toolFailure(
+            "HOST_PROPOSAL_NOT_FOUND",
+            "proposal handle is unknown or already consumed",
+          );
+        }
+        const proposal = await resolveProposal(proposalHandle);
+        if (!proposal.ok) return runtimeToolResult(proposal);
+        host = this.runtime(proposal.value.root).host;
+        this.#proposalHosts.set(proposalHandle, host);
       }
       try {
         const applied = await host.applyBootstrap({

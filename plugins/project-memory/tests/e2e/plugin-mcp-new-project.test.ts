@@ -69,7 +69,7 @@ describe("clean Plugin MCP workflow for a new project", () => {
     runGit(workflow.project_root, ["commit", "--quiet", "-m", "test: repository inferred bootstrap"]);
     runGit(workflow.project_root, ["switch", "-c", "version-5.6"]);
     const before = await projectSnapshot(workflow.project_root);
-    const session = await startPluginMcp(workflow);
+    let session = await startPluginMcp(workflow);
     sessions.push(session);
     const initialized = await session.request("initialize", {
       protocolVersion: "2025-06-18",
@@ -102,12 +102,22 @@ describe("clean Plugin MCP workflow for a new project", () => {
       readonly proposal_handle: string;
     };
     expect(directive.proposal_handle).toMatch(/^pm-proposal-[0-9a-f]{32}$/);
+    const proposalProcess = session.process_id;
+    await closeSession(session);
+    session = await startPluginMcp(workflow);
+    sessions.push(session);
+    expect(session.process_id).not.toBe(proposalProcess);
+    const applyInitialized = await session.request("initialize", {
+      protocolVersion: "2025-06-18",
+    });
+    expect(applyInitialized.error).toBeUndefined();
+
     const applied = await callMcpTool(session, "project_memory_apply", {
       mode: "bootstrap",
       proposal_handle: directive.proposal_handle,
       approval: { confirmed: true, granted_by: "Pitaji" },
     });
-    expect(applied.isError).toBeUndefined();
+    expect(applied.isError, JSON.stringify(applied)).toBeUndefined();
     expect(applied.structuredContent).toMatchObject({
       status: "initialized_verified",
       target_ref: "refs/heads/version-5.6",

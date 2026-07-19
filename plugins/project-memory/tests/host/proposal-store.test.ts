@@ -1,16 +1,35 @@
-import { describe, expect, it } from "vitest";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 
-import type { InitPlan } from "../../src/cli/init/build-init-plan.js";
-import { InMemoryProposalStore } from "../../src/host/proposal-store.js";
+import { afterEach, describe, expect, it } from "vitest";
+
+import {
+  initPlanHash,
+  type InitPlan,
+} from "../../src/cli/init/build-init-plan.js";
+import {
+  FileProposalStore,
+  InMemoryProposalStore,
+} from "../../src/host/proposal-store.js";
 
 const ROOT = new URL("file:///C:/project/");
-const PLAN = {
+const PLAN_BODY = {
   expected_head: "1".repeat(40),
-  plan_hash: "2".repeat(64),
   replay: { expires_at: "2026-07-17T13:00:00.000Z" },
+} as unknown as Omit<InitPlan, "plan_hash">;
+const PLAN = {
+  ...PLAN_BODY,
+  plan_hash: initPlanHash(PLAN_BODY),
 } as InitPlan;
+const temporaryRoots: string[] = [];
 
-describe("InMemoryProposalStore", () => {
+afterEach(async () => {
+  await Promise.all(temporaryRoots.splice(0).map((root) =>
+    rm(root, { recursive: true, force: true })));
+});
+
+describe("proposal stores", () => {
   it("binds an unguessable handle to one exact bootstrap plan", () => {
     const store = new InMemoryProposalStore({
       now: () => new Date("2026-07-17T12:00:00.000Z"),
@@ -81,6 +100,40 @@ describe("InMemoryProposalStore", () => {
     expect(store.issue(ROOT, PLAN)).toMatchObject({
       ok: false,
       issues: [{ code: "HOST_PROPOSAL_CACHE_FULL" }],
+    });
+  });
+
+  it("retains the exact proposal across MCP host processes", async () => {
+    const cacheRoot = await mkdtemp(path.join(tmpdir(), "project-memory-proposals-"));
+    temporaryRoots.push(cacheRoot);
+    const issuedByFirstProcess = new FileProposalStore({
+      cache_root: cacheRoot,
+      now: () => new Date("2026-07-17T12:00:00.000Z"),
+      handle: () => "pm-proposal-00000000000000000000000000000004",
+    });
+
+    const issued = await issuedByFirstProcess.issue(ROOT, PLAN);
+    if (!issued.ok) throw new Error("fixture failed");
+
+    const readBySecondProcess = new FileProposalStore({
+      cache_root: cacheRoot,
+      now: () => new Date("2026-07-17T12:05:00.000Z"),
+      handle: () => "pm-proposal-unused00000000000000000000000",
+    });
+    expect(await readBySecondProcess.resolve(issued.value.handle)).toMatchObject({
+      ok: true,
+      value: { root: ROOT, plan: PLAN },
+    });
+    expect((await readBySecondProcess.consume(issued.value.handle)).ok).toBe(true);
+
+    const readByThirdProcess = new FileProposalStore({
+      cache_root: cacheRoot,
+      now: () => new Date("2026-07-17T12:06:00.000Z"),
+      handle: () => "pm-proposal-unused00000000000000000000000",
+    });
+    expect(await readByThirdProcess.resolve(issued.value.handle)).toMatchObject({
+      ok: false,
+      issues: [{ code: "HOST_PROPOSAL_NOT_FOUND" }],
     });
   });
 });

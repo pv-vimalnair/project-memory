@@ -4,6 +4,8 @@
 
 **Goal:** Make the existing Project Memory Plugin operate automatically and offline through a bundled local MCP host without changing its repository model, authority rules, or user-facing product.
 
+> **2026-07-19 pilot correction:** Codex may use a different MCP process after the user-confirmation turn. The exact unexpired plan therefore uses the bounded, user-local temporary cache defined by the corrected host design; the earlier in-memory-only pseudocode below is historical and must not be reintroduced.
+
 **Architecture:** Add one transport-neutral host facade that calls the existing engine and `IntegrationCoordinator` directly. A dependency-free stdio MCP adapter exposes compact startup, allowlisted read operations, and coordinator-mediated applies; the CLI remains a fallback over the same engine.
 
 **Tech Stack:** TypeScript 6, Node.js 24, Vitest, esbuild, JSON-RPC/MCP over stdio, Git, existing Project Memory engine and schemas.

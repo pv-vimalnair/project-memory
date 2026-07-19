@@ -16674,9 +16674,9 @@ import { fileURLToPath as fileURLToPath13 } from "node:url";
 
 // src/cli/commands/doctor.ts
 import { constants } from "node:fs";
-import { access as access2, lstat as lstat9, readFile as readFile11 } from "node:fs/promises";
+import { access as access2, lstat as lstat10, readFile as readFile14 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import path13 from "node:path";
+import path14 from "node:path";
 import { fileURLToPath as fileURLToPath9, pathToFileURL as pathToFileURL6 } from "node:url";
 
 // src/contracts/vocabulary.ts
@@ -31480,280 +31480,20 @@ function buildBootstrapMutationPlan(input, validated) {
   return secrets.ok ? success(augmented) : secrets;
 }
 
-// src/version.ts
-var PACKAGE_VERSION = "0.1.0";
-
-// src/cli/commands/doctor.ts
-var PROJECT_PATH = "docs/project-memory/project.yaml";
-var PROFILE_LOCK_PATH2 = "docs/project-memory/profile.lock.yaml";
-var CATALOG_LOCK_PATH = "docs/project-memory/catalog.lock.json";
-var SHA2564 = /^[0-9a-f]{64}$/;
-function issue3(code, message, pathValue = "") {
-  return { code, severity: "error", path: pathValue, message, references: [] };
-}
-function passed(id, message) {
-  return { id, status: "passed", message, issue: null };
-}
-function failed(id, value) {
-  return { id, status: "failed", message: value.message, issue: value };
-}
-function warning(id, message) {
-  return {
-    id,
-    status: "warning",
-    message,
-    issue: { code: "DOCTOR_CHECK_SKIPPED", severity: "warning", path: id, message, references: [] }
-  };
-}
-function fromResult(id, result, message) {
-  return result.ok ? passed(id, message) : failed(id, result.issues[0] ?? issue3("DOCTOR_FAILED", message, id));
-}
-function commandEnvironment() {
-  const environment = {
-    GIT_TERMINAL_PROMPT: "0",
-    LC_ALL: "C"
-  };
-  for (const name of ["PATH", "SystemRoot", "HOME", "USERPROFILE"]) {
-    const value = process.env[name];
-    if (value !== void 0) environment[name] = value;
-  }
-  return environment;
-}
-async function gitOutput(root, args) {
-  const result = await runCommand({
-    executable: "git",
-    args,
-    cwd: root,
-    timeout_ms: 15e3,
-    env_allowlist: commandEnvironment(),
-    max_output_bytes: 131072
-  }, new NodeCommandRunner());
-  if (!result.ok) return result;
-  if (result.value.timed_out) return failure("GIT_TIMEOUT", "Git diagnostic timed out");
-  if (result.value.output_truncated) return failure("GIT_OUTPUT_TRUNCATED", "Git diagnostic output was truncated");
-  if (result.value.exit_code !== 0) {
-    return failure(
-      "GIT_NOT_FOUND",
-      result.value.stderr.trim() || `Git exited with ${String(result.value.exit_code)}`
-    );
-  }
-  return success(result.value.stdout.trim());
-}
-async function defaultGit(root) {
-  const repository = await gitOutput(root, ["rev-parse", "--show-toplevel"]);
-  if (!repository.ok) return repository;
-  const head = await gitOutput(root, ["rev-parse", "--verify", "HEAD"]);
-  if (!head.ok) return head;
-  if (!/^[0-9a-f]{40}$/.test(head.value)) {
-    return failure("GIT_HEAD_INVALID", "Git HEAD was not an exact SHA-1", head.value);
-  }
-  return success({
-    head: head.value,
-    repository_root: pathToFileURL6(`${path13.resolve(repository.value)}${path13.sep}`)
-  });
-}
-async function defaultHub(root, config) {
-  if (config.hub.kind === "local") return success(true);
-  const result = await gitOutput(root, ["ls-remote", "--exit-code", config.hub.repository, "HEAD"]);
-  return result.ok ? success(true) : failure("HUB_UNREACHABLE", "configured hub repository is unreachable", config.hub.repository);
-}
-async function viewRevision(root, relativePath) {
-  const target = await resolveInside(root, relativePath);
-  if (!target.ok) return target;
-  try {
-    const stat2 = await lstat9(target.value);
-    if (stat2.isSymbolicLink() || !stat2.isFile()) {
-      return failure("DOCTOR_VIEW_UNSAFE", "generated view must be a regular file", relativePath);
-    }
-    const decoded = decodeStrictUtf8(new Uint8Array(await readFile11(target.value)), relativePath);
-    if (!decoded.ok) return decoded;
-    if (relativePath.endsWith(".json")) {
-      const parsed = parseJsonDocument(decoded.value, relativePath);
-      if (!parsed.ok || typeof parsed.value !== "object" || parsed.value === null) {
-        return failure("DOCTOR_VIEW_METADATA_INVALID", "view metadata is invalid", relativePath);
-      }
-      const metadata = parsed.value.metadata;
-      const revision2 = typeof metadata === "object" && metadata !== null ? metadata.source_revision : null;
-      return typeof revision2 === "string" ? success(revision2) : failure("DOCTOR_VIEW_METADATA_INVALID", "view source revision is missing", relativePath);
-    }
-    const revision = /^<!-- source_revision: ([0-9a-f]{40}) -->$/m.exec(decoded.value)?.[1];
-    return revision === void 0 ? failure("DOCTOR_VIEW_METADATA_INVALID", "view source revision is missing", relativePath) : success(revision);
-  } catch (error) {
-    return failure(
-      error.code === "ENOENT" ? "DOCTOR_VIEW_MISSING" : "DOCTOR_VIEW_READ_FAILED",
-      error instanceof Error ? error.message : String(error),
-      relativePath
-    );
-  }
-}
-async function defaultViews(root, expectedHead) {
-  const drifted = [];
-  for (const relativePath of GENERATED_VIEW_PATHS) {
-    const revision = await viewRevision(root, relativePath);
-    if (!revision.ok) return revision;
-    if (revision.value !== expectedHead) drifted.push(relativePath);
-  }
-  return success({ valid: drifted.length === 0, drifted_paths: drifted });
-}
-async function defaultStaging() {
-  try {
-    await access2(tmpdir(), constants.W_OK);
-    return success(true);
-  } catch (error) {
-    return failure(
-      "FILESYSTEM_STAGING_UNWRITABLE",
-      error instanceof Error ? error.message : String(error),
-      tmpdir()
-    );
-  }
-}
-function createDefaultDoctorDependencies() {
-  return {
-    node_version: () => process.versions.node,
-    git: defaultGit,
-    hub: defaultHub,
-    views: defaultViews,
-    staging: defaultStaging
-  };
-}
-async function readDocument(root, relativePath, missingCode) {
-  const target = await resolveInside(root, relativePath);
-  if (!target.ok) return target;
-  try {
-    const stat2 = await lstat9(target.value);
-    if (stat2.isSymbolicLink() || !stat2.isFile()) {
-      return failure("DOCTOR_DOCUMENT_UNSAFE", "diagnostic target must be a regular file", relativePath);
-    }
-    const decoded = decodeStrictUtf8(new Uint8Array(await readFile11(target.value)), relativePath);
-    if (!decoded.ok) return decoded;
-    const parsed = relativePath.endsWith(".json") ? parseJsonDocument(decoded.value, relativePath) : parseYamlDocument(decoded.value, relativePath);
-    if (!parsed.ok) return parsed;
-    return typeof parsed.value === "object" && parsed.value !== null && !Array.isArray(parsed.value) ? success(parsed.value) : failure("DOCTOR_DOCUMENT_INVALID", "diagnostic target must contain an object", relativePath);
-  } catch (error) {
-    return failure(
-      error.code === "ENOENT" ? missingCode : "DOCTOR_DOCUMENT_READ_FAILED",
-      error instanceof Error ? error.message : String(error),
-      relativePath
-    );
-  }
-}
-function rootIdFromProject(value) {
-  const root = value.root;
-  if (typeof root !== "object" || root === null) return null;
-  const id = root.id;
-  return typeof id === "string" ? id : null;
-}
-function compatibleHeader(value, pathValue) {
-  return value.schema_version === "1.0.0" ? success(true) : failure("SCHEMA_VERSION_UNSUPPORTED", "document schema version must be 1.0.0", pathValue);
-}
-async function inspectRepository(root, dependencies = createDefaultDoctorDependencies()) {
-  const checks = [];
-  const major = Number.parseInt(dependencies.node_version().split(".")[0] ?? "", 10);
-  checks.push(major === 24 ? passed("runtime", "Node.js major 24 is active") : failed("runtime", issue3("NODE_VERSION_UNSUPPORTED", "Node.js major 24 is required")));
-  const git2 = await dependencies.git(root);
-  checks.push(fromResult("git", git2, "Git repository and HEAD are available"));
-  const configDocument = await readToolConfigDocument(root);
-  checks.push(fromResult("config", configDocument, `${CONFIG_RELATIVE_PATH} is readable`));
-  const config = configDocument.ok ? validateToolConfigDocument(configDocument.value) : null;
-  checks.push(config === null ? warning("schema", "configuration schema check skipped because config is unavailable") : fromResult("schema", config, "tool configuration schema is compatible"));
-  if (config === null || !config.ok) {
-    for (const id of ["project", "profile_lock", "catalog_lock", "hub", "views"]) {
-      checks.push(warning(id, `${id} check skipped because configuration is invalid`));
-    }
-  } else {
-    const project = await readDocument(root, PROJECT_PATH, "PROJECT_SELECTION_MISSING");
-    if (!project.ok) {
-      checks.push(fromResult("project", project, "project selection is available"));
-    } else {
-      const header = compatibleHeader(project.value, PROJECT_PATH);
-      const rootId = rootIdFromProject(project.value);
-      const binding = !header.ok ? header : rootId === config.value.root_id ? success(true) : failure("DOCTOR_ROOT_ID_MISMATCH", "project selection root does not match config", PROJECT_PATH);
-      checks.push(fromResult("project", binding, "project selection is bound to the configured root"));
-    }
-    const profile = await readDocument(root, PROFILE_LOCK_PATH2, "PROFILE_LOCK_MISSING");
-    if (!profile.ok) {
-      checks.push(fromResult("profile_lock", profile, "profile lock is available"));
-    } else {
-      const header = compatibleHeader(profile.value, PROFILE_LOCK_PATH2);
-      const binding = !header.ok ? header : profile.value.root_id === config.value.root_id && typeof profile.value.lock_hash === "string" && SHA2564.test(profile.value.lock_hash) ? success(true) : failure("PROFILE_LOCK_BINDING_INVALID", "profile lock header does not bind to config", PROFILE_LOCK_PATH2);
-      checks.push(fromResult("profile_lock", binding, "profile lock header is valid and bound"));
-    }
-    const catalog = await readDocument(root, CATALOG_LOCK_PATH, "SELECTED_CATALOG_LOCK_MISSING");
-    if (!catalog.ok) {
-      checks.push(fromResult("catalog_lock", catalog, "catalog lock is available"));
-    } else {
-      const header = compatibleHeader(catalog.value, CATALOG_LOCK_PATH);
-      const valid = !header.ok ? header : typeof catalog.value.lock_hash === "string" && SHA2564.test(catalog.value.lock_hash) ? success(true) : failure("SELECTED_CATALOG_LOCK_INVALID", "catalog lock header is invalid", CATALOG_LOCK_PATH);
-      checks.push(fromResult("catalog_lock", valid, "selected catalog lock header is valid"));
-    }
-    const hub = await dependencies.hub(root, config.value);
-    checks.push(fromResult("hub", hub, "configured hub relationship is reachable"));
-    if (!config.value.policy.generated_view_check) {
-      checks.push(passed("views", "generated view check is disabled by accepted policy"));
-    } else if (!git2.ok) {
-      checks.push(warning("views", "generated view check skipped because Git HEAD is unavailable"));
-    } else {
-      const views = await dependencies.views(root, git2.value.head);
-      const validViews = !views.ok ? views : views.value.valid ? success(true) : failure(
-        "DOCTOR_VIEWS_STALE",
-        "generated views do not match the current source revision",
-        views.value.drifted_paths.join(",")
-      );
-      checks.push(fromResult("views", validViews, "generated views are current"));
-    }
-  }
-  const staging = await dependencies.staging(root);
-  checks.push(fromResult("staging", staging, "transaction staging location is writable"));
-  return {
-    schema_version: "1.0.0",
-    root: root.href,
-    root_id: config?.ok === true ? config.value.root_id : null,
-    valid: checks.every((check) => check.status !== "failed"),
-    checks
-  };
-}
-function rootFromFlag(value, currentDirectory2) {
-  if (currentDirectory2.protocol !== "file:") {
-    return failure("CLI_ROOT_INVALID", "current directory must be a file URL");
-  }
-  try {
-    const rootPath = value.startsWith("file:") ? fileURLToPath9(new URL(value)) : path13.resolve(fileURLToPath9(currentDirectory2), value);
-    return success(pathToFileURL6(`${rootPath}${path13.sep}`));
-  } catch (error) {
-    return failure("CLI_ROOT_INVALID", error instanceof Error ? error.message : String(error), value);
-  }
-}
-function createDoctorCommand(dependencies = createDefaultDoctorDependencies()) {
-  return {
-    path: ["doctor"],
-    mutates: false,
-    async run(context, invocation) {
-      const rootFlag = invocation.flags.root;
-      const resolved = typeof rootFlag === "string" ? rootFromFlag(rootFlag, context.current_directory) : await discoverProjectRoot(context.current_directory);
-      if (!resolved.ok) return resolved;
-      const report = await inspectRepository(resolved.value, dependencies);
-      const failures = report.checks.filter((check) => check.status === "failed" && check.issue !== null).map((check) => check.issue);
-      if (failures.length > 0) return failureFromIssues(failures);
-      const warnings = report.checks.filter((check) => check.status === "warning" && check.issue !== null).map((check) => check.issue);
-      return success(report, warnings);
-    }
-  };
-}
-
 // src/cli/init/build-init-plan.ts
-import { lstat as lstat10, readFile as readFile14 } from "node:fs/promises";
+import { lstat as lstat9, readFile as readFile13 } from "node:fs/promises";
 
 // src/profile/catalog-selection-resolver.ts
 var import_semver6 = __toESM(require_semver2(), 1);
 
 // src/profile/catalog-release-reader.ts
-import { readFile as readFile13 } from "node:fs/promises";
-
-// src/catalog/manifest/verify-catalog-release.ts
 import { readFile as readFile12 } from "node:fs/promises";
 
+// src/catalog/manifest/verify-catalog-release.ts
+import { readFile as readFile11 } from "node:fs/promises";
+
 // src/catalog/load-catalog.ts
-import path14 from "node:path";
+import path13 from "node:path";
 function createBuilder() {
   return {
     blueprint_groups: /* @__PURE__ */ new Map(),
@@ -31842,7 +31582,7 @@ async function loadSourceDocument(root, relativePath, descriptor) {
       relativePath
     );
   }
-  const basename = path14.posix.basename(relativePath);
+  const basename = path13.posix.basename(relativePath);
   if (!expectedFileNames(descriptor, rawId).has(basename)) {
     return failure(
       "CATALOG_FILENAME_ID_MISMATCH",
@@ -31985,7 +31725,7 @@ async function readReleaseFile(root, relativePath) {
   const resolved = await resolveInside(root, relativePath);
   if (!resolved.ok) return resolved;
   try {
-    return success(new Uint8Array(await readFile12(resolved.value)));
+    return success(new Uint8Array(await readFile11(resolved.value)));
   } catch (error) {
     return failure(
       "CATALOG_RELEASE_READ_FAILED",
@@ -32143,7 +31883,7 @@ async function readBytes(root, relativePath, code = "CATALOG_RELEASE_READ_FAILED
   const resolved = await resolveInside(root, relativePath);
   if (!resolved.ok) return resolved;
   try {
-    return success(new Uint8Array(await readFile13(resolved.value)));
+    return success(new Uint8Array(await readFile12(resolved.value)));
   } catch (error) {
     return failure(
       code,
@@ -32989,11 +32729,11 @@ async function readText(root, relativePath) {
   const target = await resolveInside(root, relativePath);
   if (!target.ok) return target;
   try {
-    const stat2 = await lstat10(target.value);
+    const stat2 = await lstat9(target.value);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure("INIT_INPUT_UNSAFE", "initialization input must be a regular file", relativePath);
     }
-    return decodeStrictUtf8(new Uint8Array(await readFile14(target.value)), relativePath);
+    return decodeStrictUtf8(new Uint8Array(await readFile13(target.value)), relativePath);
   } catch (error) {
     return failure(
       "INIT_INPUT_READ_FAILED",
@@ -33004,11 +32744,11 @@ async function readText(root, relativePath) {
 }
 async function jsonFile(url) {
   try {
-    const stat2 = await lstat10(url);
+    const stat2 = await lstat9(url);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure("INIT_CATALOG_UNSAFE", "catalog document must be a regular file", url.href);
     }
-    const decoded = decodeStrictUtf8(new Uint8Array(await readFile14(url)), url.href);
+    const decoded = decodeStrictUtf8(new Uint8Array(await readFile13(url)), url.href);
     return decoded.ok ? parseJsonDocument(decoded.value, url.href) : decoded;
   } catch (error) {
     return failure("INIT_CATALOG_READ_FAILED", error instanceof Error ? error.message : String(error), url.href);
@@ -33047,11 +32787,11 @@ var NodeProfileTargetReader = class {
     const target = await resolveInside(root, relativePath);
     if (!target.ok) return target;
     try {
-      const stat2 = await lstat10(target.value);
+      const stat2 = await lstat9(target.value);
       if (stat2.isSymbolicLink() || !stat2.isFile()) {
         return failure("PROFILE_TARGET_UNSAFE", "profile target must be a regular file", relativePath);
       }
-      return success(new Uint8Array(await readFile14(target.value)));
+      return success(new Uint8Array(await readFile13(target.value)));
     } catch (error) {
       return error.code === "ENOENT" ? success(null) : failure("PROFILE_TARGET_READ_FAILED", error instanceof Error ? error.message : String(error), relativePath);
     }
@@ -33324,6 +33064,266 @@ async function buildInitPlan(replay, dependencies = createDefaultBuildInitPlanDe
     }
   };
   return success({ ...body, plan_hash: initPlanHash(body) }, [...compilation.warnings, reviewWarning()]);
+}
+
+// src/version.ts
+var PACKAGE_VERSION = "0.1.0";
+
+// src/cli/commands/doctor.ts
+var PROJECT_PATH = "docs/project-memory/project.yaml";
+var PROFILE_LOCK_PATH2 = "docs/project-memory/profile.lock.yaml";
+var CATALOG_LOCK_PATH = "docs/project-memory/catalog.lock.json";
+var SHA2564 = /^[0-9a-f]{64}$/;
+function issue3(code, message, pathValue = "") {
+  return { code, severity: "error", path: pathValue, message, references: [] };
+}
+function passed(id, message) {
+  return { id, status: "passed", message, issue: null };
+}
+function failed(id, value) {
+  return { id, status: "failed", message: value.message, issue: value };
+}
+function warning(id, message) {
+  return {
+    id,
+    status: "warning",
+    message,
+    issue: { code: "DOCTOR_CHECK_SKIPPED", severity: "warning", path: id, message, references: [] }
+  };
+}
+function fromResult(id, result, message) {
+  return result.ok ? passed(id, message) : failed(id, result.issues[0] ?? issue3("DOCTOR_FAILED", message, id));
+}
+function commandEnvironment() {
+  const environment = {
+    GIT_TERMINAL_PROMPT: "0",
+    LC_ALL: "C"
+  };
+  for (const name of ["PATH", "SystemRoot", "HOME", "USERPROFILE"]) {
+    const value = process.env[name];
+    if (value !== void 0) environment[name] = value;
+  }
+  return environment;
+}
+async function gitOutput(root, args) {
+  const result = await runCommand({
+    executable: "git",
+    args,
+    cwd: root,
+    timeout_ms: 15e3,
+    env_allowlist: commandEnvironment(),
+    max_output_bytes: 131072
+  }, new NodeCommandRunner());
+  if (!result.ok) return result;
+  if (result.value.timed_out) return failure("GIT_TIMEOUT", "Git diagnostic timed out");
+  if (result.value.output_truncated) return failure("GIT_OUTPUT_TRUNCATED", "Git diagnostic output was truncated");
+  if (result.value.exit_code !== 0) {
+    return failure(
+      "GIT_NOT_FOUND",
+      result.value.stderr.trim() || `Git exited with ${String(result.value.exit_code)}`
+    );
+  }
+  return success(result.value.stdout.trim());
+}
+async function defaultGit(root) {
+  const repository = await gitOutput(root, ["rev-parse", "--show-toplevel"]);
+  if (!repository.ok) return repository;
+  const head = await gitOutput(root, ["rev-parse", "--verify", "HEAD"]);
+  if (!head.ok) return head;
+  if (!/^[0-9a-f]{40}$/.test(head.value)) {
+    return failure("GIT_HEAD_INVALID", "Git HEAD was not an exact SHA-1", head.value);
+  }
+  return success({
+    head: head.value,
+    repository_root: pathToFileURL6(`${path14.resolve(repository.value)}${path14.sep}`)
+  });
+}
+async function defaultHub(root, config) {
+  if (config.hub.kind === "local") return success(true);
+  const result = await gitOutput(root, ["ls-remote", "--exit-code", config.hub.repository, "HEAD"]);
+  return result.ok ? success(true) : failure("HUB_UNREACHABLE", "configured hub repository is unreachable", config.hub.repository);
+}
+async function viewRevision(root, relativePath) {
+  const target = await resolveInside(root, relativePath);
+  if (!target.ok) return target;
+  try {
+    const stat2 = await lstat10(target.value);
+    if (stat2.isSymbolicLink() || !stat2.isFile()) {
+      return failure("DOCTOR_VIEW_UNSAFE", "generated view must be a regular file", relativePath);
+    }
+    const decoded = decodeStrictUtf8(new Uint8Array(await readFile14(target.value)), relativePath);
+    if (!decoded.ok) return decoded;
+    if (relativePath.endsWith(".json")) {
+      const parsed = parseJsonDocument(decoded.value, relativePath);
+      if (!parsed.ok || typeof parsed.value !== "object" || parsed.value === null) {
+        return failure("DOCTOR_VIEW_METADATA_INVALID", "view metadata is invalid", relativePath);
+      }
+      const metadata = parsed.value.metadata;
+      const revision2 = typeof metadata === "object" && metadata !== null ? metadata.source_revision : null;
+      return typeof revision2 === "string" ? success(revision2) : failure("DOCTOR_VIEW_METADATA_INVALID", "view source revision is missing", relativePath);
+    }
+    const revision = /^<!-- source_revision: ([0-9a-f]{40}) -->$/m.exec(decoded.value)?.[1];
+    return revision === void 0 ? failure("DOCTOR_VIEW_METADATA_INVALID", "view source revision is missing", relativePath) : success(revision);
+  } catch (error) {
+    return failure(
+      error.code === "ENOENT" ? "DOCTOR_VIEW_MISSING" : "DOCTOR_VIEW_READ_FAILED",
+      error instanceof Error ? error.message : String(error),
+      relativePath
+    );
+  }
+}
+async function defaultViews(root, expectedHead) {
+  const drifted = [];
+  for (const relativePath of GENERATED_VIEW_PATHS) {
+    const revision = await viewRevision(root, relativePath);
+    if (!revision.ok) return revision;
+    if (revision.value !== expectedHead) drifted.push(relativePath);
+  }
+  return success({ valid: drifted.length === 0, drifted_paths: drifted });
+}
+async function defaultStaging() {
+  try {
+    await access2(tmpdir(), constants.W_OK);
+    return success(true);
+  } catch (error) {
+    return failure(
+      "FILESYSTEM_STAGING_UNWRITABLE",
+      error instanceof Error ? error.message : String(error),
+      tmpdir()
+    );
+  }
+}
+function createDefaultDoctorDependencies() {
+  return {
+    node_version: () => process.versions.node,
+    git: defaultGit,
+    hub: defaultHub,
+    views: defaultViews,
+    staging: defaultStaging
+  };
+}
+async function readDocument(root, relativePath, missingCode) {
+  const target = await resolveInside(root, relativePath);
+  if (!target.ok) return target;
+  try {
+    const stat2 = await lstat10(target.value);
+    if (stat2.isSymbolicLink() || !stat2.isFile()) {
+      return failure("DOCTOR_DOCUMENT_UNSAFE", "diagnostic target must be a regular file", relativePath);
+    }
+    const decoded = decodeStrictUtf8(new Uint8Array(await readFile14(target.value)), relativePath);
+    if (!decoded.ok) return decoded;
+    const parsed = relativePath.endsWith(".json") ? parseJsonDocument(decoded.value, relativePath) : parseYamlDocument(decoded.value, relativePath);
+    if (!parsed.ok) return parsed;
+    return typeof parsed.value === "object" && parsed.value !== null && !Array.isArray(parsed.value) ? success(parsed.value) : failure("DOCTOR_DOCUMENT_INVALID", "diagnostic target must contain an object", relativePath);
+  } catch (error) {
+    return failure(
+      error.code === "ENOENT" ? missingCode : "DOCTOR_DOCUMENT_READ_FAILED",
+      error instanceof Error ? error.message : String(error),
+      relativePath
+    );
+  }
+}
+function rootIdFromProject(value) {
+  const root = value.root;
+  if (typeof root !== "object" || root === null) return null;
+  const id = root.id;
+  return typeof id === "string" ? id : null;
+}
+function compatibleHeader(value, pathValue) {
+  return value.schema_version === "1.0.0" ? success(true) : failure("SCHEMA_VERSION_UNSUPPORTED", "document schema version must be 1.0.0", pathValue);
+}
+async function inspectRepository(root, dependencies = createDefaultDoctorDependencies()) {
+  const checks = [];
+  const major = Number.parseInt(dependencies.node_version().split(".")[0] ?? "", 10);
+  checks.push(major === 24 ? passed("runtime", "Node.js major 24 is active") : failed("runtime", issue3("NODE_VERSION_UNSUPPORTED", "Node.js major 24 is required")));
+  const git2 = await dependencies.git(root);
+  checks.push(fromResult("git", git2, "Git repository and HEAD are available"));
+  const configDocument = await readToolConfigDocument(root);
+  checks.push(fromResult("config", configDocument, `${CONFIG_RELATIVE_PATH} is readable`));
+  const config = configDocument.ok ? validateToolConfigDocument(configDocument.value) : null;
+  checks.push(config === null ? warning("schema", "configuration schema check skipped because config is unavailable") : fromResult("schema", config, "tool configuration schema is compatible"));
+  if (config === null || !config.ok) {
+    for (const id of ["project", "profile_lock", "catalog_lock", "hub", "views"]) {
+      checks.push(warning(id, `${id} check skipped because configuration is invalid`));
+    }
+  } else {
+    const project = await readDocument(root, PROJECT_PATH, "PROJECT_SELECTION_MISSING");
+    if (!project.ok) {
+      checks.push(fromResult("project", project, "project selection is available"));
+    } else {
+      const header = compatibleHeader(project.value, PROJECT_PATH);
+      const rootId = rootIdFromProject(project.value);
+      const binding = !header.ok ? header : rootId === config.value.root_id ? success(true) : failure("DOCTOR_ROOT_ID_MISMATCH", "project selection root does not match config", PROJECT_PATH);
+      checks.push(fromResult("project", binding, "project selection is bound to the configured root"));
+    }
+    const profile = await readDocument(root, PROFILE_LOCK_PATH2, "PROFILE_LOCK_MISSING");
+    if (!profile.ok) {
+      checks.push(fromResult("profile_lock", profile, "profile lock is available"));
+    } else {
+      const header = compatibleHeader(profile.value, PROFILE_LOCK_PATH2);
+      const binding = !header.ok ? header : profile.value.root_id === config.value.root_id && typeof profile.value.lock_hash === "string" && SHA2564.test(profile.value.lock_hash) ? success(true) : failure("PROFILE_LOCK_BINDING_INVALID", "profile lock header does not bind to config", PROFILE_LOCK_PATH2);
+      checks.push(fromResult("profile_lock", binding, "profile lock header is valid and bound"));
+    }
+    const catalog = await readDocument(root, CATALOG_LOCK_PATH, "SELECTED_CATALOG_LOCK_MISSING");
+    if (!catalog.ok) {
+      checks.push(fromResult("catalog_lock", catalog, "catalog lock is available"));
+    } else {
+      const header = compatibleHeader(catalog.value, CATALOG_LOCK_PATH);
+      const valid = !header.ok ? header : typeof catalog.value.lock_hash === "string" && SHA2564.test(catalog.value.lock_hash) ? success(true) : failure("SELECTED_CATALOG_LOCK_INVALID", "catalog lock header is invalid", CATALOG_LOCK_PATH);
+      checks.push(fromResult("catalog_lock", valid, "selected catalog lock header is valid"));
+    }
+    const hub = await dependencies.hub(root, config.value);
+    checks.push(fromResult("hub", hub, "configured hub relationship is reachable"));
+    if (!config.value.policy.generated_view_check) {
+      checks.push(passed("views", "generated view check is disabled by accepted policy"));
+    } else if (!git2.ok) {
+      checks.push(warning("views", "generated view check skipped because Git HEAD is unavailable"));
+    } else {
+      const views = await dependencies.views(root, git2.value.head);
+      const validViews = !views.ok ? views : views.value.valid ? success(true) : failure(
+        "DOCTOR_VIEWS_STALE",
+        "generated views do not match the current source revision",
+        views.value.drifted_paths.join(",")
+      );
+      checks.push(fromResult("views", validViews, "generated views are current"));
+    }
+  }
+  const staging = await dependencies.staging(root);
+  checks.push(fromResult("staging", staging, "transaction staging location is writable"));
+  return {
+    schema_version: "1.0.0",
+    root: root.href,
+    root_id: config?.ok === true ? config.value.root_id : null,
+    valid: checks.every((check) => check.status !== "failed"),
+    checks
+  };
+}
+function rootFromFlag(value, currentDirectory2) {
+  if (currentDirectory2.protocol !== "file:") {
+    return failure("CLI_ROOT_INVALID", "current directory must be a file URL");
+  }
+  try {
+    const rootPath = value.startsWith("file:") ? fileURLToPath9(new URL(value)) : path14.resolve(fileURLToPath9(currentDirectory2), value);
+    return success(pathToFileURL6(`${rootPath}${path14.sep}`));
+  } catch (error) {
+    return failure("CLI_ROOT_INVALID", error instanceof Error ? error.message : String(error), value);
+  }
+}
+function createDoctorCommand(dependencies = createDefaultDoctorDependencies()) {
+  return {
+    path: ["doctor"],
+    mutates: false,
+    async run(context, invocation) {
+      const rootFlag = invocation.flags.root;
+      const resolved = typeof rootFlag === "string" ? rootFromFlag(rootFlag, context.current_directory) : await discoverProjectRoot(context.current_directory);
+      if (!resolved.ok) return resolved;
+      const report = await inspectRepository(resolved.value, dependencies);
+      const failures = report.checks.filter((check) => check.status === "failed" && check.issue !== null).map((check) => check.issue);
+      if (failures.length > 0) return failureFromIssues(failures);
+      const warnings = report.checks.filter((check) => check.status === "warning" && check.issue !== null).map((check) => check.issue);
+      return success(report, warnings);
+    }
+  };
 }
 
 // src/agent/infer-repository-brief.ts

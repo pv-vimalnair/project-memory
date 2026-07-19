@@ -146,6 +146,7 @@ export async function preparePluginWorkflow(
   await Promise.all([
     copyPluginRuntime(pluginRoot),
     cp(path.join(FIXTURE_ROOT, fixture), projectRoot, { recursive: true }),
+    mkdir(path.join(sandbox, "temp"), { recursive: true }),
   ]);
   await buildCleanBundles(sandbox, pluginRoot);
   expect(await readdir(pluginRoot)).not.toContain("node_modules");
@@ -345,7 +346,12 @@ export async function startPluginMcp(
   }
   return new PluginMcpSession(spawn(command, args, {
     cwd: resolvedCwd,
-    env: offlineEnvironment(),
+    env: {
+      ...offlineEnvironment(),
+      TEMP: path.join(workflow.sandbox, "temp"),
+      TMP: path.join(workflow.sandbox, "temp"),
+      TMPDIR: path.join(workflow.sandbox, "temp"),
+    },
     shell: false,
     windowsHide: true,
     stdio: ["pipe", "pipe", "pipe"],

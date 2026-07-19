@@ -5,6 +5,7 @@
 **Status:** Approved for implementation planning
 **Extends:** `2026-07-14-project-memory-agent-plugin-design.md`
 **Approved by:** Pv Vimal Nair (Pitaji), 2026-07-17
+**Corrected:** 2026-07-19 after the live Codex pilot proved confirmation crosses MCP processes
 
 ## 1. Decision
 
@@ -45,7 +46,7 @@ Disabling the sandbox, requiring repeated manual command approvals, or sending t
 - Add one bundled local stdio MCP server to the Plugin release artifact.
 - Add a transport-neutral host facade over the existing engine and `IntegrationCoordinator`.
 - Route every agent-facing Project Memory operation through the host facade rather than spawning the CLI.
-- Keep complete reviewed plans in a bounded in-memory proposal cache until apply.
+- Keep complete reviewed plans in a bounded, expiring, user-local temporary proposal cache until apply so confirmation can cross MCP process boundaries.
 - Return compact, schema-validated summaries, handles, hashes, expected heads, reading orders, and receipts to agents.
 - Keep the CLI as a thin adapter over the same engine behavior.
 - Update the skill and protocol references to prefer bundled MCP tools and use the CLI only as fallback.
@@ -110,7 +111,7 @@ The CLI remains supported for automation, CI, diagnostics, recovery, and non-MCP
 
 ## 6. Compact proposal contract
 
-When an operation creates a plan, the host facade stores the exact plan object in a bounded in-memory cache and returns only:
+When an operation creates a plan, the host facade stores the exact plan object in a bounded, expiring, user-local temporary cache and returns only:
 
 - proposal handle;
 - operation and repository identity;
@@ -121,9 +122,9 @@ When an operation creates a plan, the host facade stores the exact plan object i
 - expiry time;
 - whether confirmation is required.
 
-The model never receives compilation file bytes. The proposal cache is local to the Plugin process, size-bounded, time-bounded, and contains no credentials. Handles are unguessable and bound to the repository, operation, exact plan hash, and expected head.
+The model never receives compilation file bytes. The proposal cache stays on the local machine outside the product repository and Git, is size-bounded and time-bounded, and contains no credentials. Cache directories and files use private operating-system permissions where supported. Handles are unguessable and bound to the repository, operation, exact plan hash, and expected head.
 
-The cache is intentionally not a new database. If the MCP process restarts before apply, the proposal is lost and must be regenerated. No canonical state changes, and the regenerated proposal must be reviewed again. Accepted project truth always lives in the repository, not in the cache.
+The cache is intentionally not a new database or canonical store. It preserves an exact reviewed plan across short-lived MCP processes, deletes it after successful apply, and removes expired entries during later cache access. A missing, expired, corrupt, or tampered entry must be regenerated and reviewed again. Accepted project truth always lives in the repository, not in the cache.
 
 ## 7. Apply and confirmation flow
 
@@ -147,7 +148,7 @@ No repository schema or authority rule changes.
 - Generated views remain derived and non-authoritative.
 - Workers remain unable to accept direction or edit canonical history directly.
 - Existing claims, allowed paths, integration leases, expected-head checks, isolated worktrees, gate execution, and coordinator receipts remain normative.
-- Separate MCP processes do not share transient proposal caches. They coordinate canonical work through the existing repository and Git governance rules.
+- Separate MCP processes may recover only the same exact unexpired proposal through its unguessable local handle. Canonical coordination still occurs through the existing repository and Git governance rules.
 - A stale proposal, expired claim, changed head, conflicting lease, dirty root, or failed gate fails closed.
 
 ## 9. Security and privacy
@@ -166,7 +167,7 @@ No repository schema or authority rule changes.
 
 - MCP unavailable: the skill reports the exact issue and may use the existing CLI only when the host can execute it safely.
 - Git runner unavailable inside the MCP host: fail the install pilot; do not request sandbox bypass.
-- Proposal cache miss or restart: regenerate and reconfirm; perform no write.
+- Proposal cache miss, expiry, corruption, or tampering: regenerate and reconfirm; perform no write. An MCP process restart alone must not invalidate an unexpired proposal.
 - Oversized compact response: fail validation; never fall back to the full plan.
 - Head, plan, approval, role, or expiry mismatch: reject apply and replan.
 - Server crash during apply: rely on the existing atomic coordinator and Git evidence; inspect the resulting revision before retrying.
@@ -179,7 +180,7 @@ The correction is complete only when all of the following pass:
 1. Existing full typecheck, lint, tests, generated checks, Plugin validation, clean-package verification, and publication-blocker checks still pass.
 2. MCP protocol tests cover initialize, tool discovery, read/write classification, invalid input, output bounds, and clean shutdown.
 3. Host-facade tests prove direct engine composition and prove that no Project Memory CLI subprocess is spawned.
-4. Bootstrap tests prove no project write before confirmation, exact plan preservation, fresh replan comparison, one coordinator call, and atomic failure behavior.
+4. Bootstrap tests prove no project write before confirmation, exact plan preservation across separate MCP processes, fresh replan comparison, one coordinator call, and atomic failure behavior.
 5. The bundled clean Plugin starts offline with no `node_modules` and includes only declared runtime files.
 6. A real default-sandbox Codex pilot in a sanitized scratch repository proves implicit invocation, no profile picker, one confirmation, successful initialization, one small synthetic task, new-thread deterministic resume, and exact rollback.
 7. Two independent lower-reasoning runs use the same fixed prompt and at least 30 identical supported briefs and meet every existing Task 9 threshold.

@@ -27,6 +27,7 @@ function command(
 
 function harness(overrides: {
   readonly readValue?: unknown;
+  readonly resolveProposal?: ProjectMemoryMcpServerDependencies["resolveProposal"];
 } = {}) {
   const readCommand = command(["doctor"], false, overrides.readValue ?? { valid: true });
   const writeCommand = command(["init", "apply"], true, { status: "initialized_verified" });
@@ -50,6 +51,9 @@ function harness(overrides: {
     createHost: vi.fn(() => host),
     createRegistry: vi.fn(() => registry),
     execute: executeCli,
+    ...(overrides.resolveProposal === undefined
+      ? {}
+      : { resolveProposal: overrides.resolveProposal }),
   };
   return {
     server: new ProjectMemoryMcpServer(dependencies),
@@ -154,6 +158,30 @@ describe("ProjectMemoryMcpServer", () => {
     expect(applied).toMatchObject({
       structuredContent: { status: "initialized_verified" },
     });
+    expect(host.applyBootstrap).toHaveBeenCalledWith({
+      proposal_handle: PROPOSAL_HANDLE,
+      approval: { confirmed: true, granted_by: "Pitaji" },
+    });
+  });
+
+  it("recovers a reviewed proposal after the MCP process changes", async () => {
+    const resolveProposal = vi.fn(() => Promise.resolve(success({
+      root: ROOT,
+      plan: {} as never,
+    })));
+    const { server, dependencies, host } = harness({ resolveProposal });
+
+    const applied = await callTool(server, "project_memory_apply", {
+      mode: "bootstrap",
+      proposal_handle: PROPOSAL_HANDLE,
+      approval: { confirmed: true, granted_by: "Pitaji" },
+    });
+
+    expect(applied).toMatchObject({
+      structuredContent: { status: "initialized_verified" },
+    });
+    expect(resolveProposal).toHaveBeenCalledWith(PROPOSAL_HANDLE);
+    expect(dependencies.createHost).toHaveBeenCalledWith(ROOT);
     expect(host.applyBootstrap).toHaveBeenCalledWith({
       proposal_handle: PROPOSAL_HANDLE,
       approval: { confirmed: true, granted_by: "Pitaji" },
