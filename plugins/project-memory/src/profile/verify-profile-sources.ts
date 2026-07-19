@@ -8,6 +8,7 @@ import {
 import { canonicalJson } from "../core/canonical-json.js";
 import {
   decodeStrictUtf8,
+  normalizeGitTextBytes,
   parseYamlDocument,
 } from "../core/document-io.js";
 import { sha256 } from "../core/hash.js";
@@ -46,7 +47,9 @@ async function requiredBytes(
         relativePath,
       );
     }
-    return success(new Uint8Array(await readFile(resolved.value)));
+    return success(normalizeGitTextBytes(
+      new Uint8Array(await readFile(resolved.value)),
+    ));
   } catch (error: unknown) {
     return failure(
       "PROFILE_TARGET_READ_FAILED",

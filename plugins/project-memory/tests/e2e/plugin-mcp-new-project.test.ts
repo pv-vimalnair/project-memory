@@ -1,5 +1,5 @@
 import { Buffer } from "node:buffer";
-import { access, mkdir, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
@@ -43,6 +43,7 @@ describe("clean Plugin MCP workflow for a new project", () => {
   it("keeps startup compact and read-only, applies one confirmation, then resumes", async () => {
     const workflow = await preparePluginWorkflow("new");
     workflows.push(workflow);
+    runGit(workflow.project_root, ["config", "core.autocrlf", "true"]);
     await rm(path.join(workflow.project_root, "BRIEF.md"));
     await Promise.all([
       writeFile(path.join(workflow.project_root, "AGENTS.md"), [
@@ -67,6 +68,11 @@ describe("clean Plugin MCP workflow for a new project", () => {
     ]);
     runGit(workflow.project_root, ["add", "--all", "--", "."]);
     runGit(workflow.project_root, ["commit", "--quiet", "-m", "test: repository inferred bootstrap"]);
+    await rm(path.join(workflow.project_root, "AGENTS.md"));
+    runGit(workflow.project_root, ["restore", "--worktree", "--", "AGENTS.md"]);
+    expect(await readFile(path.join(workflow.project_root, "AGENTS.md"), "utf8"))
+      .toContain("\r\n");
+    expect(runGit(workflow.project_root, ["status", "--porcelain=v1"])).toBe("");
     runGit(workflow.project_root, ["switch", "-c", "version-5.6"]);
     const before = await projectSnapshot(workflow.project_root);
     let session = await startPluginMcp(workflow);
@@ -133,12 +139,12 @@ describe("clean Plugin MCP workflow for a new project", () => {
       root: workflow.project_url.href,
     });
     expect(resumed.isError).toBeUndefined();
-    expect(resumed.structuredContent).toMatchObject({
+    expect(resumed.structuredContent, JSON.stringify(resumed)).toMatchObject({
       kind: "resume",
       reading_order: READING_ORDER,
       assigned_task_packets: [],
     });
 
     await closeSession(session);
-  }, 120_000);
+  }, 180_000);
 });

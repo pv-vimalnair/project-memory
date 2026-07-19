@@ -16956,7 +16956,7 @@ import { constants } from "node:fs";
 import { access as access2, lstat as lstat11, readFile as readFile15 } from "node:fs/promises";
 import { tmpdir as tmpdir2 } from "node:os";
 import path15 from "node:path";
-import { fileURLToPath as fileURLToPath9, pathToFileURL as pathToFileURL6 } from "node:url";
+import { fileURLToPath as fileURLToPath10, pathToFileURL as pathToFileURL6 } from "node:url";
 
 // src/contracts/vocabulary.ts
 var ROOT_KIND_VALUES = Object.freeze([
@@ -17835,6 +17835,21 @@ function decodeStrictUtf8(bytes, source = "document") {
   } catch {
     return failure("UTF8_INVALID", "document is not valid UTF-8", source);
   }
+}
+function normalizeGitTextBytes(bytes) {
+  let crlfCount = 0;
+  for (let index = 0; index + 1 < bytes.length; index += 1) {
+    if (bytes[index] === 13 && bytes[index + 1] === 10) crlfCount += 1;
+  }
+  if (crlfCount === 0) return bytes;
+  const normalized = new Uint8Array(bytes.length - crlfCount);
+  let target = 0;
+  for (let index = 0; index < bytes.length; index += 1) {
+    if (bytes[index] === 13 && bytes[index + 1] === 10) continue;
+    normalized[target] = bytes[index] ?? 0;
+    target += 1;
+  }
+  return normalized;
 }
 async function readUtf8Document(root, relativePath) {
   const resolved = await resolveInside(root, relativePath);
@@ -27639,7 +27654,9 @@ async function requiredBytes(root, relativePath) {
         relativePath
       );
     }
-    return success(new Uint8Array(await readFile4(resolved.value)));
+    return success(normalizeGitTextBytes(
+      new Uint8Array(await readFile4(resolved.value))
+    ));
   } catch (error) {
     return failure(
       "PROFILE_TARGET_READ_FAILED",
@@ -27944,7 +27961,9 @@ async function readTargetBytes(root, relativePath, missingCode) {
   const resolved = await resolveInside(root, relativePath);
   if (!resolved.ok) return resolved;
   try {
-    return success(new Uint8Array(await readFile5(resolved.value)));
+    return success(normalizeGitTextBytes(
+      new Uint8Array(await readFile5(resolved.value))
+    ));
   } catch (error) {
     const code = error.code;
     return failure(
@@ -28170,7 +28189,9 @@ async function readTarget(root, relativePath, optional = false) {
         relativePath
       );
     }
-    return success(new Uint8Array(await readFile6(resolved.value)));
+    return success(normalizeGitTextBytes(
+      new Uint8Array(await readFile6(resolved.value))
+    ));
   } catch (error) {
     if (optional && error.code === "ENOENT") {
       return success(null);
@@ -29438,7 +29459,9 @@ var FilesystemViewTargetReader = class {
           relativePath
         );
       }
-      return success(new Uint8Array(await readFile8(resolved.value)));
+      return success(normalizeGitTextBytes(
+        new Uint8Array(await readFile8(resolved.value))
+      ));
     } catch (error) {
       if (error.code === "ENOENT") return success(null);
       return failure(
@@ -31776,6 +31799,190 @@ import { deserialize, serialize } from "node:v8";
 // src/cli/init/build-init-plan.ts
 import { lstat as lstat9, readFile as readFile13 } from "node:fs/promises";
 
+// src/governance/integration/integration-git-client.ts
+import { fileURLToPath as fileURLToPath9 } from "node:url";
+var OBJECT_ID = /^[0-9a-f]{40}$/;
+var FORBIDDEN_REF_CHARACTERS = /* @__PURE__ */ new Set(["~", "^", ":", "?", "*", "[", "\\"]);
+function gitEnvironment2() {
+  const result = {
+    GIT_MERGE_AUTOEDIT: "no",
+    GIT_TERMINAL_PROMPT: "0",
+    LC_ALL: "C"
+  };
+  for (const name of ["PATH", "SystemRoot", "HOME", "USERPROFILE"]) {
+    const value = process.env[name];
+    if (value !== void 0) result[name] = value;
+  }
+  return result;
+}
+function assertObjectId(value) {
+  if (!OBJECT_ID.test(value)) throw new TypeError(`unsafe Git object ID: ${value}`);
+}
+function assertRef(value) {
+  let unsafeCharacter = false;
+  for (const character of value) {
+    if (character.charCodeAt(0) <= 32 || FORBIDDEN_REF_CHARACTERS.has(character)) {
+      unsafeCharacter = true;
+      break;
+    }
+  }
+  if (!value.startsWith("refs/") || value.length > 512 || unsafeCharacter || value.includes("..") || value.includes("@{") || value.includes("//") || value.endsWith("/") || value.endsWith(".") || value.endsWith(".lock")) {
+    throw new TypeError(`unsafe Git ref: ${value}`);
+  }
+}
+function assertPathspec(value) {
+  if (value.length === 0 || value.includes("\0") || value.includes("\\") || value.startsWith("/") || value.startsWith(":") || /^[A-Za-z]:/.test(value) || value.split("/").some((part) => part === "..")) {
+    throw new TypeError(`unsafe Git pathspec: ${value}`);
+  }
+}
+function assertMessage(value) {
+  if (value.trim().length === 0 || value.includes("\0")) {
+    throw new TypeError("Git commit message must be non-empty and NUL-free");
+  }
+}
+function records2(value) {
+  const parts = value.split("\0");
+  if (parts.at(-1) === "") parts.pop();
+  return parts;
+}
+var IntegrationGitCliClient = class extends GitCliClient {
+  constructor(integrationRunner) {
+    super(integrationRunner);
+    this.integrationRunner = integrationRunner;
+  }
+  integrationRunner;
+  async #execute(cwd, args, maxOutputBytes = 4194304) {
+    const result = await this.integrationRunner.run({
+      executable: "git",
+      args: ["-c", "core.longpaths=true", ...args],
+      cwd,
+      timeout_ms: 12e4,
+      env_allowlist: gitEnvironment2(),
+      max_output_bytes: maxOutputBytes
+    });
+    if (result.timed_out) throw new Error("Git command timed out");
+    if (result.output_truncated) throw new Error("Git command output exceeded its bound");
+    return result;
+  }
+  async #checked(cwd, args) {
+    const result = await this.#execute(cwd, args);
+    if (result.exit_code !== 0) {
+      throw new Error(
+        `Git command failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
+      );
+    }
+    return result.stdout;
+  }
+  async resolveRef(repo, ref) {
+    assertRef(ref);
+    const revision = (await this.#checked(repo, [
+      "rev-parse",
+      "--verify",
+      `${ref}^{commit}`
+    ])).trim();
+    assertObjectId(revision);
+    return revision;
+  }
+  async commitParents(repo, revision) {
+    assertObjectId(revision);
+    const values = (await this.#checked(repo, [
+      "rev-list",
+      "--parents",
+      "-n",
+      "1",
+      revision
+    ])).trim().split(/\s+/u);
+    const commit = values.shift();
+    if (commit !== revision) throw new Error("Git returned the wrong commit ancestry");
+    values.forEach(assertObjectId);
+    return values;
+  }
+  async listTree(repo, revision, pathspec) {
+    assertObjectId(revision);
+    assertPathspec(pathspec);
+    return records2(await this.#checked(repo, [
+      "ls-tree",
+      "-r",
+      "--name-only",
+      "-z",
+      revision,
+      "--",
+      pathspec
+    ]));
+  }
+  async readBlob(repo, revision, relativePath) {
+    assertObjectId(revision);
+    assertPathspec(relativePath);
+    const entries = await this.listTree(repo, revision, relativePath);
+    if (!entries.includes(relativePath)) return null;
+    const result = await this.#execute(
+      repo,
+      ["show", `${revision}:${relativePath}`],
+      67108864
+    );
+    if (result.exit_code !== 0) {
+      throw new Error(
+        `Git blob read failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
+      );
+    }
+    return new TextEncoder().encode(result.stdout);
+  }
+  async listCommits(repo, base, head) {
+    assertObjectId(base);
+    assertObjectId(head);
+    const output = await this.#checked(repo, ["rev-list", "--reverse", `${base}..${head}`]);
+    const commits = output.split(/\r?\n/u).filter((value) => value.length > 0);
+    commits.forEach(assertObjectId);
+    return commits;
+  }
+  async cherryPickNoCommit(worktree, commit) {
+    assertObjectId(commit);
+    return this.#execute(worktree, ["cherry-pick", "--no-commit", commit]);
+  }
+  async stageAll(worktree) {
+    await this.#checked(worktree, ["add", "--all", "--", "."]);
+  }
+  async writeTree(worktree) {
+    const tree = (await this.#checked(worktree, ["write-tree"])).trim();
+    assertObjectId(tree);
+    return tree;
+  }
+  async commitTree(repo, tree, parent, message) {
+    assertObjectId(tree);
+    assertObjectId(parent);
+    assertMessage(message);
+    const commit = (await this.#checked(repo, [
+      "commit-tree",
+      tree,
+      "-p",
+      parent,
+      "-m",
+      message
+    ])).trim();
+    assertObjectId(commit);
+    return commit;
+  }
+  async updateRef(repo, ref, next, expected) {
+    assertRef(ref);
+    assertObjectId(next);
+    assertObjectId(expected);
+    const result = await this.#execute(repo, ["update-ref", ref, next, expected]);
+    if (result.exit_code === 0) return true;
+    if (result.stderr.includes("cannot lock ref") || result.stderr.includes("but expected")) return false;
+    throw new Error(
+      `Git update-ref failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
+    );
+  }
+  async removeWorktree(repo, destination) {
+    await this.#checked(repo, [
+      "worktree",
+      "remove",
+      "--force",
+      fileURLToPath9(destination)
+    ]);
+  }
+};
+
 // src/profile/catalog-selection-resolver.ts
 var import_semver6 = __toESM(require_semver2(), 1);
 
@@ -33075,45 +33282,52 @@ async function defaultReadCatalog(bundleUrl) {
     }
   });
 }
-var NodeProfileTargetReader = class {
+var RevisionProfileTargetReader = class {
+  constructor(git2, revision) {
+    this.git = git2;
+    this.revision = revision;
+  }
+  git;
+  revision;
   async read(root, relativePath) {
-    const target = await resolveInside(root, relativePath);
-    if (!target.ok) return target;
     try {
-      const stat2 = await lstat9(target.value);
-      if (stat2.isSymbolicLink() || !stat2.isFile()) {
-        return failure("PROFILE_TARGET_UNSAFE", "profile target must be a regular file", relativePath);
-      }
-      return success(new Uint8Array(await readFile13(target.value)));
+      return success(await this.git.readBlob(root, this.revision, relativePath));
     } catch (error) {
-      return error.code === "ENOENT" ? success(null) : failure("PROFILE_TARGET_READ_FAILED", error instanceof Error ? error.message : String(error), relativePath);
+      return failure(
+        "PROFILE_TARGET_READ_FAILED",
+        error instanceof Error ? error.message : String(error),
+        relativePath
+      );
     }
   }
 };
-async function targetSnapshot(root) {
-  const reader = new NodeProfileTargetReader();
+async function targetSnapshot(root, reader) {
   const files = /* @__PURE__ */ new Map();
   for (const relativePath of ["AGENTS.md", "CLAUDE.md"]) {
     const current = await reader.read(root, relativePath);
-    if (current.ok && current.value !== null) files.set(relativePath, current.value);
+    if (!current.ok) return current;
+    if (current.value !== null) files.set(relativePath, current.value);
   }
-  return files;
+  return success(files);
 }
-async function defaultPlanProfile(input) {
+async function defaultPlanProfile(input, git2) {
   if (getSchemaValidator("project-memory/v1/project-selection") === void 0) {
     const registered2 = registerProjectSchemas(PROJECT_SCHEMA_REGISTRARS);
     if (!registered2.ok) return registered2;
   }
+  const targetReader = new RevisionProfileTargetReader(git2, input.expected_head);
+  const snapshot = await targetSnapshot(input.target_root, targetReader);
+  if (!snapshot.ok) return snapshot;
   const compiler = createProfileCompiler({
     catalog: new CatalogSelectionResolver(),
     source_renderer: acceptedProfileSourceRenderer,
-    artifact_renderer: createProfileArtifactRenderer({ files: await targetSnapshot(input.target_root) }),
-    target_reader: new NodeProfileTargetReader()
+    artifact_renderer: createProfileArtifactRenderer({ files: snapshot.value }),
+    target_reader: targetReader
   });
   return compiler.plan(input);
 }
 function createDefaultBuildInitPlanDependencies() {
-  const git2 = new GitCliClient(new NodeCommandRunner());
+  const git2 = new IntegrationGitCliClient(new NodeCommandRunner());
   return {
     head: async (root) => {
       try {
@@ -33124,7 +33338,7 @@ function createDefaultBuildInitPlanDependencies() {
     },
     read_brief: readText,
     read_catalog: defaultReadCatalog,
-    plan_profile: defaultPlanProfile
+    plan_profile: (input) => defaultPlanProfile(input, git2)
   };
 }
 function projectSources(input) {
@@ -34000,7 +34214,7 @@ function rootFromFlag(value, currentDirectory) {
     return failure("CLI_ROOT_INVALID", "current directory must be a file URL");
   }
   try {
-    const rootPath = value.startsWith("file:") ? fileURLToPath9(new URL(value)) : path15.resolve(fileURLToPath9(currentDirectory), value);
+    const rootPath = value.startsWith("file:") ? fileURLToPath10(new URL(value)) : path15.resolve(fileURLToPath10(currentDirectory), value);
     return success(pathToFileURL6(`${rootPath}${path15.sep}`));
   } catch (error) {
     return failure("CLI_ROOT_INVALID", error instanceof Error ? error.message : String(error), value);
@@ -34026,7 +34240,7 @@ function createDoctorCommand(dependencies = createDefaultDoctorDependencies()) {
 // src/agent/infer-repository-brief.ts
 import { lstat as lstat12, readFile as readFile16, readdir as readdir9 } from "node:fs/promises";
 import path16 from "node:path";
-import { fileURLToPath as fileURLToPath10 } from "node:url";
+import { fileURLToPath as fileURLToPath11 } from "node:url";
 var MAX_EVIDENCE_BYTES = 1048576;
 var STRUCTURED_BRIEF_CANDIDATES = [
   "PROJECT_MEMORY_BRIEF.yaml",
@@ -34246,7 +34460,7 @@ async function inferRepositoryBrief(root) {
   const allText = [...documents.values()].join("\n");
   const mission = missionFrom(allText);
   const packageName = stringValue(pubspec?.name);
-  const resolvedName = mission.name ?? projectNameFrom(allText) ?? (packageName === null ? humanName(path16.basename(fileURLToPath10(root))) : humanName(packageName));
+  const resolvedName = mission.name ?? projectNameFrom(allText) ?? (packageName === null ? humanName(path16.basename(fileURLToPath11(root))) : humanName(packageName));
   const genericDescription = /^A new .+ project\.?$/iu;
   const packageDescription = stringValue(pubspec?.description);
   const resolvedMission = mission.mission ?? missionSentenceFrom(allText, resolvedName) ?? (packageDescription !== null && !genericDescription.test(packageDescription) ? packageDescription : null);
@@ -34334,190 +34548,6 @@ import { lstat as lstat13, mkdir as mkdir4, mkdtemp, readFile as readFile17, rm 
 import { tmpdir as tmpdir3 } from "node:os";
 import path17 from "node:path";
 import { fileURLToPath as fileURLToPath12 } from "node:url";
-
-// src/governance/integration/integration-git-client.ts
-import { fileURLToPath as fileURLToPath11 } from "node:url";
-var OBJECT_ID = /^[0-9a-f]{40}$/;
-var FORBIDDEN_REF_CHARACTERS = /* @__PURE__ */ new Set(["~", "^", ":", "?", "*", "[", "\\"]);
-function gitEnvironment2() {
-  const result = {
-    GIT_MERGE_AUTOEDIT: "no",
-    GIT_TERMINAL_PROMPT: "0",
-    LC_ALL: "C"
-  };
-  for (const name of ["PATH", "SystemRoot", "HOME", "USERPROFILE"]) {
-    const value = process.env[name];
-    if (value !== void 0) result[name] = value;
-  }
-  return result;
-}
-function assertObjectId(value) {
-  if (!OBJECT_ID.test(value)) throw new TypeError(`unsafe Git object ID: ${value}`);
-}
-function assertRef(value) {
-  let unsafeCharacter = false;
-  for (const character of value) {
-    if (character.charCodeAt(0) <= 32 || FORBIDDEN_REF_CHARACTERS.has(character)) {
-      unsafeCharacter = true;
-      break;
-    }
-  }
-  if (!value.startsWith("refs/") || value.length > 512 || unsafeCharacter || value.includes("..") || value.includes("@{") || value.includes("//") || value.endsWith("/") || value.endsWith(".") || value.endsWith(".lock")) {
-    throw new TypeError(`unsafe Git ref: ${value}`);
-  }
-}
-function assertPathspec(value) {
-  if (value.length === 0 || value.includes("\0") || value.includes("\\") || value.startsWith("/") || value.startsWith(":") || /^[A-Za-z]:/.test(value) || value.split("/").some((part) => part === "..")) {
-    throw new TypeError(`unsafe Git pathspec: ${value}`);
-  }
-}
-function assertMessage(value) {
-  if (value.trim().length === 0 || value.includes("\0")) {
-    throw new TypeError("Git commit message must be non-empty and NUL-free");
-  }
-}
-function records2(value) {
-  const parts = value.split("\0");
-  if (parts.at(-1) === "") parts.pop();
-  return parts;
-}
-var IntegrationGitCliClient = class extends GitCliClient {
-  constructor(integrationRunner) {
-    super(integrationRunner);
-    this.integrationRunner = integrationRunner;
-  }
-  integrationRunner;
-  async #execute(cwd, args, maxOutputBytes = 4194304) {
-    const result = await this.integrationRunner.run({
-      executable: "git",
-      args: ["-c", "core.longpaths=true", ...args],
-      cwd,
-      timeout_ms: 12e4,
-      env_allowlist: gitEnvironment2(),
-      max_output_bytes: maxOutputBytes
-    });
-    if (result.timed_out) throw new Error("Git command timed out");
-    if (result.output_truncated) throw new Error("Git command output exceeded its bound");
-    return result;
-  }
-  async #checked(cwd, args) {
-    const result = await this.#execute(cwd, args);
-    if (result.exit_code !== 0) {
-      throw new Error(
-        `Git command failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
-      );
-    }
-    return result.stdout;
-  }
-  async resolveRef(repo, ref) {
-    assertRef(ref);
-    const revision = (await this.#checked(repo, [
-      "rev-parse",
-      "--verify",
-      `${ref}^{commit}`
-    ])).trim();
-    assertObjectId(revision);
-    return revision;
-  }
-  async commitParents(repo, revision) {
-    assertObjectId(revision);
-    const values = (await this.#checked(repo, [
-      "rev-list",
-      "--parents",
-      "-n",
-      "1",
-      revision
-    ])).trim().split(/\s+/u);
-    const commit = values.shift();
-    if (commit !== revision) throw new Error("Git returned the wrong commit ancestry");
-    values.forEach(assertObjectId);
-    return values;
-  }
-  async listTree(repo, revision, pathspec) {
-    assertObjectId(revision);
-    assertPathspec(pathspec);
-    return records2(await this.#checked(repo, [
-      "ls-tree",
-      "-r",
-      "--name-only",
-      "-z",
-      revision,
-      "--",
-      pathspec
-    ]));
-  }
-  async readBlob(repo, revision, relativePath) {
-    assertObjectId(revision);
-    assertPathspec(relativePath);
-    const entries = await this.listTree(repo, revision, relativePath);
-    if (!entries.includes(relativePath)) return null;
-    const result = await this.#execute(
-      repo,
-      ["show", `${revision}:${relativePath}`],
-      67108864
-    );
-    if (result.exit_code !== 0) {
-      throw new Error(
-        `Git blob read failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
-      );
-    }
-    return new TextEncoder().encode(result.stdout);
-  }
-  async listCommits(repo, base, head) {
-    assertObjectId(base);
-    assertObjectId(head);
-    const output = await this.#checked(repo, ["rev-list", "--reverse", `${base}..${head}`]);
-    const commits = output.split(/\r?\n/u).filter((value) => value.length > 0);
-    commits.forEach(assertObjectId);
-    return commits;
-  }
-  async cherryPickNoCommit(worktree, commit) {
-    assertObjectId(commit);
-    return this.#execute(worktree, ["cherry-pick", "--no-commit", commit]);
-  }
-  async stageAll(worktree) {
-    await this.#checked(worktree, ["add", "--all", "--", "."]);
-  }
-  async writeTree(worktree) {
-    const tree = (await this.#checked(worktree, ["write-tree"])).trim();
-    assertObjectId(tree);
-    return tree;
-  }
-  async commitTree(repo, tree, parent, message) {
-    assertObjectId(tree);
-    assertObjectId(parent);
-    assertMessage(message);
-    const commit = (await this.#checked(repo, [
-      "commit-tree",
-      tree,
-      "-p",
-      parent,
-      "-m",
-      message
-    ])).trim();
-    assertObjectId(commit);
-    return commit;
-  }
-  async updateRef(repo, ref, next, expected) {
-    assertRef(ref);
-    assertObjectId(next);
-    assertObjectId(expected);
-    const result = await this.#execute(repo, ["update-ref", ref, next, expected]);
-    if (result.exit_code === 0) return true;
-    if (result.stderr.includes("cannot lock ref") || result.stderr.includes("but expected")) return false;
-    throw new Error(
-      `Git update-ref failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
-    );
-  }
-  async removeWorktree(repo, destination) {
-    await this.#checked(repo, [
-      "worktree",
-      "remove",
-      "--force",
-      fileURLToPath11(destination)
-    ]);
-  }
-};
 
 // src/governance/records/supersession-index.ts
 function compareUtf823(left, right) {

@@ -77,6 +77,18 @@ describe("generated view drift", () => {
     expect(result).toMatchObject({ ok: true, value: { drifted_paths: [] } });
   });
 
+  it("does not drift when Git materializes generated views with CRLF", async () => {
+    const provider = new MutableSnapshotProvider(viewSnapshotFixture());
+    const generator = await materializedViews(provider);
+    for (const relativePath of GENERATED_VIEW_PATHS) {
+      const target = new URL(relativePath, root);
+      const content = await readFile(target, "utf8");
+      await writeFile(target, content.replaceAll("\n", "\r\n"), "utf8");
+    }
+    const result = await generator.verify(root);
+    expect(result).toMatchObject({ ok: true, value: { drifted_paths: [] } });
+  });
+
   it("reports every stale view after canonical source changes", async () => {
     const provider = new MutableSnapshotProvider(viewSnapshotFixture());
     const generator = await materializedViews(provider);

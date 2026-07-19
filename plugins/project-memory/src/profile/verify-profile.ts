@@ -10,6 +10,7 @@ import { canonicalJson } from "../core/canonical-json.js";
 import {
   decodeStrictUtf8,
   emitGeneratedYaml,
+  normalizeGitTextBytes,
   parseJsonDocument,
   parseYamlDocument,
 } from "../core/document-io.js";
@@ -75,7 +76,9 @@ async function readTarget(
         relativePath,
       );
     }
-    return success(new Uint8Array(await readFile(resolved.value)));
+    return success(normalizeGitTextBytes(
+      new Uint8Array(await readFile(resolved.value)),
+    ));
   } catch (error: unknown) {
     if (optional && (error as NodeJS.ErrnoException).code === "ENOENT") {
       return success(null);

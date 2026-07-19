@@ -23,9 +23,12 @@ import {
   emitGeneratedYaml,
   parseJsonDocument,
 } from "../../core/document-io.js";
-import { GitCliClient } from "../../core/git-cli-client.js";
 import { sha256 } from "../../core/hash.js";
 import { resolveInside } from "../../core/path-safety.js";
+import {
+  IntegrationGitCliClient,
+  type IntegrationGitClient,
+} from "../../governance/integration/integration-git-client.js";
 import { createProfileArtifactRenderer } from "../../materialize/render-adapters.js";
 import { acceptedProfileSourceRenderer } from "../../materialize/render-project-source.js";
 import type { ProfileTargetReader } from "../../profile/build-profile-mutation-plan.js";
@@ -515,52 +518,60 @@ async function defaultReadCatalog(
   });
 }
 
-class NodeProfileTargetReader implements ProfileTargetReader {
+class RevisionProfileTargetReader implements ProfileTargetReader {
+  constructor(
+    private readonly git: Pick<IntegrationGitClient, "readBlob">,
+    private readonly revision: string,
+  ) {}
+
   async read(root: URL, relativePath: string): Promise<RuntimeResult<Uint8Array | null>> {
-    const target = await resolveInside(root, relativePath);
-    if (!target.ok) return target;
     try {
-      const stat = await lstat(target.value);
-      if (stat.isSymbolicLink() || !stat.isFile()) {
-        return failure("PROFILE_TARGET_UNSAFE", "profile target must be a regular file", relativePath);
-      }
-      return success(new Uint8Array(await readFile(target.value)));
+      return success(await this.git.readBlob(root, this.revision, relativePath));
     } catch (error: unknown) {
-      return (error as NodeJS.ErrnoException).code === "ENOENT"
-        ? success(null)
-        : failure("PROFILE_TARGET_READ_FAILED", error instanceof Error ? error.message : String(error), relativePath);
+      return failure(
+        "PROFILE_TARGET_READ_FAILED",
+        error instanceof Error ? error.message : String(error),
+        relativePath,
+      );
     }
   }
 }
 
-async function targetSnapshot(root: URL): Promise<ReadonlyMap<string, Uint8Array>> {
-  const reader = new NodeProfileTargetReader();
+async function targetSnapshot(
+  root: URL,
+  reader: ProfileTargetReader,
+): Promise<RuntimeResult<ReadonlyMap<string, Uint8Array>>> {
   const files = new Map<string, Uint8Array>();
   for (const relativePath of ["AGENTS.md", "CLAUDE.md"]) {
     const current = await reader.read(root, relativePath);
-    if (current.ok && current.value !== null) files.set(relativePath, current.value);
+    if (!current.ok) return current;
+    if (current.value !== null) files.set(relativePath, current.value);
   }
-  return files;
+  return success(files);
 }
 
 async function defaultPlanProfile(
   input: ProfilePlanInput,
+  git: Pick<IntegrationGitClient, "readBlob">,
 ): Promise<RuntimeResult<CanonicalMutationPlan<unknown>>> {
   if (getSchemaValidator("project-memory/v1/project-selection") === undefined) {
     const registered = registerProjectSchemas(PROJECT_SCHEMA_REGISTRARS);
     if (!registered.ok) return registered;
   }
+  const targetReader = new RevisionProfileTargetReader(git, input.expected_head);
+  const snapshot = await targetSnapshot(input.target_root, targetReader);
+  if (!snapshot.ok) return snapshot;
   const compiler: ProfileCompiler = createProfileCompiler({
     catalog: new CatalogSelectionResolver(),
     source_renderer: acceptedProfileSourceRenderer,
-    artifact_renderer: createProfileArtifactRenderer({ files: await targetSnapshot(input.target_root) }),
-    target_reader: new NodeProfileTargetReader(),
+    artifact_renderer: createProfileArtifactRenderer({ files: snapshot.value }),
+    target_reader: targetReader,
   });
   return compiler.plan(input);
 }
 
 export function createDefaultBuildInitPlanDependencies(): BuildInitPlanDependencies {
-  const git = new GitCliClient(new NodeCommandRunner());
+  const git = new IntegrationGitCliClient(new NodeCommandRunner());
   return {
     head: async (root) => {
       try {
@@ -571,7 +582,7 @@ export function createDefaultBuildInitPlanDependencies(): BuildInitPlanDependenc
     },
     read_brief: readText,
     read_catalog: defaultReadCatalog,
-    plan_profile: defaultPlanProfile,
+    plan_profile: (input) => defaultPlanProfile(input, git),
   };
 }
 

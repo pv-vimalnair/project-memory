@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import {
   emitGeneratedYaml,
+  normalizeGitTextBytes,
   parseJsonDocument,
   parseYamlDocument,
   readUtf8Document,
@@ -24,6 +25,12 @@ afterEach(async () => {
 });
 
 describe("document IO", () => {
+  it("normalizes Git CRLF pairs without hiding lone carriage returns", () => {
+    expect([...normalizeGitTextBytes(
+      new Uint8Array([0x61, 0x0d, 0x0a, 0x62, 0x0d, 0x63]),
+    )]).toEqual([0x61, 0x0a, 0x62, 0x0d, 0x63]);
+  });
+
   it("preserves JSON-compatible YAML scalar types", async () => {
     const result = await readUtf8Document(fixtureRoot, "valid.yaml");
 

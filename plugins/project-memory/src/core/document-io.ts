@@ -400,6 +400,22 @@ export function decodeStrictUtf8(
   }
 }
 
+export function normalizeGitTextBytes(bytes: Uint8Array): Uint8Array {
+  let crlfCount = 0;
+  for (let index = 0; index + 1 < bytes.length; index += 1) {
+    if (bytes[index] === 0x0d && bytes[index + 1] === 0x0a) crlfCount += 1;
+  }
+  if (crlfCount === 0) return bytes;
+  const normalized = new Uint8Array(bytes.length - crlfCount);
+  let target = 0;
+  for (let index = 0; index < bytes.length; index += 1) {
+    if (bytes[index] === 0x0d && bytes[index + 1] === 0x0a) continue;
+    normalized[target] = bytes[index] ?? 0;
+    target += 1;
+  }
+  return normalized;
+}
+
 export async function readUtf8Document(
   root: URL,
   relativePath: string,

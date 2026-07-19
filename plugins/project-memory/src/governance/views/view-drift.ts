@@ -3,6 +3,7 @@ import { lstat, readFile } from "node:fs/promises";
 import {
   decodeStrictUtf8,
   failure,
+  normalizeGitTextBytes,
   parseJsonDocument,
   resolveInside,
   success,
@@ -76,7 +77,9 @@ export class FilesystemViewTargetReader implements ViewTargetReader {
           relativePath,
         );
       }
-      return success(new Uint8Array(await readFile(resolved.value)));
+      return success(normalizeGitTextBytes(
+        new Uint8Array(await readFile(resolved.value)),
+      ));
     } catch (error: unknown) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") return success(null);
       return failure(

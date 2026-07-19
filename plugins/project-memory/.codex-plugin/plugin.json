@@ -1,6 +1,6 @@
 {
   "name": "project-memory",
-  "version": "0.1.0+codex.20260719080946",
+  "version": "0.1.0+codex.20260719102752",
   "description": "Keep project context when work moves from one AI coding agent to another.",
   "author": {
     "name": "Pv Vimal Nair",

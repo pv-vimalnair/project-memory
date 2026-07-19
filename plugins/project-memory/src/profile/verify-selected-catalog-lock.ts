@@ -11,6 +11,7 @@ import {
 import { canonicalJson } from "../core/canonical-json.js";
 import {
   decodeStrictUtf8,
+  normalizeGitTextBytes,
   parseJsonDocument,
 } from "../core/document-io.js";
 import { sha256 } from "../core/hash.js";
@@ -171,7 +172,9 @@ async function readTargetBytes(
   const resolved = await resolveInside(root, relativePath);
   if (!resolved.ok) return resolved;
   try {
-    return success(new Uint8Array(await readFile(resolved.value)));
+    return success(normalizeGitTextBytes(
+      new Uint8Array(await readFile(resolved.value)),
+    ));
   } catch (error: unknown) {
     const code = (error as NodeJS.ErrnoException).code;
     return failure(
