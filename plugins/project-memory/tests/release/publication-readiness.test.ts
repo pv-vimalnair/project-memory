@@ -211,7 +211,7 @@ async function publicationSnapshot() {
 }
 
 describe("publication readiness", () => {
-  it("opens the approved release gate reproducibly and performs no writes", async () => {
+  it("keeps an unapproved candidate release blocked reproducibly and performs no writes", async () => {
     const before = await publicationSnapshot();
     const approval = JSON.parse(await readFile(
       path.join(PUBLICATION_ROOT, "PUBLICATION_APPROVALS.json"),
@@ -226,9 +226,12 @@ describe("publication readiness", () => {
     expect(after).toEqual(before);
     expect(first).toEqual({
       schema_version: "1.0.0",
-      ready: true,
+      ready: false,
       mode: "read_only",
-      blockers: [],
+      blockers: [{
+        code: "PUBLICATION_APPROVALS_MISSING",
+        path: "docs/publication/PUBLICATION_APPROVALS.json",
+      }],
     });
   });
 

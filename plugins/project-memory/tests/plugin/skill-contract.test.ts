@@ -65,13 +65,22 @@ describe("Project Memory skill command contract", () => {
   });
 
   it("locks one bootstrap confirmation and the exact startup reading prefix", async () => {
-    const skill = await readFile(SKILL, "utf8");
+    const [skill, protocol] = await Promise.all([
+      readFile(SKILL, "utf8"),
+      readFile(PROTOCOL, "utf8"),
+    ]);
     expect(skill).toContain("one confirmation of the complete bootstrap proposal");
-    let previous = -1;
-    for (const relativePath of AGENT_READING_ORDER_PREFIX) {
-      const current = skill.indexOf(`\`${relativePath}\``);
-      expect(current).toBeGreaterThan(previous);
-      previous = current;
+    const resumeSection = skill.split("For `resume`")[1]?.split("For `blocked`")[0] ?? "";
+    const fallbackSection = protocol
+      .split("## Missing Plugin or engine")[1]
+      ?.split("## Legacy import")[0] ?? "";
+    for (const document of [resumeSection, fallbackSection]) {
+      let previous = -1;
+      for (const relativePath of AGENT_READING_ORDER_PREFIX) {
+        const current = document.indexOf(`\`${relativePath}\``);
+        expect(current).toBeGreaterThan(previous);
+        previous = current;
+      }
     }
     expect(skill).toMatch(/never ask (?:Pitaji|the user) to choose (?:a )?profile/i);
     expect(skill).not.toMatch(/profile menu|choose from (?:these |a )?profiles/i);

@@ -16618,7 +16618,7 @@ ${humanData(envelope2.data)}`,
 }
 
 // src/version.ts
-var PACKAGE_VERSION = "0.1.0";
+var PACKAGE_VERSION = "0.1.1";
 
 // src/cli/parse-args.ts
 var VALUE_FLAGS = /* @__PURE__ */ new Set([
@@ -27210,13 +27210,17 @@ function renderStartupContext(selection, profile, profileLock) {
     "",
     "## Startup Order",
     "",
-    "1. `PROJECT_CONTEXT.md`",
-    "2. `docs/project-memory/profile.lock.yaml`",
-    "3. `docs/project-memory/views/NOW.md`",
-    "4. The assigned task packet",
-    "5. Named component and domain documents",
-    "6. Linked canonical records",
-    "7. Archive only for historical investigation",
+    ...AGENT_READING_ORDER_PREFIX.map(
+      (relativePath, index) => `${String(index + 1)}. \`${relativePath}\``
+    ),
+    ...[
+      "The assigned task packet",
+      "Named component and domain documents",
+      "Linked canonical records",
+      "Archive only for historical investigation"
+    ].map(
+      (instruction, index) => `${String(AGENT_READING_ORDER_PREFIX.length + index + 1)}. ${instruction}`
+    ),
     "",
     "## Agent Rule",
     "",
@@ -29313,11 +29317,15 @@ function renderHandoff(context) {
     "",
     "## Startup Continuation Set",
     "",
-    "1. Read `PROJECT_CONTEXT.md`.",
-    "2. Read `docs/project-memory/profile.lock.yaml`.",
-    "3. Read `docs/project-memory/views/NOW.md`.",
-    "4. Read the assigned workstream and task packet.",
-    "5. Read named component/domain documents and linked records.",
+    ...AGENT_READING_ORDER_PREFIX.map(
+      (relativePath, index) => `${String(index + 1)}. Read \`${relativePath}\`.`
+    ),
+    ...[
+      "Read the assigned workstream and task packet.",
+      "Read named component/domain documents and linked records."
+    ].map(
+      (instruction, index) => `${String(AGENT_READING_ORDER_PREFIX.length + index + 1)}. ${instruction}`
+    ),
     "",
     "## Active Work",
     "",

@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { AGENT_READING_ORDER_PREFIX } from "../../src/agent/index.js";
+
 import { parseCanonicalMarkdown } from "../../src/materialize/parse-canonical-markdown.js";
 import {
   acceptedProfileSourceRenderer,
@@ -191,9 +193,15 @@ describe("accepted project tree rendering", () => {
     expect(startupText).toContain("GENERATED — DO NOT EDIT");
     expect(startupText).toContain(fixture.selection.root.id);
     expect(startupText).toContain(input.profile_lock.lock_hash);
-    expect(startupText).toContain("1. `PROJECT_CONTEXT.md`");
-    expect(startupText).toContain("2. `docs/project-memory/profile.lock.yaml`");
-    expect(startupText).toContain("3. `docs/project-memory/views/NOW.md`");
+    const startupOrder = startupText
+      .split("## Startup Order\n\n")[1]
+      ?.split("\n\n## Agent Rule")[0] ?? "";
+    expect(
+      [...startupOrder.matchAll(/^\d+\. `([^`]+)`$/gm)].map((match) => match[1]),
+    ).toEqual(AGENT_READING_ORDER_PREFIX);
+    expect(startupOrder).toContain(
+      `${String(AGENT_READING_ORDER_PREFIX.length + 1)}. The assigned task packet`,
+    );
     expect(startupText).toContain("Do not edit generated views");
     expect(startupText).not.toContain("Prove deterministic profile planning.");
   });

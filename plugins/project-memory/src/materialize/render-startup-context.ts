@@ -1,3 +1,4 @@
+import { AGENT_READING_ORDER_PREFIX } from "../agent/start.js";
 import type { PlannedWrite } from "../contracts/planned-write.js";
 import {
   failure,
@@ -50,13 +51,18 @@ export function renderStartupContext(
     "",
     "## Startup Order",
     "",
-    "1. `PROJECT_CONTEXT.md`",
-    "2. `docs/project-memory/profile.lock.yaml`",
-    "3. `docs/project-memory/views/NOW.md`",
-    "4. The assigned task packet",
-    "5. Named component and domain documents",
-    "6. Linked canonical records",
-    "7. Archive only for historical investigation",
+    ...AGENT_READING_ORDER_PREFIX.map(
+      (relativePath, index) => `${String(index + 1)}. \`${relativePath}\``,
+    ),
+    ...[
+      "The assigned task packet",
+      "Named component and domain documents",
+      "Linked canonical records",
+      "Archive only for historical investigation",
+    ].map(
+      (instruction, index) =>
+        `${String(AGENT_READING_ORDER_PREFIX.length + index + 1)}. ${instruction}`,
+    ),
     "",
     "## Agent Rule",
     "",

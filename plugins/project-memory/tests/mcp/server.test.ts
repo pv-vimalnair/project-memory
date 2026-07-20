@@ -122,7 +122,7 @@ describe("ProjectMemoryMcpServer", () => {
       .toEqual({
         protocolVersion: "2025-06-18",
         capabilities: { tools: {} },
-        serverInfo: { name: "Project Memory", version: "0.1.0" },
+        serverInfo: { name: "Project Memory", version: "0.1.1" },
         instructions: "Use project_memory_start before substantive repository work. Project Memory is repository-first, offline, and coordinator-governed. Never ask the user to select a profile.",
       });
   });

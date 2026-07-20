@@ -130,7 +130,7 @@ describe("self-contained plugin bundle", () => {
     await mkdir(repository, { recursive: true });
     const version = runLauncher(firstRoot, repository, ["--version"]);
     expect(version.status, version.stderr).toBe(0);
-    expect(version.stdout).toBe("0.1.0\n");
+    expect(version.stdout).toBe("0.1.1\n");
 
     const start = runLauncher(firstRoot, repository, [
       "agent", "start", "--root", repository, "--json",

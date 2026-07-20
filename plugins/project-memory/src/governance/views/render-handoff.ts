@@ -1,3 +1,5 @@
+import { AGENT_READING_ORDER_PREFIX } from "../../agent/start.js";
+
 import {
   activeWorkstreams,
   blockerRecords,
@@ -21,11 +23,16 @@ export function renderHandoff(context: ViewRenderContext): string {
     "",
     "## Startup Continuation Set",
     "",
-    "1. Read `PROJECT_CONTEXT.md`.",
-    "2. Read `docs/project-memory/profile.lock.yaml`.",
-    "3. Read `docs/project-memory/views/NOW.md`.",
-    "4. Read the assigned workstream and task packet.",
-    "5. Read named component/domain documents and linked records.",
+    ...AGENT_READING_ORDER_PREFIX.map(
+      (relativePath, index) => `${String(index + 1)}. Read \`${relativePath}\`.`,
+    ),
+    ...[
+      "Read the assigned workstream and task packet.",
+      "Read named component/domain documents and linked records.",
+    ].map(
+      (instruction, index) =>
+        `${String(AGENT_READING_ORDER_PREFIX.length + index + 1)}. ${instruction}`,
+    ),
     "",
     "## Active Work",
     "",

@@ -105,7 +105,7 @@ describe("Project Memory MCP stdio entrypoint", () => {
       id: 1,
       result: {
         protocolVersion: "2025-06-18",
-        serverInfo: { name: "Project Memory", version: "0.1.0" },
+        serverInfo: { name: "Project Memory", version: "0.1.1" },
       },
     });
     expect(responses[1]).toMatchObject({

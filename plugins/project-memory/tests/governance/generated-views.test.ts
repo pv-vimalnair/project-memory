@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { AGENT_READING_ORDER_PREFIX } from "../../src/agent/index.js";
 import {
   PROJECT_SCHEMA_REGISTRARS,
   canonicalMutationPlanHash,
@@ -76,6 +77,29 @@ describe("deterministic generated views", () => {
     }
   });
 
+  it("renders the canonical five-file startup prefix in HANDOFF", () => {
+    const snapshot = viewSnapshotFixture();
+    const result = createViewGenerator({
+      clock: new CountingClock(GENERATED_AT),
+      snapshots: new MutableSnapshotProvider(snapshot),
+    }).plan(snapshot);
+    if (!result.ok) throw new Error(JSON.stringify(result.issues));
+    const handoff = result.value.writes.find((write) =>
+      write.relative_path.endsWith("HANDOFF.md"),
+    );
+    const rendered = new TextDecoder().decode(handoff?.bytes);
+    const continuation = rendered
+      .split("## Startup Continuation Set\n\n")[1]
+      ?.split("\n\n## Active Work")[0] ?? "";
+    expect(
+      [...continuation.matchAll(/^\d+\. Read `([^`]+)`\.$/gm)].map(
+        (match) => match[1],
+      ),
+    ).toEqual(AGENT_READING_ORDER_PREFIX);
+    expect(continuation).toContain(
+      `${String(AGENT_READING_ORDER_PREFIX.length + 1)}. Read the assigned workstream and task packet.`,
+    );
+  });
   it("is stable when canonical arrays arrive in reverse order", () => {
     const snapshot = viewSnapshotFixture();
     const reversed = {

@@ -83,7 +83,7 @@ describe("clean Plugin MCP workflow for a new project", () => {
     expect(initialized.error).toBeUndefined();
     expect(initialized.result).toMatchObject({
       protocolVersion: "2025-06-18",
-      serverInfo: { name: "Project Memory", version: "0.1.0" },
+      serverInfo: { name: "Project Memory", version: "0.1.1" },
     });
 
     const started = await callMcpTool(session, "project_memory_start", {

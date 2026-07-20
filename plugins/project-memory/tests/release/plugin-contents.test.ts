@@ -49,7 +49,7 @@ interface ExecutionReport {
     readonly skill: "passed";
   };
   readonly launcher: {
-    readonly version: "0.1.0";
+    readonly version: "0.1.1";
     readonly agent_start: "bootstrap_review_required";
     readonly node_modules_present: false;
   };
@@ -191,7 +191,7 @@ describe("clean installable Project Memory Plugin", () => {
       network: "disabled",
       validators: { plugin: "passed", skill: "passed" },
       launcher: {
-        version: "0.1.0",
+        version: "0.1.1",
         agent_start: "bootstrap_review_required",
         node_modules_present: false,
       },

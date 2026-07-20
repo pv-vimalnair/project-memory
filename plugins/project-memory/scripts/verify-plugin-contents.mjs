@@ -616,7 +616,7 @@ async function runCleanLauncher() {
   const envelope = record(started);
   const data = envelope === null ? null : record(envelope.data);
   const kind = data?.kind;
-  if (version !== "0.1.0" || kind !== "bootstrap_review_required") {
+  if (version !== "0.1.1" || kind !== "bootstrap_review_required") {
     throw new PluginVerificationError(
       "PLUGIN_CLEAN_LAUNCH_INVALID",
       "clean launcher did not return the pinned version and bootstrap directive",

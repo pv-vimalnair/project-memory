@@ -5,12 +5,12 @@
   "root_id": "ROOT-01J01000000000000000000000",
   "target_ref": "refs/heads/main",
   "expected_head": "1111111111111111111111111111111111111111",
-  "plan_hash": "10054ad7793d37e31f96ee13956499e5678efcca690d822320ed159efe5c2806",
+  "plan_hash": "0946a7e6065fde4f2d17e5110b0632de0bf7494dad1177eb981661ce67df7666",
   "approval_ids": ["APR-01J01000000000000000000000"],
   "selected_catalog_lock": {"relative_path":"docs/project-memory/catalog.lock.json","lock_hash":"26e37eeb3cda95b3e684006c69c1c584f211e369b35af11bbf8f52f2dbbf6d57"},
   "profile_lock": {"relative_path":"docs/project-memory/profile.lock.yaml","lock_hash":"3143fdacccf420792411645b18a0bf084c9881bd1f1dfff94e28a36b9773ab0c"},
   "writes": [
-    {"relative_path":"PROJECT_CONTEXT.md","mode":"create_or_replace","expected_existing_sha256":"58a75284c6b5a72dea2a15d810fd51b5055b3195868e7d30a9086daca9c6ff7e","final_sha256":"896dde08a4f9776a8fa97f26ae8b3544057190081314ccd6a824220e9d4a9bef","byte_length":1250},
+    {"relative_path":"PROJECT_CONTEXT.md","mode":"create_or_replace","expected_existing_sha256":"58a75284c6b5a72dea2a15d810fd51b5055b3195868e7d30a9086daca9c6ff7e","final_sha256":"20c71bc61ba85b45d665608cc1e1be6b8fff3018973f61b983c0229b8b2a677a","byte_length":1329},
     {"relative_path":"docs/project-memory/PROTOCOL.md","mode":"create_or_replace","expected_existing_sha256":null,"final_sha256":"197625ae1e380268cf2c04f39bf87970c7e5bb2df95516965530a5cef35b62d4","byte_length":709},
     {"relative_path":"docs/project-memory/archive/retired/.gitkeep","mode":"create_or_replace","expected_existing_sha256":null,"final_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","byte_length":0},
     {"relative_path":"docs/project-memory/archive/sessions/.gitkeep","mode":"create_or_replace","expected_existing_sha256":null,"final_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","byte_length":0},
@@ -644,10 +644,10 @@
   ],
   "exact_payload": {
     "relative_path": "plan.bytes.snapshot.json.gz",
-    "uncompressed_sha256": "932a9944413de681a653c42f3a02c14cbf3da43fac443a5436bbe9a9ded7a4c3",
-    "uncompressed_byte_length": 961328,
+    "uncompressed_sha256": "3d2df74327df974630be6601f8d548fcb3650fe1f5ac96a6ec69073a9240359f",
+    "uncompressed_byte_length": 961432,
     "entries": [
-      {"relative_path":"PROJECT_CONTEXT.md","final_sha256":"896dde08a4f9776a8fa97f26ae8b3544057190081314ccd6a824220e9d4a9bef","byte_length":1250},
+      {"relative_path":"PROJECT_CONTEXT.md","final_sha256":"20c71bc61ba85b45d665608cc1e1be6b8fff3018973f61b983c0229b8b2a677a","byte_length":1329},
       {"relative_path":"docs/project-memory/PROTOCOL.md","final_sha256":"197625ae1e380268cf2c04f39bf87970c7e5bb2df95516965530a5cef35b62d4","byte_length":709},
       {"relative_path":"docs/project-memory/archive/retired/.gitkeep","final_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","byte_length":0},
       {"relative_path":"docs/project-memory/archive/sessions/.gitkeep","final_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","byte_length":0},

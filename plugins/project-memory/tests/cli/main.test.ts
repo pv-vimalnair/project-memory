@@ -83,7 +83,7 @@ describe("CLI version contract", () => {
     const registry = registryWith(() => failure("MUST_NOT_RUN", "handler ran"));
     const human = await executeCli(["--version"], { registry });
     expect(human.exit_code).toBe(0);
-    expect(human.stdout).toBe("0.1.0\n");
+    expect(human.stdout).toBe("0.1.1\n");
     expect(human.stderr).toBe("");
 
     const json = await executeCli(["--version", "--json"], { registry });
@@ -91,7 +91,7 @@ describe("CLI version contract", () => {
       schema_version: "1.0.0",
       command: "version",
       status: "success",
-      data: "0.1.0",
+      data: "0.1.1",
       issues: [],
     });
   });

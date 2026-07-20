@@ -49,13 +49,13 @@ a canonical logical manifest. It does not publish to npm.
 Use Node.js 24 and verify a downloaded CLI tarball before installation:
 
 ```powershell
-Get-FileHash .\pitaji-project-memory-0.1.0.tgz -Algorithm SHA256
-Get-Content .\pitaji-project-memory-0.1.0.tgz.sha256
-npm install --global .\pitaji-project-memory-0.1.0.tgz --ignore-scripts
+Get-FileHash .\pitaji-project-memory-0.1.1.tgz -Algorithm SHA256
+Get-Content .\pitaji-project-memory-0.1.1.tgz.sha256
+npm install --global .\pitaji-project-memory-0.1.1.tgz --ignore-scripts
 project-memory --help
 ```
 
-On Linux, use `sha256sum -c pitaji-project-memory-0.1.0.tgz.sha256` before the
+On Linux, use `sha256sum -c pitaji-project-memory-0.1.1.tgz.sha256` before the
 same global install command.
 
 Run `npm run generated:verify`, `npm run plugin:verify`, and

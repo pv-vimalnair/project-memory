@@ -18,10 +18,12 @@
 ## Startup Continuation Set
 
 1. Read `PROJECT_CONTEXT.md`.
-2. Read `docs/project-memory/profile.lock.yaml`.
-3. Read `docs/project-memory/views/NOW.md`.
-4. Read the assigned workstream and task packet.
-5. Read named component/domain documents and linked records.
+2. Read `docs/project-memory/PROTOCOL.md`.
+3. Read `docs/project-memory/profile.lock.yaml`.
+4. Read `docs/project-memory/views/NOW.md`.
+5. Read `docs/project-memory/views/HANDOFF.md`.
+6. Read the assigned workstream and task packet.
+7. Read named component/domain documents and linked records.
 
 ## Active Work
 
