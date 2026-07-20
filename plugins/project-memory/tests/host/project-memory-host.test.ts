@@ -6,6 +6,8 @@ import {
   type InitPlan,
 } from "../../src/cli/init/build-init-plan.js";
 import { failure, success } from "../../src/contracts/runtime-result.js";
+import { canonicalJson } from "../../src/core/canonical-json.js";
+import { sha256 } from "../../src/core/hash.js";
 import { InMemoryProposalStore } from "../../src/host/proposal-store.js";
 import {
   ProjectMemoryHost,
@@ -96,6 +98,54 @@ const PLAN = {
   plan_hash: initPlanHash(PLAN_BODY),
 } as InitPlan;
 
+const LEGACY_SCAN_BODY = {
+  schema_version: "1.0.0" as const,
+  root: ROOT.href,
+  artifacts: [{
+    relative_path: "HANDOFF.md",
+    sha256: "8".repeat(64),
+    byte_length: 12,
+    git_revision: HEAD,
+    detected_roles: ["handoff"] as const,
+    sensitivity_findings: [],
+  }],
+};
+const LEGACY_SCAN = {
+  ...LEGACY_SCAN_BODY,
+  scan_hash: sha256(canonicalJson(LEGACY_SCAN_BODY)),
+};
+const LEGACY_PROPOSAL_BODY = {
+  schema_version: "1.0.0" as const,
+  root_id: ROOT_ID,
+  status: "review_required" as const,
+  scan_hash: LEGACY_SCAN.scan_hash,
+  mappings: [{
+    source_path: "HANDOFF.md",
+    source_sha256: "8".repeat(64),
+    classification: "historical_status" as const,
+    destination_kind: "view_candidate" as const,
+    destination_path: null,
+    accepted: false as const,
+    rationale: "Review historical handoff evidence.",
+  }],
+};
+const LEGACY_PENDING = {
+  root_id: ROOT_ID,
+  scan: LEGACY_SCAN,
+  proposal: {
+    ...LEGACY_PROPOSAL_BODY,
+    proposal_hash: sha256(canonicalJson(LEGACY_PROPOSAL_BODY)),
+  },
+};
+const LEGACY_DIRECTIVE: AgentStartDirective = {
+  kind: "legacy_import_review_required",
+  root_id: ROOT_ID,
+  profile_lock_hash: "7".repeat(64),
+  expected_head: HEAD,
+  proposal: LEGACY_PENDING.proposal,
+  pending: LEGACY_PENDING,
+  warnings: [],
+};
 const BOOTSTRAP_DIRECTIVE: AgentStartDirective = {
   kind: "bootstrap_review_required",
   proposal: { confirmation_required: true, plan: PLAN },
@@ -120,6 +170,36 @@ function harness(
 }
 
 describe("ProjectMemoryHost", () => {
+  it("returns a compact legacy review handle without scan or proposal internals", async () => {
+    const { host } = harness(LEGACY_DIRECTIVE);
+    const result = await host.start({
+      root: ROOT,
+      brief_path: null,
+      adapter_id: "adapter.codex",
+    });
+
+    expect(result).toMatchObject({
+      ok: true,
+      value: {
+        kind: "legacy_import_review_required",
+        review_handle: "pm-proposal-00000000000000000000000000000001",
+        confirmation_required: false,
+        root_id: ROOT_ID,
+        expected_head: HEAD,
+        sources: [{
+          source_path: "HANDOFF.md",
+          source_sha256: "8".repeat(64),
+          detected_roles: ["handoff"],
+          source_git_revision: HEAD,
+          sensitivity_finding_count: 0,
+        }],
+      },
+    });
+    expect(JSON.stringify(result)).not.toContain("mappings");
+    expect(JSON.stringify(result)).not.toContain("scan_hash");
+    expect(Buffer.byteLength(JSON.stringify(result), "utf8")).toBeLessThanOrEqual(65_536);
+  });
+
   it("returns a compact bootstrap summary without compilation bytes", async () => {
     const { host } = harness();
 

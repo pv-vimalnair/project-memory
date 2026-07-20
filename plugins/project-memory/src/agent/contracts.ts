@@ -44,6 +44,7 @@ export type AgentStartDirective =
       readonly profile_lock_hash: string;
       readonly expected_head: string;
       readonly proposal: LegacyImportProposal;
+      readonly pending: PendingLegacyReview;
       readonly warnings: readonly RuntimeIssue[];
     }
   | {

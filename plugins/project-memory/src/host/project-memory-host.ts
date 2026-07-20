@@ -7,11 +7,20 @@ import type { InitPlan } from "../cli/init/build-init-plan.js";
 import {
   failure,
   success,
+  type RuntimeIssue,
   type RuntimeResult,
 } from "../contracts/runtime-result.js";
 import type { CanonicalRecord } from "../governance/contracts/index.js";
 import type { BootstrapFinalization } from "../governance/integration/bootstrap-finalizer.js";
+import type { MutationReceipt } from "../governance/integration/canonical-mutation-finalizer.js";
 import { bootstrapApprovalBinding } from "../governance/integration/bootstrap-plan.js";
+import {
+  LegacyImportService,
+  type ApplyLegacyImportInput,
+  type CompactLegacyImportProposal,
+  type LegacyImportServiceDependencies,
+  type PlanLegacyImportInput,
+} from "./legacy-import-service.js";
 import {
   FileProposalStore,
   type ProposalStore,
@@ -24,6 +33,7 @@ export interface ProjectMemoryHostDependencies {
   readonly applyBootstrap: (
     input: InitApplyInput,
   ) => Promise<RuntimeResult<BootstrapFinalization>>;
+  readonly legacyImport?: LegacyImportServiceDependencies;
 }
 
 export interface BootstrapApprovalConfirmation {
@@ -64,8 +74,18 @@ export interface CompactBootstrapSummary {
   readonly risks: readonly string[];
 }
 
+export interface CompactLegacyReviewSource {
+  readonly source_path: string;
+  readonly source_sha256: string;
+  readonly detected_roles: readonly string[];
+  readonly source_git_revision: string | null;
+  readonly sensitivity_finding_count: number;
+}
+
 export type CompactAgentStartDirective =
-  | Exclude<AgentStartDirective, { readonly kind: "bootstrap_review_required" }>
+  | Exclude<AgentStartDirective,
+      { readonly kind: "bootstrap_review_required" | "legacy_import_review_required" }
+    >
   | {
       readonly kind: "bootstrap_review_required";
       readonly proposal_handle: string;
@@ -80,6 +100,18 @@ export type CompactAgentStartDirective =
         AgentStartDirective,
         { readonly kind: "bootstrap_review_required" }
       >["legacy_import_proposal"];
+    }
+  | {
+      readonly kind: "legacy_import_review_required";
+      readonly repository: string;
+      readonly review_handle: string;
+      readonly confirmation_required: false;
+      readonly expires_at: string;
+      readonly root_id: string;
+      readonly profile_lock_hash: string;
+      readonly expected_head: string;
+      readonly sources: readonly CompactLegacyReviewSource[];
+      readonly warnings: readonly RuntimeIssue[];
     };
 
 function compareUtf8(left: string, right: string): number {
@@ -195,10 +227,16 @@ function dependencyFailure(name: string): RuntimeResult<never> {
 }
 
 export class ProjectMemoryHost {
+  readonly #legacyImports: LegacyImportService | null;
+
   constructor(
     readonly dependencies: ProjectMemoryHostDependencies,
     private readonly proposals: ProposalStore = new FileProposalStore(),
-  ) {}
+  ) {
+    this.#legacyImports = dependencies.legacyImport === undefined
+      ? null
+      : new LegacyImportService(proposals, dependencies.legacyImport);
+  }
 
   async start(
     input: AgentStartInput,
@@ -210,6 +248,34 @@ export class ProjectMemoryHost {
       return dependencyFailure("start");
     }
     if (!started.ok) return started;
+    if (started.value.kind === "legacy_import_review_required") {
+      const issued = await this.proposals.issue({
+        kind: "legacy_review",
+        root: input.root,
+        pending: started.value.pending,
+        expected_head: started.value.expected_head,
+        profile_lock_hash: started.value.profile_lock_hash,
+      });
+      if (!issued.ok) return issued;
+      return success({
+        kind: "legacy_import_review_required",
+        repository: input.root.href,
+        review_handle: issued.value.handle,
+        confirmation_required: false,
+        expires_at: issued.value.expires_at,
+        root_id: started.value.root_id,
+        profile_lock_hash: started.value.profile_lock_hash,
+        expected_head: started.value.expected_head,
+        sources: started.value.pending.scan.artifacts.map((artifact) => ({
+          source_path: artifact.relative_path,
+          source_sha256: artifact.sha256,
+          detected_roles: [...artifact.detected_roles],
+          source_git_revision: artifact.git_revision,
+          sensitivity_finding_count: artifact.sensitivity_findings.length,
+        })),
+        warnings: started.value.warnings,
+      }, started.warnings);
+    }
     if (started.value.kind !== "bootstrap_review_required") {
       return success(started.value, started.warnings);
     }
@@ -229,6 +295,28 @@ export class ProjectMemoryHost {
       clarification: started.value.clarification,
       legacy_import_proposal: started.value.legacy_import_proposal ?? null,
     }, started.warnings);
+  }
+
+  planLegacyImport(
+    input: PlanLegacyImportInput,
+  ): Promise<RuntimeResult<CompactLegacyImportProposal>> {
+    return this.#legacyImports === null
+      ? Promise.resolve(failure(
+          "HOST_LEGACY_IMPORT_UNAVAILABLE",
+          "guided legacy import is unavailable in this host",
+        ))
+      : this.#legacyImports.planLegacyImport(input);
+  }
+
+  applyLegacyImport(
+    input: ApplyLegacyImportInput,
+  ): Promise<RuntimeResult<MutationReceipt>> {
+    return this.#legacyImports === null
+      ? Promise.resolve(failure(
+          "HOST_LEGACY_IMPORT_UNAVAILABLE",
+          "guided legacy import is unavailable in this host",
+        ))
+      : this.#legacyImports.applyLegacyImport(input);
   }
 
   async applyBootstrap(

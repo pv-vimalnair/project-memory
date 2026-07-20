@@ -6,13 +6,21 @@ import { pathToFileURL } from "node:url";
 import { createNodeAgentStartDependencies, startAgentSession } from "../agent/index.js";
 import type { CanonicalMutationPlan } from "../contracts/canonical-mutation-plan.js";
 import { failure, success, type RuntimeResult } from "../contracts/runtime-result.js";
+import { deterministicInstanceId } from "./init/build-initial-source-proposal.js";
 import { SystemClock, type Clock } from "../core/clock.js";
 import type { CommandRunner } from "../contracts/command-runner.js";
 import { NodeCommandRunner } from "../core/command-runner.js";
 import { currentGitBranchRef } from "../core/git-cli-client.js";
+import { canonicalJson } from "../core/canonical-json.js";
 import { sha256 } from "../core/hash.js";
+import type { IdFactory } from "../core/id-factory.js";
 import { resolveInside } from "../core/path-safety.js";
-import { createLegacyImporter } from "../import/index.js";
+import {
+  createLegacyImporter,
+  planGuidedLegacyImport,
+  type GuidedLegacyImportInput,
+} from "../import/index.js";
+import type { LegacyImportServiceDependencies } from "../host/legacy-import-service.js";
 import { createProfileVerifier, type ProfileVerifier } from "../profile/verify-profile.js";
 import { createBootstrapFinalizer, createBootstrapMutationHooks } from "../governance/integration/bootstrap-finalizer.js";
 import {
@@ -323,6 +331,7 @@ function createLocalCoordinator(
   git: IntegrationGitCliClient,
   snapshots: CanonicalSnapshotBuilder,
   profiles: ProfileVerifier,
+  authority: PlanAuthorityValidator = createAuthorityValidator(repo),
 ): IntegrationCoordinator {
   const temporaryRoot = pathToFileURL(
     `${path.join(tmpdir(), "project-memory-runtime")}${path.sep}`,
@@ -354,7 +363,7 @@ function createLocalCoordinator(
     snapshots,
     views,
     bindings: createBindingValidator(repo, targetRef, runner, git, profiles),
-    authority: createAuthorityValidator(repo),
+    authority,
     repository: createRepositoryValidator(snapshots, profiles),
     bootstrap: createBootstrapMutationHooks({ git, verifier: profiles }),
     integrator_id: INTEGRATOR_ID,
@@ -390,6 +399,49 @@ export interface NodeProjectMemoryServices {
   readonly registry: CommandRegistry;
   readonly start: AgentCommandDependencies["start"];
   readonly applyBootstrap: InitCommandDependencies["apply_plan"];
+  readonly legacyImport: LegacyImportServiceDependencies;
+}
+
+class DeterministicGuidedImportIds implements IdFactory {
+  #counter = 0;
+  readonly #seed: string;
+
+  constructor(input: GuidedLegacyImportInput) {
+    this.#seed = sha256(canonicalJson(input));
+  }
+
+  next(prefix: Parameters<IdFactory["next"]>[0]): string {
+    this.#counter += 1;
+    return deterministicInstanceId(
+      prefix,
+      `${this.#seed}\0${prefix}\0${String(this.#counter)}`,
+    );
+  }
+}
+
+async function readGuidedImportSource(
+  root: URL,
+  relativePath: string,
+): Promise<RuntimeResult<Uint8Array>> {
+  const resolved = await resolveInside(root, relativePath);
+  if (!resolved.ok) return resolved;
+  try {
+    const stat = await lstat(resolved.value);
+    if (!stat.isFile() || stat.isSymbolicLink()) {
+      return failure(
+        "GUIDED_IMPORT_SOURCE_UNSAFE",
+        "guided import accepts regular source files only",
+        relativePath,
+      );
+    }
+    return success(new Uint8Array(await readFile(resolved.value)));
+  } catch (error: unknown) {
+    return failure(
+      "GUIDED_IMPORT_SOURCE_READ_FAILED",
+      error instanceof Error ? error.message : String(error),
+      relativePath,
+    );
+  }
 }
 
 export function createNodeProjectMemoryServices(repo: URL): NodeProjectMemoryServices {
@@ -399,6 +451,79 @@ export function createNodeProjectMemoryServices(repo: URL): NodeProjectMemorySer
   const snapshots = createCanonicalSnapshotBuilder(createRevisionTreeReader(runner));
   const profiles = createProfileVerifier();
   const coordinator = createDynamicLocalCoordinator(repo, clock, runner, git, snapshots, profiles);
+  const legacyImport: LegacyImportServiceDependencies = {
+    now: () => clock.now(),
+    async context(root) {
+      if (!sameRoot(root, repo)) {
+        return failure(
+          "runtime.root_mismatch",
+          "guided import is bound to the configured local repository",
+          root.href,
+        );
+      }
+      const targetRef = await currentGitBranchRef(root, runner);
+      if (!targetRef.ok) return targetRef;
+      let head: string;
+      try {
+        head = await git.resolveRef(root, targetRef.value);
+      } catch (error: unknown) {
+        return failure(
+          "runtime.binding_head_failed",
+          error instanceof Error ? error.message : String(error),
+          targetRef.value,
+        );
+      }
+      const snapshot = await snapshots.build(root, { kind: "commit", object_id: head });
+      if (!snapshot.ok) return snapshot;
+      const catalogVersion = snapshot.value.catalog_versions[0];
+      if (catalogVersion === undefined || snapshot.value.catalog_versions.length !== 1) {
+        return failure(
+          "runtime.catalog_binding_invalid",
+          "guided import requires one verified catalog release",
+          root.href,
+        );
+      }
+      return success({
+        root_id: snapshot.value.root_id,
+        target_ref: targetRef.value,
+        expected_head: head,
+        profile_lock_hash: snapshot.value.profile_lock_hash,
+        catalog_version: catalogVersion,
+      });
+    },
+    plan(root, input) {
+      if (!sameRoot(root, repo)) {
+        return Promise.resolve(failure(
+          "runtime.root_mismatch",
+          "guided import planner is bound to the configured local repository",
+          root.href,
+        ));
+      }
+      return planGuidedLegacyImport(input, {
+        ids: new DeterministicGuidedImportIds(input),
+        read_source: (relativePath) => readGuidedImportSource(root, relativePath),
+      });
+    },
+    finalize(root, plan, authority) {
+      if (!sameRoot(root, repo)) {
+        return Promise.resolve(failure(
+          "runtime.root_mismatch",
+          "guided import finalization is bound to the configured local repository",
+          root.href,
+        ));
+      }
+      return createLocalCoordinator(
+        repo,
+        plan.target_ref,
+        clock,
+        runner,
+        git,
+        snapshots,
+        profiles,
+        authority,
+      ).finalizeMutation(plan);
+    },
+  };
   const lifecycle = createWorkLifecycleService({
     clock,
     context: {
@@ -437,7 +562,7 @@ export function createNodeProjectMemoryServices(repo: URL): NodeProjectMemorySer
     import: { planner: importer, coordinator },
     work_lifecycle: { service: lifecycle, coordinator },
   });
-  return { registry, start, applyBootstrap: init.apply_plan };
+  return { registry, start, applyBootstrap: init.apply_plan, legacyImport };
 }
 
 export function createNodeCommandRegistry(repo: URL): CommandRegistry {

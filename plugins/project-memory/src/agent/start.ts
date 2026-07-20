@@ -230,6 +230,7 @@ export async function startAgentSession(
       profile_lock_hash: profile.value.profile_lock_hash,
       expected_head: head.value,
       proposal: pending.value.proposal,
+      pending: pending.value,
       warnings,
     }, warnings);
   }

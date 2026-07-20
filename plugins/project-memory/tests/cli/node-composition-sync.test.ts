@@ -27,6 +27,15 @@ afterEach(async () => {
 });
 
 describe("post-finalization checkout synchronization", () => {
+  it("exposes the guided legacy import host services without widening command authority", () => {
+    const repo = pathToFileURL(`${tmpdir()}${path.sep}`);
+    const services = nodeComposition.createNodeProjectMemoryServices(repo);
+    expect(typeof services.legacyImport.now).toBe("function");
+    expect(typeof services.legacyImport.context).toBe("function");
+    expect(typeof services.legacyImport.plan).toBe("function");
+    expect(typeof services.legacyImport.finalize).toBe("function");
+  });
+
   it("preserves an edit injected after ref advance and before checkout sync", async () => {
     const directory = await mkdtemp(path.join(tmpdir(), "project-memory-sync-race-"));
     roots.push(directory);
