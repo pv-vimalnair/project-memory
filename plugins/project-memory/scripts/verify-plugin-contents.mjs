@@ -35,6 +35,7 @@ const executionReportPath = path.join(
 const REQUIRED_FILES = [
   ".codex-plugin/plugin.json",
   ".mcp.json",
+  "assets/project-memory-logo.png",
   "catalog/project-memory/v1/CHANGELOG.md",
   "catalog/project-memory/v1/fixtures/blueprints/ai-data/ai.analytics-decision-support.positive.yaml",
   "catalog/project-memory/v1/manifest.yaml",
@@ -61,6 +62,13 @@ const EXACT_RUNTIME_FILES = new Set([
   "dist/project-memory.mjs",
   "dist/project-memory.mjs.sha256",
   "scripts/project-memory.mjs",
+]);
+
+const APPROVED_BINARY_FILES = new Map([
+  [
+    "assets/project-memory-logo.png",
+    "df1e9be53cb65b6b5abb3db431c708b4ab004cd494a1cf56d0e85c2b1d44cc67",
+  ],
 ]);
 
 class PluginVerificationError extends Error {
@@ -201,6 +209,7 @@ function forbiddenPath(relativePath) {
 /** @param {string} relativePath */
 function allowlistedPath(relativePath) {
   if (EXACT_RUNTIME_FILES.has(relativePath)) return true;
+  if (APPROVED_BINARY_FILES.has(relativePath)) return true;
   if (relativePath.startsWith("catalog/project-memory/v1/")) {
     return /\.(?:md|ya?ml|json)$/.test(relativePath);
   }
@@ -223,6 +232,17 @@ function allowlistedPath(relativePath) {
 
 /** @param {string} relativePath @param {Uint8Array} bytes */
 function assertSafeContent(relativePath, bytes) {
+  const approvedHash = APPROVED_BINARY_FILES.get(relativePath);
+  if (approvedHash !== undefined) {
+    const actualHash = sha256(bytes);
+    if (actualHash !== approvedHash) {
+      throw new PluginVerificationError(
+        "PLUGIN_CONTENT_HASH_MISMATCH",
+        `${relativePath}: approved binary hash mismatch`,
+      );
+    }
+    return;
+  }
   let text;
   try {
     text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
@@ -358,6 +378,7 @@ async function copyRuntimeAllowlist() {
   for (const relativePath of [
     ".codex-plugin",
     ".mcp.json",
+    "assets",
     "catalog/project-memory/v1",
     "skills/project-memory",
     "scripts/project-memory.mjs",

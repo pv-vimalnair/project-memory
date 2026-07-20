@@ -56,6 +56,8 @@ interface ExecutionReport {
 }
 
 let verification: SpawnSyncReturns<string>;
+const APPROVED_LOGO_SHA256 =
+  "df1e9be53cb65b6b5abb3db431c708b4ab004cd494a1cf56d0e85c2b1d44cc67";
 
 function runVerifier(arguments_: readonly string[] = []): SpawnSyncReturns<string> {
   return spawnSync(process.execPath, [VERIFIER, ...arguments_], {
@@ -143,6 +145,7 @@ describe("clean installable Project Memory Plugin", () => {
     expect(paths).toEqual([...paths].sort());
     expect(paths).toEqual(expect.arrayContaining([
       ".codex-plugin/plugin.json",
+      "assets/project-memory-logo.png",
       "catalog/project-memory/v1/CHANGELOG.md",
       "catalog/project-memory/v1/fixtures/blueprints/ai-data/ai.analytics-decision-support.positive.yaml",
       "catalog/project-memory/v1/manifest.yaml",
@@ -170,6 +173,25 @@ describe("clean installable Project Memory Plugin", () => {
       expect.stringMatching(/(?:^|\/)\.env/i),
       expect.stringMatching(/^(?!catalog\/project-memory\/v1\/).*(?:credential|secret|raw-model-output|\.log$)/i),
     ]));
+
+    const pluginDocument = JSON.parse(await readFile(
+      path.join(PLUGIN_ROOT, ".codex-plugin", "plugin.json"),
+      "utf8",
+    )) as {
+      readonly interface: {
+        readonly logo: string;
+        readonly logoDark: string;
+      };
+    };
+    expect(pluginDocument.interface.logo).toBe("./assets/project-memory-logo.png");
+    expect(pluginDocument.interface.logoDark).toBe("./assets/project-memory-logo.png");
+    const logoBytes = await readFile(path.join(
+      PLUGIN_ROOT,
+      "assets",
+      "project-memory-logo.png",
+    ));
+    expect(createHash("sha256").update(logoBytes).digest("hex"))
+      .toBe(APPROVED_LOGO_SHA256);
 
     for (const entry of manifest.entries) {
       expect(path.posix.isAbsolute(entry.path)).toBe(false);
@@ -228,5 +250,15 @@ describe("clean installable Project Memory Plugin", () => {
     );
     expect(inspected.status).toBe(1);
     expect(inspected.stderr).toContain("PLUGIN_CONTENT_FORBIDDEN_CONTENT");
+  });
+
+  it("rejects altered Project Memory logo bytes", async () => {
+    const inspected = await maliciousCase(
+      "altered-logo",
+      "assets/project-memory-logo.png",
+      "not-the-approved-logo\n",
+    );
+    expect(inspected.status).toBe(1);
+    expect(inspected.stderr).toContain("PLUGIN_CONTENT_HASH_MISMATCH");
   });
 });

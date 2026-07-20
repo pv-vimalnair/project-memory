@@ -26,6 +26,8 @@
     "category": "Productivity",
     "websiteURL": "https://github.com/pv-vimalnair/project-memory",
     "privacyPolicyURL": "https://github.com/pv-vimalnair/project-memory/blob/main/PRIVACY.md",
+    "logo": "./assets/project-memory-logo.png",
+    "logoDark": "./assets/project-memory-logo.png",
     "capabilities": [
       "Project initialization",
       "Context recovery",
