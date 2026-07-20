@@ -20,6 +20,7 @@ export * from "./schema/index.js";
 export * from "./profile/index.js";
 export * from "./materialize/index.js";
 export * from "./migrations/index.js";
+export * from "./upgrades/index.js";
 export * from "./import/index.js";
 export * from "./benchmark/index.js";
 export * from "./release/index.js";
