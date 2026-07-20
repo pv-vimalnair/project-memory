@@ -2,7 +2,7 @@
 
 Date: 2026-07-19
 
-Status: Approved in conversation; awaiting written-spec review
+Status: Approved for implementation
 
 Scope: One Project Memory plugin improvement
 
