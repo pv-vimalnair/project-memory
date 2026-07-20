@@ -29,7 +29,7 @@ export function createLegacyImporter(
 ): LegacyImporter {
   const scanner = createLegacyScanner(dependencies);
   return {
-    scan: (root) => scanner.scan(root),
+    scan: (root, options) => scanner.scan(root, options),
     propose: proposeLegacyImport,
     plan: planImport,
   };
@@ -41,3 +41,4 @@ export * from "./scanner.js";
 export * from "./planner.js";
 export * from "./plan-reviewed-import.js";
 export * from "./render-import-report.js";
+export * from "./pending-review.js";

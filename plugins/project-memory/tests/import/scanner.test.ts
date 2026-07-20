@@ -52,6 +52,40 @@ describe("legacy scanner", () => {
     });
   });
 
+  it("excludes Project Memory-owned files only in post-bootstrap scans", async () => {
+    const repository = await temporaryRoot();
+    await mkdir(path.join(repository.path, "docs", "project-memory", "source"), {
+      recursive: true,
+    });
+    await mkdir(path.join(repository.path, "docs", "product"), { recursive: true });
+    await writeFile(path.join(repository.path, "PROJECT_CONTEXT.md"), "# Generated\n", "utf8");
+    await writeFile(
+      path.join(repository.path, "docs", "project-memory", "source", "PROJECT.md"),
+      "# Canonical\n",
+      "utf8",
+    );
+    await writeFile(path.join(repository.path, "README.md"), "# Product\n", "utf8");
+    await writeFile(path.join(repository.path, "AGENTS.md"), "# Agent\n", "utf8");
+    await writeFile(path.join(repository.path, "docs", "product", "PRD.md"), "# PRD\n", "utf8");
+    const scanner = createLegacyScanner({ git_revision: () => Promise.resolve(null) });
+
+    const bootstrap = await scanner.scan(repository.url);
+    const postBootstrap = await scanner.scan(repository.url, { phase: "post_bootstrap" });
+
+    expect(bootstrap.ok && bootstrap.value.artifacts.map((item) => item.relative_path))
+      .toContain("PROJECT_CONTEXT.md");
+    expect(postBootstrap).toMatchObject({
+      ok: true,
+      value: {
+        artifacts: [
+          { relative_path: "AGENTS.md" },
+          { relative_path: "README.md" },
+          { relative_path: "docs/product/PRD.md" },
+        ],
+      },
+    });
+  });
+
   it("detects provider-shaped credentials without storing one in a fixture", () => {
     const providerPrefix = ["AK", "IA"].join("");
     const syntheticCredential = providerPrefix + "X".repeat(16);

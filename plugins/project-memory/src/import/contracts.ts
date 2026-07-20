@@ -172,8 +172,18 @@ export interface ReviewedImportMetadata {
 
 export type ReviewedImportPlan = CanonicalMutationPlan<ReviewedImportMetadata>;
 
+export interface LegacyScanOptions {
+  readonly phase: "bootstrap" | "post_bootstrap";
+}
+
+export interface PendingLegacyReview {
+  readonly root_id: string;
+  readonly scan: LegacyScan;
+  readonly proposal: LegacyImportProposal;
+}
+
 export interface LegacyScanner {
-  scan(root: URL): Promise<RuntimeResult<LegacyScan>>;
+  scan(root: URL, options?: LegacyScanOptions): Promise<RuntimeResult<LegacyScan>>;
 }
 
 export interface LegacyImporter extends LegacyScanner {

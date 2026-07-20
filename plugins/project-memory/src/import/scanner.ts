@@ -15,6 +15,7 @@ import {
 import type {
   LegacyScan,
   LegacyScanner,
+  LegacyScanOptions,
   LegacySourceArtifact,
 } from "./contracts.js";
 
@@ -42,6 +43,17 @@ function ignoredGeneratedDirectory(relativePath: string): boolean {
     normalized === "macos/flutter/ephemeral/.symlinks";
 }
 
+function ignoredProjectMemoryPath(
+  relativePath: string,
+  options: LegacyScanOptions,
+): boolean {
+  if (options.phase !== "post_bootstrap") return false;
+  const normalized = relativePath.toLowerCase();
+  return normalized === "project_context.md" ||
+    normalized === "docs/project-memory" ||
+    normalized.startsWith("docs/project-memory/");
+}
+
 async function defaultGitRevision(root: URL, relativePath: string): Promise<string | null> {
   const result = await runCommand({
     executable: "git",
@@ -61,7 +73,10 @@ export function createLegacyScanner(
 ): LegacyScanner {
   const gitRevision = dependencies.git_revision ?? defaultGitRevision;
   return {
-    async scan(root): Promise<RuntimeResult<LegacyScan>> {
+    async scan(
+      root,
+      options = { phase: "bootstrap" },
+    ): Promise<RuntimeResult<LegacyScan>> {
       if (root.protocol !== "file:") {
         return failure("LEGACY_ROOT_INVALID", "legacy scan root must be a file URL");
       }
@@ -74,6 +89,7 @@ export function createLegacyScanner(
           const absolute = path.join(directory, entry.name);
           if (entry.name === ".git" || entry.name === "node_modules" || entry.name === "build") continue;
           const relative = path.relative(rootPath, absolute).split(path.sep).join("/");
+          if (ignoredProjectMemoryPath(relative, options)) continue;
           if (entry.isDirectory() && ignoredGeneratedDirectory(relative)) continue;
           const stat = await lstat(absolute);
           if (stat.isSymbolicLink()) {
