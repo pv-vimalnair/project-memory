@@ -133,7 +133,7 @@ const TOOLS = Object.freeze([
   },
   {
     name: "project_memory_apply",
-    description: "Apply an approved bootstrap, guided-history handle, or allowlisted coordinator mutation.",
+    description: "Apply an approved bootstrap, repository upgrade, guided-history handle, or allowlisted coordinator mutation.",
     inputSchema: {
       oneOf: [
         {
@@ -150,6 +150,23 @@ const TOOLS = Object.freeze([
               properties: {
                 confirmed: { type: "boolean" },
                 granted_by: { type: "string", minLength: 1 },
+              },
+            },
+          },
+        },
+        {
+          type: "object",
+          additionalProperties: false,
+          required: ["mode", "proposal_handle", "approval"],
+          properties: {
+            mode: { enum: ["upgrade"] },
+            proposal_handle: { type: "string", minLength: 1 },
+            approval: {
+              type: "object",
+              additionalProperties: false,
+              required: ["confirmed"],
+              properties: {
+                confirmed: { type: "boolean" },
               },
             },
           },
@@ -186,7 +203,7 @@ export interface McpToolResult {
 
 type ProjectMemoryHostAdapter = Pick<
   ProjectMemoryHost,
-  "start" | "applyBootstrap" | "planLegacyImport" | "applyLegacyImport"
+  "start" | "applyBootstrap" | "applyUpgrade" | "planLegacyImport" | "applyLegacyImport"
 >;
 
 export interface ProjectMemoryMcpServerDependencies {
@@ -462,6 +479,9 @@ export class ProjectMemoryMcpServer {
       if (started.ok && started.value.kind === "bootstrap_review_required") {
         this.#proposalHosts.set(started.value.proposal_handle, this.runtime(root).host);
       }
+      if (started.ok && started.value.kind === "upgrade_review_required") {
+        this.#proposalHosts.set(started.value.proposal_handle, this.runtime(root).host);
+      }
       if (started.ok && started.value.kind === "legacy_import_review_required") {
         this.#proposalHosts.set(started.value.review_handle, this.runtime(root).host);
       }
@@ -514,6 +534,34 @@ export class ProjectMemoryMcpServer {
   private async apply(arguments_: unknown): Promise<McpToolResult> {
     const input = objectValue(arguments_, "project_memory_apply arguments");
     const mode = stringValue(input.mode, "mode");
+    if (mode === "upgrade") {
+      onlyKeys(
+        input,
+        new Set(["mode", "proposal_handle", "approval"]),
+        "upgrade apply arguments",
+      );
+      const proposalHandle = stringValue(input.proposal_handle, "proposal_handle");
+      const approval = objectValue(input.approval, "approval");
+      onlyKeys(approval, new Set(["confirmed"]), "approval");
+      if (typeof approval.confirmed !== "boolean") {
+        throw new McpProtocolError(-32602, "approval.confirmed must be boolean");
+      }
+      const host = await this.proposalHost(proposalHandle, "upgrade");
+      if (!host.ok) return runtimeToolResult(host);
+      try {
+        const applied = await host.value.applyUpgrade({
+          proposal_handle: proposalHandle,
+          approval: { confirmed: approval.confirmed },
+        });
+        if (applied.ok) this.#proposalHosts.delete(proposalHandle);
+        return runtimeToolResult(applied);
+      } catch {
+        return toolFailure(
+          "MCP_HOST_REJECTED",
+          "Project Memory upgrade host rejected",
+        );
+      }
+    }
     if (mode === "bootstrap" || mode === "legacy_import") {
       onlyKeys(
         input,
@@ -572,7 +620,7 @@ export class ProjectMemoryMcpServer {
     }
     throw new McpProtocolError(
       -32602,
-      "mode must be bootstrap, legacy_import, or command",
+      "mode must be bootstrap, upgrade, legacy_import, or command",
     );
   }
 

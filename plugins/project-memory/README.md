@@ -29,6 +29,7 @@ projects.
 
 - New projects receive one compact bootstrap proposal and one confirmation.
 - Initialized projects resume from accepted repository context.
+- Compatible older Project Memory repositories receive one local upgrade proposal and one confirmation; the Plugin preserves canonical history and does not change application code.
 - Existing handoffs, PRDs, changelogs, decisions, and task notes are reviewed through one guided history proposal; the agent reads the named sources and Pitaji confirms once.
 - Canonical changes remain bound to an approved plan and the current Git head.
 - Repository and Git history are authoritative; cloud mirrors are optional.

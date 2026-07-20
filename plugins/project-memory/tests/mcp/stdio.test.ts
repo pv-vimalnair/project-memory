@@ -121,6 +121,32 @@ describe("Project Memory MCP stdio entrypoint", () => {
     expect(responses[2]).toEqual({ jsonrpc: "2.0", id: 3, result: {} });
   }, 30_000);
 
+  it("advertises a dedicated upgrade approval input without granted_by", async () => {
+    const execution = await runProtocol([{
+      jsonrpc: "2.0",
+      id: 4,
+      method: "tools/list",
+      params: {},
+    }]);
+    expect(execution.exitCode, execution.stderr).toBe(0);
+    const response = JSON.parse(execution.stdout.trim()) as {
+      readonly result: {
+        readonly tools: readonly {
+          readonly name: string;
+          readonly inputSchema: unknown;
+        }[];
+      };
+    };
+    const apply = response.result.tools.find((tool) => tool.name === "project_memory_apply");
+    const schema = JSON.stringify(apply?.inputSchema);
+    expect(schema).toContain('"upgrade"');
+    expect(schema).toContain('"confirmed"');
+    const upgradeBranch = (apply?.inputSchema as {
+      readonly oneOf?: readonly unknown[];
+    }).oneOf?.find((branch) => JSON.stringify(branch).includes('"upgrade"'));
+    expect(JSON.stringify(upgradeBranch)).not.toContain("granted_by");
+  }, 30_000);
+
   it("rejects malformed guided-history requests with JSON-RPC -32602", async () => {
     const execution = await runProtocol([{
       jsonrpc: "2.0",

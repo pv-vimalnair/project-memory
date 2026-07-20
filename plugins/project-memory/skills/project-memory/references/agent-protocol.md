@@ -55,6 +55,16 @@ Read the repository doorway and router files in their declared order: `PROJECT_C
 
 Remain worker-only. Perform scoped product work only when repository evidence independently proves that the packet's claim is valid, unexpired, assigned to you, and covers the intended paths; any uncertainty is blocking. You may return a completion proposal. Do not issue or renew claims, accept decisions, regenerate views, alter locks, append history, import, migrate, or promote canonical state. Report that the Plugin or coordinator is required for finalization.
 
+## Repository upgrades
+
+Repository contract upgrades are local and offline. The automatic compatibility path supports pre-marker `1.0.0` repositories only and targets contract `1.1.0`; current repositories resume normally, while explicit future or unsupported versions fail closed.
+
+1. Startup may return one compact `upgrade_review_required` proposal only for a clean canonical checkout. Present every summary field and request one exact confirmation.
+2. Apply only through `project_memory_apply` in `upgrade` mode using the exact engine-issued proposal handle and `approval: { confirmed: true }`. The handle binds the root, adapter, plan hash, expected Git head, timestamps, preimages, changed paths, and generated views.
+3. Upgrade authority is `none` and narrowly coordinator-owned. Existing canonical source, history, profile, catalog, archive, and application bytes are preserved; only the doorway, tool configuration, migration record, generated views, and standard coordinator audit may change.
+4. A dirty checkout, stale head, changed preimage, expired handle, wrong proposal kind, unsupported version, or broadened path set fails before mutation. Never stash, clean, edit, copy, commit, or reconstruct upgrade files manually.
+5. After `upgraded_verified`, inspect `post_upgrade_state` and invoke startup again. Startup must not propose the same upgrade again; it may return `resume` or a preserved `legacy_import_review_required` state.
+
 ## Legacy import
 
 The guided host path is the only trusted legacy-import route. Generic command-mode `import apply` remains untrusted and cannot acquire the handle-scoped authority below.

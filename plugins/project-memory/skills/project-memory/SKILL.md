@@ -40,6 +40,16 @@ For `bootstrap_review_required`:
 4. After explicit confirmation, invoke `project_memory_apply` in bootstrap mode with the engine-issued `proposal_handle` and `approval: { confirmed: true, granted_by: "Pitaji" }`. The MCP host retains and applies the exact plan through the IntegrationCoordinator; never reconstruct, expose, or write the plan yourself.
 5. Re-invoke `project_memory_start`. Continue only when it returns `resume`.
 
+For `upgrade_review_required`:
+
+1. Explain that Project Memory's repository format is being upgraded; the user's application code is not being changed.
+2. Present the complete `summary`: current and target contract versions, changed paths, regenerated paths, canonical-preservation statement, plan hash, expected Git head, expiry, warnings, and risks.
+3. Request one confirmation of that exact upgrade proposal. Never infer approval from silence.
+4. After explicit confirmation, invoke `project_memory_apply` in `upgrade` mode with only the engine-issued `proposal_handle` and `approval: { confirmed: true }`.
+5. Never manually edit, regenerate, stash, commit, or move Project Memory files. The host replans and the IntegrationCoordinator owns the mutation.
+6. Continue only when apply returns `upgraded_verified`. Read `post_upgrade_state`: `resume` means the normal reading order is ready; `legacy_import_review_required` means preserved unresolved history still needs the guided review below.
+7. Re-invoke `project_memory_start`. It must not return `upgrade_review_required` again. Follow the returned `resume` or `legacy_import_review_required` flow exactly.
+
 For `legacy_import_review_required`:
 
 1. For each entry, read only the source paths returned in `sources`; verify the returned path, hash, Git revision, roles, and sensitivity count. Do not read unrelated repository files for this review.

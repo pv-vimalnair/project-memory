@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { CommandRegistry } from "../../src/cli/command-registry.js";
 import { executeCli } from "../../src/cli/main.js";
-import { success } from "../../src/contracts/runtime-result.js";
+import { failure, success } from "../../src/contracts/runtime-result.js";
 import {
   ProjectMemoryMcpServer,
   routeMcpMessage,
@@ -14,6 +14,7 @@ const ROOT = new URL("file:///C:/project/");
 const PROPOSAL_HANDLE = "pm-proposal-00000000000000000000000000000001";
 const REVIEW_HANDLE = "pm-proposal-00000000000000000000000000000002";
 const IMPORT_HANDLE = "pm-proposal-00000000000000000000000000000003";
+const UPGRADE_HANDLE = "pm-proposal-00000000000000000000000000000004";
 const SOURCE_REVIEW = {
   source_path: "HANDOFF.md",
   source_sha256: "4".repeat(64),
@@ -61,6 +62,14 @@ function harness(overrides: {
       clarification: null,
       legacy_import_proposal: null,
     } as never))),
+    applyUpgrade: vi.fn((input: { readonly approval: { readonly confirmed: boolean } }) =>
+      Promise.resolve(input.approval.confirmed
+        ? success({
+            status: "upgraded_verified",
+            repository_contract_version: "1.1.0",
+            post_upgrade_state: "resume",
+          } as never)
+        : failure("HOST_APPROVAL_REQUIRED", "repository upgrade requires explicit confirmation"))),
     applyBootstrap: vi.fn(() => Promise.resolve(success({
       status: "initialized_verified",
     } as never))),
@@ -192,6 +201,102 @@ describe("ProjectMemoryMcpServer", () => {
     expect(host.applyBootstrap).toHaveBeenCalledWith({
       proposal_handle: PROPOSAL_HANDLE,
       approval: { confirmed: true, granted_by: "Pitaji" },
+    });
+  });
+
+  it("routes one exact upgrade confirmation and keeps responses bounded", async () => {
+    const { server, host } = harness();
+    vi.mocked(host.start).mockResolvedValueOnce(success({
+      kind: "upgrade_review_required",
+      proposal_handle: UPGRADE_HANDLE,
+      confirmation_required: true,
+      expires_at: "2026-07-17T13:00:00.000Z",
+      summary: {
+        from_version: "1.0.0",
+        to_version: "1.1.0",
+        plan_hash: "6".repeat(64),
+        expected_head: "2".repeat(40),
+        preserves_existing_canonical_history: true,
+      },
+      warnings: [],
+    } as never));
+
+    const started = await callTool(server, "project_memory_start", { root: ROOT.href });
+    expect(started).toMatchObject({
+      structuredContent: {
+        kind: "upgrade_review_required",
+        proposal_handle: UPGRADE_HANDLE,
+        confirmation_required: true,
+      },
+    });
+    expect(Buffer.byteLength(JSON.stringify(started), "utf8")).toBeLessThanOrEqual(65_536);
+
+    await expect(callTool(server, "project_memory_apply", {
+      mode: "upgrade",
+      proposal_handle: UPGRADE_HANDLE,
+      approval: {},
+    })).rejects.toMatchObject({ code: -32602 });
+    expect(await callTool(server, "project_memory_apply", {
+      mode: "upgrade",
+      proposal_handle: UPGRADE_HANDLE,
+      approval: { confirmed: false },
+    })).toMatchObject({
+      isError: true,
+      structuredContent: {
+        code: "HOST_APPROVAL_REQUIRED",
+        details: { issues: [{ code: "HOST_APPROVAL_REQUIRED" }] },
+      },
+    });
+
+    const applied = await callTool(server, "project_memory_apply", {
+      mode: "upgrade",
+      proposal_handle: UPGRADE_HANDLE,
+      approval: { confirmed: true },
+    });
+    expect(applied).toMatchObject({
+      structuredContent: {
+        status: "upgraded_verified",
+        repository_contract_version: "1.1.0",
+      },
+    });
+    expect(host.applyUpgrade).toHaveBeenLastCalledWith({
+      proposal_handle: UPGRADE_HANDLE,
+      approval: { confirmed: true },
+    });
+  });
+
+  it("recovers only an upgrade-kind handle in a fresh MCP process", async () => {
+    const resolveUpgrade = vi.fn(() => Promise.resolve(success({
+      kind: "upgrade" as const,
+      root: ROOT,
+      adapter_id: "adapter.codex",
+      plan: {} as never,
+    })));
+    const applying = harness({ resolveProposal: resolveUpgrade });
+    expect(await callTool(applying.server, "project_memory_apply", {
+      mode: "upgrade",
+      proposal_handle: UPGRADE_HANDLE,
+      approval: { confirmed: true },
+    })).toMatchObject({ structuredContent: { status: "upgraded_verified" } });
+    expect(resolveUpgrade).toHaveBeenCalledWith(UPGRADE_HANDLE);
+
+    const wrongKind = harness({
+      resolveProposal: () => Promise.resolve(success({
+        kind: "bootstrap" as const,
+        root: ROOT,
+        plan: {} as never,
+      })),
+    });
+    expect(await callTool(wrongKind.server, "project_memory_apply", {
+      mode: "upgrade",
+      proposal_handle: UPGRADE_HANDLE,
+      approval: { confirmed: true },
+    })).toMatchObject({
+      isError: true,
+      structuredContent: {
+        code: "HOST_PROPOSAL_KIND_MISMATCH",
+        details: { issues: [{ code: "HOST_PROPOSAL_KIND_MISMATCH" }] },
+      },
     });
   });
 

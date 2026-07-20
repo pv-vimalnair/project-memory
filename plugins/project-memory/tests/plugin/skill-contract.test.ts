@@ -113,6 +113,35 @@ describe("Project Memory skill command contract", () => {
     expect(protocol).toContain("The guided host path is the only trusted legacy-import route.");
     expect(protocol).toContain("Generic command-mode `import apply` remains untrusted");
   });
+
+  it("gives lower-reasoning agents one exact repository-upgrade sequence", async () => {
+    const [skill, protocol] = await Promise.all([
+      readFile(SKILL, "utf8"),
+      readFile(PROTOCOL, "utf8"),
+    ]);
+    const sequence = [
+      "For `upgrade_review_required`",
+      "application code is not being changed",
+      "Present the complete `summary`",
+      "one confirmation of that exact upgrade proposal",
+      "`project_memory_apply` in `upgrade` mode",
+      "Never manually edit, regenerate, stash, commit, or move Project Memory files",
+      "`upgraded_verified`",
+      "`post_upgrade_state`",
+      "must not return `upgrade_review_required`",
+    ];
+    let previous = -1;
+    for (const phrase of sequence) {
+      const current = skill.indexOf(phrase, previous + 1);
+      expect(current).toBeGreaterThan(previous);
+      previous = current;
+    }
+    expect(protocol).toMatch(/local and offline/i);
+    expect(protocol).toContain("pre-marker `1.0.0` repositories only");
+    expect(protocol).toContain("exact engine-issued proposal handle");
+    expect(protocol).toContain("clean canonical checkout");
+    expect(protocol).toContain("coordinator-owned");
+  });
   it("keeps task inputs out of the repository initialization brief slot", async () => {
     const skill = await readFile(SKILL, "utf8");
     expect(skill).toContain("Invoke `project_memory_start` with the repository root only first.");
