@@ -12,6 +12,24 @@ import {
 
 const ROOT = new URL("file:///C:/project/");
 const PROPOSAL_HANDLE = "pm-proposal-00000000000000000000000000000001";
+const REVIEW_HANDLE = "pm-proposal-00000000000000000000000000000002";
+const IMPORT_HANDLE = "pm-proposal-00000000000000000000000000000003";
+const SOURCE_REVIEW = {
+  source_path: "HANDOFF.md",
+  source_sha256: "4".repeat(64),
+  source_git_revision: "2".repeat(40),
+  disposition: "import",
+  rationale: "Keep the completed work.",
+  facts: [{
+    source_line_start: 1,
+    source_line_end: 1,
+    category: "completed_work",
+    title: "Launch completed",
+    statement: "Launch work is complete.",
+    rationale: "The handoff records completion.",
+    confidence: "high",
+  }],
+} as const;
 
 function command(
   path: readonly string[],
@@ -45,6 +63,19 @@ function harness(overrides: {
     } as never))),
     applyBootstrap: vi.fn(() => Promise.resolve(success({
       status: "initialized_verified",
+    } as never))),
+    planLegacyImport: vi.fn(() => Promise.resolve(success({
+      operation: "legacy_import",
+      proposal_handle: IMPORT_HANDLE,
+      confirmation_required: true,
+      plan_hash: "5".repeat(64),
+      expected_head: "2".repeat(40),
+      expires_at: "2026-07-17T13:00:00.000Z",
+      groups: [],
+    } as never))),
+    applyLegacyImport: vi.fn(() => Promise.resolve(success({
+      status: "mutation_integrated",
+      plan_hash: "5".repeat(64),
     } as never))),
   };
   const dependencies: ProjectMemoryMcpServerDependencies = {
@@ -189,6 +220,78 @@ describe("ProjectMemoryMcpServer", () => {
     });
   });
 
+  it("routes one typed guided-history plan and apply through the existing tools", async () => {
+    const { server, host } = harness();
+    vi.mocked(host.start).mockResolvedValueOnce(success({
+      kind: "legacy_import_review_required",
+      review_handle: REVIEW_HANDLE,
+      confirmation_required: false,
+      expected_head: "2".repeat(40),
+      sources: [{ source_path: "HANDOFF.md", source_sha256: "4".repeat(64) }],
+    } as never));
+
+    const started = await callTool(server, "project_memory_start", { root: ROOT.href });
+    expect(started).toMatchObject({
+      structuredContent: {
+        kind: "legacy_import_review_required",
+        review_handle: REVIEW_HANDLE,
+      },
+    });
+    const planned = await callTool(server, "project_memory_read", {
+      mode: "legacy_import",
+      review_handle: REVIEW_HANDLE,
+      created_by: "codex",
+      sources: [SOURCE_REVIEW],
+    });
+    expect(planned).toMatchObject({
+      structuredContent: {
+        operation: "legacy_import",
+        proposal_handle: IMPORT_HANDLE,
+      },
+    });
+    expect(host.planLegacyImport).toHaveBeenCalledWith({
+      review_handle: REVIEW_HANDLE,
+      created_by: "codex",
+      sources: [SOURCE_REVIEW],
+    });
+    const applied = await callTool(server, "project_memory_apply", {
+      mode: "legacy_import",
+      proposal_handle: IMPORT_HANDLE,
+      approval: { confirmed: true, granted_by: "Pitaji" },
+    });
+    expect(applied).toMatchObject({
+      structuredContent: { status: "mutation_integrated" },
+    });
+    expect(host.applyLegacyImport).toHaveBeenCalledWith({
+      proposal_handle: IMPORT_HANDLE,
+      approval: { confirmed: true, granted_by: "Pitaji" },
+    });
+    expect(Buffer.byteLength(JSON.stringify(planned), "utf8")).toBeLessThanOrEqual(65_536);
+  });
+
+  it("recovers guided review and apply handles across MCP processes", async () => {
+    const resolveProposal = vi.fn((handle: string) => Promise.resolve(success(
+      handle === REVIEW_HANDLE
+        ? { kind: "legacy_review", root: ROOT }
+        : { kind: "legacy_import", root: ROOT },
+    ) as never));
+    const planning = harness({ resolveProposal });
+    expect(await callTool(planning.server, "project_memory_read", {
+      mode: "legacy_import",
+      review_handle: REVIEW_HANDLE,
+      created_by: "codex",
+      sources: [SOURCE_REVIEW],
+    })).toMatchObject({ structuredContent: { proposal_handle: IMPORT_HANDLE } });
+
+    const applying = harness({ resolveProposal });
+    expect(await callTool(applying.server, "project_memory_apply", {
+      mode: "legacy_import",
+      proposal_handle: IMPORT_HANDLE,
+      approval: { confirmed: true, granted_by: "Pitaji" },
+    })).toMatchObject({ structuredContent: { status: "mutation_integrated" } });
+    expect(resolveProposal).toHaveBeenCalledWith(REVIEW_HANDLE);
+    expect(resolveProposal).toHaveBeenCalledWith(IMPORT_HANDLE);
+  });
   it("accepts standard MCP metadata on tool calls", async () => {
     const { server, host } = harness();
 
@@ -337,6 +440,27 @@ describe("routeMcpMessage", () => {
     });
   });
 
+  it("returns -32602 for malformed guided-history fields", async () => {
+    const { server } = harness();
+    expect(await routeMcpMessage(server, {
+      jsonrpc: "2.0",
+      id: 3,
+      method: "tools/call",
+      params: {
+        name: "project_memory_read",
+        arguments: {
+          mode: "legacy_import",
+          review_handle: REVIEW_HANDLE,
+          created_by: "codex",
+          sources: [{ ...SOURCE_REVIEW, unsupported: true }],
+        },
+      },
+    })).toMatchObject({
+      jsonrpc: "2.0",
+      id: 3,
+      error: { code: -32602 },
+    });
+  });
   it("processes notifications without emitting a response", async () => {
     const { server } = harness();
 

@@ -77,6 +77,33 @@ describe("Project Memory skill command contract", () => {
     expect(skill).not.toMatch(/profile menu|choose from (?:these |a )?profiles/i);
   });
 
+  it("guides lower-reasoning agents through one complete post-bootstrap history review", async () => {
+    const [skill, protocol] = await Promise.all([
+      readFile(SKILL, "utf8"),
+      readFile(PROTOCOL, "utf8"),
+    ]);
+    const sequence = [
+      "For `legacy_import_review_required`",
+      "read only the source paths returned in `sources`",
+      "submit the complete drafts through `project_memory_read`",
+      "present every returned `groups` section",
+      "one confirmation of the complete grouped history proposal",
+      "invoke `project_memory_apply` in `legacy_import` mode",
+      "Re-invoke `project_memory_start`",
+    ];
+    let previous = -1;
+    for (const phrase of sequence) {
+      const current = skill.indexOf(phrase, previous + 1);
+      expect(current).toBeGreaterThan(previous);
+      previous = current;
+    }
+    expect(skill).toContain(
+      "Never manually create or edit Project Memory canonical records, import reports, generated views, or configuration",
+    );
+    expect(skill).toMatch(/never silently accept legacy facts/i);
+    expect(protocol).toContain("The guided host path is the only trusted legacy-import route.");
+    expect(protocol).toContain("Generic command-mode `import apply` remains untrusted");
+  });
   it("keeps task inputs out of the repository initialization brief slot", async () => {
     const skill = await readFile(SKILL, "utf8");
     expect(skill).toContain("Invoke `project_memory_start` with the repository root only first.");

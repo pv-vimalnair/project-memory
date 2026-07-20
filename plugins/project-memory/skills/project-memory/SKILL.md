@@ -40,6 +40,17 @@ For `bootstrap_review_required`:
 4. After explicit confirmation, invoke `project_memory_apply` in bootstrap mode with the engine-issued `proposal_handle` and `approval: { confirmed: true, granted_by: "Pitaji" }`. The MCP host retains and applies the exact plan through the IntegrationCoordinator; never reconstruct, expose, or write the plan yourself.
 5. Re-invoke `project_memory_start`. Continue only when it returns `resume`.
 
+For `legacy_import_review_required`:
+
+1. For each entry, read only the source paths returned in `sources`; verify the returned path, hash, Git revision, roles, and sensitivity count. Do not read unrelated repository files for this review.
+2. Extract evidence-bound drafts for every source using only these categories: `completed_work`, `current_decision`, `constraint`, `next_action`, `idea`, `risk`, `finding`, `removed`, `rejected`, `superseded`, and `lesson`. Give every source one disposition: `import`, `archive`, `reject`, or `unresolved`. Never silently accept legacy facts or invent missing context.
+3. After every returned source is covered exactly once, submit the complete drafts through `project_memory_read` in `legacy_import` mode with the engine-issued `review_handle`. Do not send source bytes or construct records, IDs, paths, reports, or plans.
+4. Then present every returned `groups` section, plus assumptions, conflicts, sensitivity count, plan hash, expected Git head, and expiry. Ask one focused clarification if a consequential conflict remains unresolved.
+5. Request one confirmation of the complete grouped history proposal. Never split approval by file or fact and never infer approval from silence.
+6. After explicit confirmation, invoke `project_memory_apply` in `legacy_import` mode with only the returned `proposal_handle` and `approval: { confirmed: true, granted_by: "Pitaji" }`.
+7. Re-invoke `project_memory_start`. Continue only when it returns `resume`; if unchanged unresolved material returns, report it honestly.
+
+Never manually create or edit Project Memory canonical records, import reports, generated views, or configuration. Never rewrite or delete the original legacy sources. The guided host and IntegrationCoordinator retain the exact plan locally.
 For `resume`, read these fixed files in this exact order, followed only by the returned assigned task packets and their direct references:
 
 1. `PROJECT_CONTEXT.md`

@@ -120,4 +120,28 @@ describe("Project Memory MCP stdio entrypoint", () => {
     });
     expect(responses[2]).toEqual({ jsonrpc: "2.0", id: 3, result: {} });
   }, 30_000);
+
+  it("rejects malformed guided-history requests with JSON-RPC -32602", async () => {
+    const execution = await runProtocol([{
+      jsonrpc: "2.0",
+      id: 4,
+      method: "tools/call",
+      params: {
+        name: "project_memory_read",
+        arguments: {
+          mode: "legacy_import",
+          review_handle: "pm-proposal-00000000000000000000000000000001",
+          created_by: "codex",
+          sources: [{ unsupported: true }],
+        },
+      },
+    }]);
+    expect(execution.exitCode, execution.stderr).toBe(0);
+    expect(execution.stderr).toBe("");
+    const response = JSON.parse(execution.stdout.trim()) as {
+      readonly id: number;
+      readonly error: { readonly code: number };
+    };
+    expect(response).toMatchObject({ id: 4, error: { code: -32602 } });
+  }, 30_000);
 });

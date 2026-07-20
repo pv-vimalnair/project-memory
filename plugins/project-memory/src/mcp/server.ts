@@ -5,13 +5,22 @@ import type { CommandRegistry } from "../cli/command-registry.js";
 import { executeCli } from "../cli/main.js";
 import { createNodeCommandRegistry } from "../cli/node-composition.js";
 import { parseCliArguments } from "../cli/parse-args.js";
-import type { RuntimeResult } from "../contracts/runtime-result.js";
+import {
+  failure,
+  success,
+  type RuntimeResult,
+} from "../contracts/runtime-result.js";
 import {
   createNodeProjectMemoryHost,
   FileProposalStore,
   type ProjectMemoryHost,
-  type StoredBootstrapProposal,
+  type StoredProposalEnvelope,
 } from "../host/index.js";
+import {
+  LegacyImportInputError,
+  LEGACY_SOURCE_SCHEMA,
+  parseLegacySourceReviews,
+} from "./legacy-import-mode.js";
 import { PACKAGE_VERSION } from "../version.js";
 const MAX_TOOL_RESPONSE_BYTES = 65_536;
 const SERVER_INSTRUCTIONS = "Use project_memory_start before substantive repository work. Project Memory is repository-first, offline, and coordinator-governed. Never ask the user to select a profile.";
@@ -91,13 +100,29 @@ const TOOLS = Object.freeze([
     name: "project_memory_read",
     description: "Run one allowlisted read-only Project Memory protocol command in-process.",
     inputSchema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["root", "arguments"],
-      properties: {
-        root: { type: "string", format: "uri" },
-        arguments: { type: "array", items: { type: "string" } },
-      },
+      oneOf: [
+        {
+          type: "object",
+          additionalProperties: false,
+          required: ["root", "arguments"],
+          properties: {
+            mode: { enum: ["command"] },
+            root: { type: "string", format: "uri" },
+            arguments: { type: "array", items: { type: "string" } },
+          },
+        },
+        {
+          type: "object",
+          additionalProperties: false,
+          required: ["mode", "review_handle", "created_by", "sources"],
+          properties: {
+            mode: { enum: ["legacy_import"] },
+            review_handle: { type: "string", minLength: 1 },
+            created_by: { type: "string", minLength: 1 },
+            sources: { type: "array", items: LEGACY_SOURCE_SCHEMA },
+          },
+        },
+      ],
     },
     annotations: {
       readOnlyHint: true,
@@ -108,18 +133,38 @@ const TOOLS = Object.freeze([
   },
   {
     name: "project_memory_apply",
-    description: "Apply an approved bootstrap handle or one allowlisted coordinator-governed mutation.",
+    description: "Apply an approved bootstrap, guided-history handle, or allowlisted coordinator mutation.",
     inputSchema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["mode"],
-      properties: {
-        mode: { enum: ["bootstrap", "command"] },
-        proposal_handle: { type: "string" },
-        approval: { type: "object" },
-        root: { type: "string", format: "uri" },
-        arguments: { type: "array", items: { type: "string" } },
-      },
+      oneOf: [
+        {
+          type: "object",
+          additionalProperties: false,
+          required: ["mode", "proposal_handle", "approval"],
+          properties: {
+            mode: { enum: ["bootstrap", "legacy_import"] },
+            proposal_handle: { type: "string", minLength: 1 },
+            approval: {
+              type: "object",
+              additionalProperties: false,
+              required: ["confirmed", "granted_by"],
+              properties: {
+                confirmed: { type: "boolean" },
+                granted_by: { type: "string", minLength: 1 },
+              },
+            },
+          },
+        },
+        {
+          type: "object",
+          additionalProperties: false,
+          required: ["mode", "root", "arguments"],
+          properties: {
+            mode: { enum: ["command"] },
+            root: { type: "string", format: "uri" },
+            arguments: { type: "array", items: { type: "string" } },
+          },
+        },
+      ],
     },
     annotations: {
       readOnlyHint: false,
@@ -139,7 +184,10 @@ export interface McpToolResult {
   readonly isError?: true;
 }
 
-type ProjectMemoryHostAdapter = Pick<ProjectMemoryHost, "start" | "applyBootstrap">;
+type ProjectMemoryHostAdapter = Pick<
+  ProjectMemoryHost,
+  "start" | "applyBootstrap" | "planLegacyImport" | "applyLegacyImport"
+>;
 
 export interface ProjectMemoryMcpServerDependencies {
   readonly createHost: (root: URL) => ProjectMemoryHostAdapter;
@@ -147,7 +195,7 @@ export interface ProjectMemoryMcpServerDependencies {
   readonly execute: typeof executeCli;
   readonly resolveProposal?: (
     handle: string,
-  ) => Promise<RuntimeResult<StoredBootstrapProposal>>;
+  ) => Promise<RuntimeResult<StoredProposalEnvelope>>;
 }
 
 interface ProjectMemoryRuntime {
@@ -161,7 +209,7 @@ function defaultDependencies(): ProjectMemoryMcpServerDependencies {
     createHost: (root) => createNodeProjectMemoryHost(root),
     createRegistry: (root) => createNodeCommandRegistry(root),
     execute: executeCli,
-    resolveProposal: (handle) => proposals.resolve(handle, "bootstrap"),
+    resolveProposal: (handle) => proposals.resolve(handle),
   };
 }
 
@@ -202,7 +250,11 @@ function compactTextContent(structuredContent: unknown): string {
     "command",
     "status",
     "kind",
+    "operation",
+    "review_handle",
     "proposal_handle",
+    "plan_hash",
+    "expected_head",
     "confirmation_required",
     "expires_at",
     "summary",
@@ -280,6 +332,17 @@ function stringArray(value: unknown, label: string): readonly string[] {
   return value;
 }
 
+function legacySourceReviews(value: unknown) {
+  try {
+    return parseLegacySourceReviews(value);
+  } catch (error: unknown) {
+    if (error instanceof LegacyImportInputError) {
+      throw new McpProtocolError(-32602, error.message);
+    }
+    throw error;
+  }
+}
+
 function rootUrl(value: unknown): URL {
   const raw = stringValue(value, "root");
   try {
@@ -342,6 +405,34 @@ export class ProjectMemoryMcpServer {
     return created;
   }
 
+  private async proposalHost(
+    handle: string,
+    expectedKind: StoredProposalEnvelope["kind"],
+  ): Promise<RuntimeResult<ProjectMemoryHostAdapter>> {
+    const cached = this.#proposalHosts.get(handle);
+    if (cached !== undefined) return success(cached);
+    const resolveProposal = this.dependencies.resolveProposal;
+    if (resolveProposal === undefined) {
+      return failure(
+        "HOST_PROPOSAL_NOT_FOUND",
+        "proposal handle is unknown or already consumed",
+        handle,
+      );
+    }
+    const proposal = await resolveProposal(handle);
+    if (!proposal.ok) return proposal;
+    if (proposal.value.kind !== expectedKind) {
+      return failure(
+        "HOST_PROPOSAL_KIND_MISMATCH",
+        `proposal handle contains ${proposal.value.kind}, not ${expectedKind}`,
+        handle,
+      );
+    }
+    const host = this.runtime(proposal.value.root).host;
+    this.#proposalHosts.set(handle, host);
+    return success(host);
+  }
+
   private async callTool(params: unknown): Promise<McpToolResult> {
     const input = objectValue(params, "tools/call params");
     onlyKeys(input, new Set(["name", "arguments", "_meta"]), "tools/call params");
@@ -371,6 +462,9 @@ export class ProjectMemoryMcpServer {
       if (started.ok && started.value.kind === "bootstrap_review_required") {
         this.#proposalHosts.set(started.value.proposal_handle, this.runtime(root).host);
       }
+      if (started.ok && started.value.kind === "legacy_import_review_required") {
+        this.#proposalHosts.set(started.value.review_handle, this.runtime(root).host);
+      }
       return runtimeToolResult(started);
     } catch {
       return toolFailure("MCP_HOST_REJECTED", "Project Memory startup host rejected");
@@ -379,48 +473,87 @@ export class ProjectMemoryMcpServer {
 
   private async read(arguments_: unknown): Promise<McpToolResult> {
     const input = objectValue(arguments_, "project_memory_read arguments");
-    onlyKeys(input, new Set(["root", "arguments"]), "project_memory_read arguments");
-    const root = rootUrl(input.root);
-    return this.runCommand(root, stringArray(input.arguments, "arguments"), false);
+    const mode = input.mode === undefined ? "command" : stringValue(input.mode, "mode");
+    if (mode === "command") {
+      onlyKeys(input, new Set(["mode", "root", "arguments"]), "command read arguments");
+      return this.runCommand(
+        rootUrl(input.root),
+        stringArray(input.arguments, "arguments"),
+        false,
+      );
+    }
+    if (mode === "legacy_import") {
+      onlyKeys(
+        input,
+        new Set(["mode", "review_handle", "created_by", "sources"]),
+        "legacy import planning arguments",
+      );
+      const reviewHandle = stringValue(input.review_handle, "review_handle");
+      const createdBy = stringValue(input.created_by, "created_by");
+      const sources = legacySourceReviews(input.sources);
+      const host = await this.proposalHost(reviewHandle, "legacy_review");
+      if (!host.ok) return runtimeToolResult(host);
+      try {
+        const planned = await host.value.planLegacyImport({
+          review_handle: reviewHandle,
+          created_by: createdBy,
+          sources,
+        });
+        if (planned.ok) {
+          this.#proposalHosts.delete(reviewHandle);
+          this.#proposalHosts.set(planned.value.proposal_handle, host.value);
+        }
+        return runtimeToolResult(planned);
+      } catch {
+        return toolFailure("MCP_HOST_REJECTED", "Project Memory legacy planning host rejected");
+      }
+    }
+    throw new McpProtocolError(-32602, "mode must be command or legacy_import");
   }
 
   private async apply(arguments_: unknown): Promise<McpToolResult> {
     const input = objectValue(arguments_, "project_memory_apply arguments");
     const mode = stringValue(input.mode, "mode");
-    if (mode === "bootstrap") {
-      onlyKeys(input, new Set(["mode", "proposal_handle", "approval"]), "bootstrap apply arguments");
+    if (mode === "bootstrap" || mode === "legacy_import") {
+      onlyKeys(
+        input,
+        new Set(["mode", "proposal_handle", "approval"]),
+        `${mode} apply arguments`,
+      );
       const proposalHandle = stringValue(input.proposal_handle, "proposal_handle");
       const approval = objectValue(input.approval, "approval");
       onlyKeys(approval, new Set(["confirmed", "granted_by"]), "approval");
       if (typeof approval.confirmed !== "boolean") {
         throw new McpProtocolError(-32602, "approval.confirmed must be boolean");
       }
-      let host = this.#proposalHosts.get(proposalHandle);
-      if (host === undefined) {
-        const resolveProposal = this.dependencies.resolveProposal;
-        if (resolveProposal === undefined) {
-          return toolFailure(
-            "HOST_PROPOSAL_NOT_FOUND",
-            "proposal handle is unknown or already consumed",
-          );
-        }
-        const proposal = await resolveProposal(proposalHandle);
-        if (!proposal.ok) return runtimeToolResult(proposal);
-        host = this.runtime(proposal.value.root).host;
-        this.#proposalHosts.set(proposalHandle, host);
-      }
+      const host = await this.proposalHost(
+        proposalHandle,
+        mode === "bootstrap" ? "bootstrap" : "legacy_import",
+      );
+      if (!host.ok) return runtimeToolResult(host);
+      const approvalInput = {
+        confirmed: approval.confirmed,
+        granted_by: stringValue(approval.granted_by, "approval.granted_by"),
+      };
       try {
-        const applied = await host.applyBootstrap({
-          proposal_handle: proposalHandle,
-          approval: {
-            confirmed: approval.confirmed,
-            granted_by: stringValue(approval.granted_by, "approval.granted_by"),
-          },
-        });
+        const applied: RuntimeResult<unknown> = mode === "bootstrap"
+          ? await host.value.applyBootstrap({
+              proposal_handle: proposalHandle,
+              approval: approvalInput,
+            })
+          : await host.value.applyLegacyImport({
+              proposal_handle: proposalHandle,
+              approval: approvalInput,
+            });
         if (applied.ok) this.#proposalHosts.delete(proposalHandle);
         return runtimeToolResult(applied);
       } catch {
-        return toolFailure("MCP_HOST_REJECTED", "Project Memory bootstrap host rejected");
+        return toolFailure(
+          "MCP_HOST_REJECTED",
+          mode === "bootstrap"
+            ? "Project Memory bootstrap host rejected"
+            : "Project Memory legacy apply host rejected",
+        );
       }
     }
     if (mode === "command") {
@@ -431,7 +564,10 @@ export class ProjectMemoryMcpServer {
         true,
       );
     }
-    throw new McpProtocolError(-32602, "mode must be bootstrap or command");
+    throw new McpProtocolError(
+      -32602,
+      "mode must be bootstrap, legacy_import, or command",
+    );
   }
 
   private async runCommand(

@@ -57,11 +57,17 @@ Remain worker-only. Perform scoped product work only when repository evidence in
 
 ## Legacy import
 
-1. Scan legacy handoffs, changelogs, PRDs, and agent notes without writes; retain exact source paths and content hashes.
-2. Run `import plan` with one reviewed destination and disposition for every candidate fact. Ambiguous, conflicting, secret-bearing, or ownerless facts remain unresolved.
-3. Have Pitaji approve consequential product decisions and the integrator review the complete atomic plan.
-4. The integrator runs `import apply` only through the IntegrationCoordinator with the freshly recomputed hash and expected head.
-5. Validate the receipt and generated views. Never delete or rewrite legacy sources as an implicit part of import.
+The guided host path is the only trusted legacy-import route. Generic command-mode `import apply` remains untrusted and cannot acquire the handle-scoped authority below.
+
+1. Invoke `project_memory_start`. When it returns `legacy_import_review_required`, retain its short-lived `review_handle` and read only the named `sources` paths.
+2. Cover every returned source path and hash exactly once with evidence-bound fact drafts and one `import`, `archive`, `reject`, or `unresolved` disposition. Use only the fixed categories in the skill. Sensitive, ambiguous, conflicting, low-confidence, or ownerless material stays rejected or unresolved without copied facts.
+3. Invoke `project_memory_read` in `legacy_import` mode with the review handle, actor, and complete source drafts. The host rereads the sources, validates anchors and hashes, materializes complete canonical records locally, and returns only a bounded grouped proposal plus one apply handle.
+4. Present every group, assumption, conflict, sensitivity count, plan hash, expected head, and expiry. Pitaji confirms or declines the complete proposal once.
+5. After explicit confirmation, invoke `project_memory_apply` in `legacy_import` mode with only the apply handle and Pitaji approval. The host replans, revalidates root/ref/head/profile/source bindings, and grants authority only to that one import plan hash.
+6. The IntegrationCoordinator is the sole writer. A failed apply retains the unexpired handle and changes no canonical state; a successful apply consumes it.
+7. Invoke startup again. Continue only after `resume`, then read the normal five-file prefix.
+
+Never expose source bytes or plan writes through MCP. Never manually edit canonical records, immutable import reports, generated views, configuration, or original legacy sources.
 
 ## Migrations
 

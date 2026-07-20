@@ -29,6 +29,7 @@ projects.
 
 - New projects receive one compact bootstrap proposal and one confirmation.
 - Initialized projects resume from accepted repository context.
+- Existing handoffs, PRDs, changelogs, decisions, and task notes are reviewed through one guided history proposal; the agent reads the named sources and Pitaji confirms once.
 - Canonical changes remain bound to an approved plan and the current Git head.
 - Repository and Git history are authoritative; cloud mirrors are optional.
 - The runtime is offline and has no telemetry or hosted service.
