@@ -4,7 +4,10 @@ import type { InitPlan } from "../cli/init/build-init-plan.js";
 import type { InitialClarification } from "../cli/init/build-initial-source-proposal.js";
 import type { ProfileVerificationReport } from "../profile/verify-profile.js";
 import type { ViewDriftReport } from "../governance/views/view-drift.js";
-import type { LegacyImportProposal } from "../import/contracts.js";
+import type {
+  LegacyImportProposal,
+  PendingLegacyReview,
+} from "../import/contracts.js";
 
 export interface AgentStartInput {
   readonly root: URL;
@@ -36,6 +39,14 @@ export type AgentStartDirective =
       readonly apply_command: readonly string[];
     }
   | {
+      readonly kind: "legacy_import_review_required";
+      readonly root_id: string;
+      readonly profile_lock_hash: string;
+      readonly expected_head: string;
+      readonly proposal: LegacyImportProposal;
+      readonly warnings: readonly RuntimeIssue[];
+    }
+  | {
       readonly kind: "resume";
       readonly root_id: string;
       readonly profile_lock_hash: string;
@@ -61,6 +72,13 @@ export interface AgentStartDependencies {
   readonly verifyViews: (
     root: URL,
   ) => Promise<RuntimeResult<ViewDriftReport>>;
+  readonly findPendingLegacyReview: (input: {
+    readonly root: URL;
+    readonly root_id: string;
+  }) => Promise<RuntimeResult<PendingLegacyReview | null>>;
+  readonly currentGitHead: (
+    root: URL,
+  ) => Promise<RuntimeResult<string>>;
   readonly findAssignedTaskPackets: (
     root: URL,
   ) => Promise<RuntimeResult<readonly string[]>>;

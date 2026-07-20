@@ -58,7 +58,13 @@ describe("legacy scanner", () => {
       recursive: true,
     });
     await mkdir(path.join(repository.path, "docs", "product"), { recursive: true });
+    await mkdir(path.join(repository.path, ".tmp", "project-memory"), { recursive: true });
     await writeFile(path.join(repository.path, "PROJECT_CONTEXT.md"), "# Generated\n", "utf8");
+    await writeFile(
+      path.join(repository.path, ".tmp", "project-memory", "init.plan.json"),
+      "{}\n",
+      "utf8",
+    );
     await writeFile(
       path.join(repository.path, "docs", "project-memory", "source", "PROJECT.md"),
       "# Canonical\n",
@@ -66,6 +72,11 @@ describe("legacy scanner", () => {
     );
     await writeFile(path.join(repository.path, "README.md"), "# Product\n", "utf8");
     await writeFile(path.join(repository.path, "AGENTS.md"), "# Agent\n", "utf8");
+    await writeFile(
+      path.join(repository.path, "CLAUDE.md"),
+      "<!-- PROJECT MEMORY GENERATED ROUTER - DO NOT EDIT -->\n# Router\n",
+      "utf8",
+    );
     await writeFile(path.join(repository.path, "docs", "product", "PRD.md"), "# PRD\n", "utf8");
     const scanner = createLegacyScanner({ git_revision: () => Promise.resolve(null) });
 

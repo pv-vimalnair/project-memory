@@ -10,10 +10,15 @@ import {
   type RuntimeIssue,
   type RuntimeResult,
 } from "../contracts/runtime-result.js";
+import { NodeCommandRunner } from "../core/command-runner.js";
+import {
+  currentGitBranchRef,
+  GitCliClient,
+} from "../core/git-cli-client.js";
 import { resolveInside } from "../core/path-safety.js";
-import { currentGitBranchRef } from "../core/git-cli-client.js";
 import {
   createLegacyImporter,
+  findPendingLegacyReview as detectPendingLegacyReview,
   type LegacyDocumentRole,
 } from "../import/index.js";
 import { createProfileVerifier } from "../profile/verify-profile.js";
@@ -132,6 +137,7 @@ export function createNodeAgentStartDependencies(
 ): AgentStartDependencies {
   const profiles = createProfileVerifier();
   const importer = createLegacyImporter();
+  const git = new GitCliClient(new NodeCommandRunner());
   const views = createNodeViewVerifier();
   const doctorDependencies = {
     ...createDefaultDoctorDependencies(),
@@ -186,6 +192,26 @@ export function createNodeAgentStartDependencies(
     },
     verifyProfile: (root) => profiles.verify(root),
     verifyViews: (root) => views.verify(root),
+    findPendingLegacyReview: (input) =>
+      detectPendingLegacyReview(input.root, input.root_id, importer),
+    async currentGitHead(root) {
+      try {
+        const head = await git.head(root);
+        return /^[0-9a-f]{40}$/u.test(head)
+          ? success(head)
+          : failure(
+              "AGENT_GIT_HEAD_INVALID",
+              "Git returned an invalid current head revision",
+              root.href,
+            );
+      } catch (error: unknown) {
+        return failure(
+          "AGENT_GIT_HEAD_FAILED",
+          error instanceof Error ? error.message : String(error),
+          root.href,
+        );
+      }
+    },
     findAssignedTaskPackets,
     async proposeLegacyImport(input) {
       const scan = await importer.scan(input.root);

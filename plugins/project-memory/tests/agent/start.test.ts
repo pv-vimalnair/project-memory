@@ -10,6 +10,7 @@ import {
   startAgentSession,
 } from "../../src/agent/index.js";
 import type { AgentStartDependencies } from "../../src/agent/contracts.js";
+import type { PendingLegacyReview } from "../../src/import/contracts.js";
 
 const ROOT = new URL("file:///C:/project/");
 const HEAD = "1".repeat(40);
@@ -49,6 +50,43 @@ function viewReport(overrides: Partial<ViewDriftReport> = {}): ViewDriftReport {
     missing_paths: [],
     metadata_invalid_paths: [],
     ...overrides,
+  };
+}
+
+function pendingReview(): PendingLegacyReview {
+  const artifact = {
+    relative_path: "HANDOFF.md",
+    sha256: "8".repeat(64),
+    byte_length: 12,
+    git_revision: HEAD,
+    detected_roles: ["handoff"] as const,
+    sensitivity_findings: [],
+  };
+  const scan = {
+    schema_version: "1.0.0" as const,
+    root: ROOT.href,
+    artifacts: [artifact],
+    scan_hash: "9".repeat(64),
+  };
+  return {
+    root_id: ROOT_ID,
+    scan,
+    proposal: {
+      schema_version: "1.0.0",
+      root_id: ROOT_ID,
+      status: "review_required",
+      scan_hash: scan.scan_hash,
+      mappings: [{
+        source_path: artifact.relative_path,
+        source_sha256: artifact.sha256,
+        classification: "historical_status",
+        destination_kind: "view_candidate",
+        destination_path: null,
+        accepted: false,
+        rationale: "Review historical handoff evidence.",
+      }],
+      proposal_hash: "a".repeat(64),
+    },
   };
 }
 
@@ -115,6 +153,8 @@ function dependencies(
     planInitialization: vi.fn(() => Promise.resolve(success(initPlan()))),
     verifyProfile: vi.fn(() => Promise.resolve(success(profileReport()))),
     verifyViews: vi.fn(() => Promise.resolve(success(viewReport()))),
+    findPendingLegacyReview: vi.fn(() => Promise.resolve(success(null))),
+    currentGitHead: vi.fn(() => Promise.resolve(success(HEAD))),
     findAssignedTaskPackets: vi.fn(() => Promise.resolve(success([
       "docs/project-memory/workstreams/WS-01/tasks/TASK-02/TASK.md",
     ]))),
@@ -214,6 +254,77 @@ describe("read-only agent startup", () => {
       },
     });
     expect(deps.planInitialization).not.toHaveBeenCalled();
+  });
+
+  it("requires pending legacy review after profile and views but before task discovery", async () => {
+    const order: string[] = [];
+    const deps = dependencies({
+      doctor: vi.fn(() => {
+        order.push("doctor");
+        return Promise.resolve(success(doctorReport()));
+      }),
+      verifyProfile: vi.fn(() => {
+        order.push("profile");
+        return Promise.resolve(success(profileReport()));
+      }),
+      verifyViews: vi.fn(() => {
+        order.push("views");
+        return Promise.resolve(success(viewReport()));
+      }),
+      findPendingLegacyReview: vi.fn(() => {
+        order.push("pending");
+        return Promise.resolve(success(pendingReview(), [{
+          code: "LEGACY_REVIEW_WARNING",
+          severity: "warning",
+          path: "HANDOFF.md",
+          message: "review warning",
+          references: [],
+        }]));
+      }),
+      currentGitHead: vi.fn(() => {
+        order.push("head");
+        return Promise.resolve(success(HEAD));
+      }),
+      findAssignedTaskPackets: vi.fn(() => {
+        order.push("assigned");
+        return Promise.resolve(success([]));
+      }),
+    });
+    const result = await startAgentSession(
+      { root: ROOT, brief_path: null, adapter_id: "adapter.codex" },
+      deps,
+    );
+    expect(result).toMatchObject({
+      ok: true,
+      value: {
+        kind: "legacy_import_review_required",
+        root_id: ROOT_ID,
+        profile_lock_hash: PROFILE_HASH,
+        expected_head: HEAD,
+        proposal: { proposal_hash: "a".repeat(64) },
+        warnings: [{ code: "LEGACY_REVIEW_WARNING" }],
+      },
+    });
+    expect(order).toEqual(["doctor", "profile", "views", "pending", "head"]);
+  });
+
+  it("blocks when pending-review discovery fails without locating assigned work", async () => {
+    const deps = dependencies({
+      findPendingLegacyReview: vi.fn(() => Promise.resolve(failure(
+        "LEGACY_REPORT_INVALID",
+        "malformed report",
+      ))),
+    });
+    const result = await startAgentSession(
+      { root: ROOT, brief_path: null, adapter_id: "adapter.codex" },
+      deps,
+    );
+    expect(result).toMatchObject({
+      ok: true,
+      value: { kind: "blocked", issues: [{ code: "LEGACY_REPORT_INVALID" }] },
+    });
+    expect(deps.currentGitHead).not.toHaveBeenCalled();
+    expect(deps.findAssignedTaskPackets).not.toHaveBeenCalled();
   });
 
   it("blocks a stale profile lock before checking views", async () => {

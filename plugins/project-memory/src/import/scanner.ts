@@ -37,7 +37,8 @@ function inside(root: string, candidate: string): boolean {
 
 function ignoredGeneratedDirectory(relativePath: string): boolean {
   const normalized = relativePath.toLowerCase();
-  return normalized === ".claude/worktrees" ||
+  return normalized === ".tmp/project-memory" ||
+    normalized === ".claude/worktrees" ||
     /^(?:linux|windows)\/flutter\/ephemeral\/\.plugin_symlinks$/u.test(normalized) ||
     normalized === "ios/.symlinks" ||
     normalized === "macos/flutter/ephemeral/.symlinks";
@@ -52,6 +53,20 @@ function ignoredProjectMemoryPath(
   return normalized === "project_context.md" ||
     normalized === "docs/project-memory" ||
     normalized.startsWith("docs/project-memory/");
+}
+
+function ignoredGeneratedRouter(
+  relativePath: string,
+  text: string,
+  options: LegacyScanOptions,
+): boolean {
+  if (options.phase !== "post_bootstrap") return false;
+  const normalized = relativePath.toLowerCase();
+  return (
+    normalized === "agents.md" || normalized === "claude.md"
+  ) && text.startsWith(
+    "<!-- PROJECT MEMORY GENERATED ROUTER - DO NOT EDIT -->\n",
+  );
 }
 
 async function defaultGitRevision(root: URL, relativePath: string): Promise<string | null> {
@@ -122,6 +137,7 @@ export function createLegacyScanner(
           if (!decoded.ok) {
             return failure("LEGACY_ENCODING_INVALID", "legacy source must be strict UTF-8", relativePath);
           }
+          if (ignoredGeneratedRouter(relativePath, decoded.value, options)) continue;
           artifacts.push({
             relative_path: relativePath,
             sha256: sha256(bytes),

@@ -187,6 +187,53 @@ export async function startAgentSession(
     )]);
   }
 
+  const pending = await callDependency("findPendingLegacyReview", () =>
+    dependencies.findPendingLegacyReview({
+      root: input.root,
+      root_id: profile.value.root_id,
+    }),
+  );
+  if (!pending.ok) return blocked(pending.issues);
+  if (pending.value !== null) {
+    if (
+      pending.value.root_id !== profile.value.root_id ||
+      pending.value.proposal.root_id !== profile.value.root_id ||
+      pending.value.proposal.scan_hash !== pending.value.scan.scan_hash
+    ) {
+      return blocked([agentIssue(
+        "AGENT_LEGACY_BINDING_MISMATCH",
+        "pending legacy review is not bound to the verified project root and scan",
+        "root_id",
+      )]);
+    }
+    const head = await callDependency("currentGitHead", () =>
+      dependencies.currentGitHead(input.root),
+    );
+    if (!head.ok) return blocked(head.issues);
+    if (!/^[0-9a-f]{40}$/u.test(head.value)) {
+      return blocked([agentIssue(
+        "AGENT_GIT_HEAD_INVALID",
+        "current Git head must be an exact 40-character revision",
+        "HEAD",
+      )]);
+    }
+    const warnings = stableIssues([
+      ...doctor.warnings,
+      ...profile.warnings,
+      ...views.warnings,
+      ...pending.warnings,
+      ...head.warnings,
+    ]);
+    return success({
+      kind: "legacy_import_review_required",
+      root_id: profile.value.root_id,
+      profile_lock_hash: profile.value.profile_lock_hash,
+      expected_head: head.value,
+      proposal: pending.value.proposal,
+      warnings,
+    }, warnings);
+  }
+
   const assigned = await callDependency("findAssignedTaskPackets", () =>
     dependencies.findAssignedTaskPackets(input.root),
   );
@@ -205,6 +252,7 @@ export async function startAgentSession(
     ...doctor.warnings,
     ...profile.warnings,
     ...views.warnings,
+    ...pending.warnings,
     ...assigned.warnings,
   ]);
   return success({

@@ -147,6 +147,14 @@ describe("automatic Plugin workflow for an initialized project", () => {
     const workflow = await preparePluginWorkflow("new");
     workflows.push(workflow);
     const bootstrap = await bootstrapPluginWorkflow(workflow);
+    const initialResume = runLauncher(workflow, ["agent", "start", "--root", ".", "--json"]);
+    expect(
+      initialResume.envelope,
+      JSON.stringify(initialResume.envelope, null, 2),
+    ).toMatchObject({
+      status: "success",
+      data: { kind: "resume", root_id: bootstrap.target_root_id },
+    });
     const projectPath = path.join(workflow.project_root, "docs", "project-memory", "project.yaml");
     const contextPath = path.join(workflow.project_root, "PROJECT_CONTEXT.md");
     const projectBefore = await readFile(projectPath, "utf8");
@@ -284,7 +292,7 @@ describe("automatic Plugin workflow for an initialized project", () => {
 
     const resumed = runLauncher(workflow, ["agent", "start", "--root", ".", "--json"]);
     expect(resumed.status, resumed.stderr || resumed.stdout).toBe(0);
-    expect(resumed.envelope).toMatchObject({
+    expect(resumed.envelope, JSON.stringify(resumed.envelope, null, 2)).toMatchObject({
       status: "success",
       data: {
         kind: "resume",
