@@ -4,6 +4,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { createNodeAgentStartDependencies, startAgentSession } from "../agent/index.js";
+import { CONFIG_RELATIVE_PATH } from "./config.js";
 import type { CanonicalMutationPlan } from "../contracts/canonical-mutation-plan.js";
 import { failure, success, type RuntimeResult } from "../contracts/runtime-result.js";
 import { deterministicInstanceId } from "./init/build-initial-source-proposal.js";
@@ -38,8 +39,16 @@ import type { SingleRepoFinalizer } from "../governance/integration/single-repo-
 import { createCanonicalSnapshotBuilder } from "../governance/snapshot/canonical-snapshot-builder.js";
 import { createRevisionTreeReader } from "../governance/snapshot/revision-tree-reader.js";
 import type { CanonicalSnapshotBuilder } from "../governance/snapshot/snapshot-contracts.js";
-import { createViewGenerator } from "../governance/views/generate-views.js";
+import { createViewGenerator, GENERATED_VIEW_PATHS } from "../governance/views/generate-views.js";
 import { createWorkLifecycleService } from "../governance/work/work-lifecycle-service.js";
+import { PROJECT_CONTEXT_PATH } from "../materialize/render-startup-context.js";
+import { createMigrationService } from "../migrations/planner.js";
+import { createProjectMemoryMigrationRegistry } from "../migrations/v1/project-memory-v1-1.js";
+import {
+  createNodeRepositoryUpgradePlanner,
+  REPOSITORY_UPGRADE_RECORD_PATH,
+  type RepositoryUpgradePlan,
+} from "../upgrades/index.js";
 import { applyInitPlan } from "./init/apply-init-plan.js";
 import { buildInitPlan } from "./init/build-init-plan.js";
 import { createDefaultCommandRegistry } from "./command-registry.js";
@@ -51,6 +60,23 @@ const INTEGRATOR_ID = "project-memory-integrator";
 
 function sameRoot(left: URL, right: URL): boolean {
   return left.protocol === "file:" && left.href === right.href;
+}
+
+function compareUtf8(left: string, right: string): number {
+  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
+}
+
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function exactStringArray(
+  value: unknown,
+  expected: readonly string[],
+): boolean {
+  return Array.isArray(value) &&
+    value.length === expected.length &&
+    value.every((entry, index) => entry === expected[index]);
 }
 
 async function currentSnapshot(
@@ -105,6 +131,8 @@ function createBindingValidator(
   runner: CommandRunner,
   git: IntegrationGitCliClient,
   profiles: ProfileVerifier,
+  snapshots: CanonicalSnapshotBuilder,
+  allowLegacyUpgrade = false,
 ): MutationBindingValidator {
   return {
     async verify(repo, plan) {
@@ -156,7 +184,28 @@ function createBindingValidator(
         );
       }
       const profile = await profiles.verify(repo);
-      if (!profile.ok) return profile;
+      if (!profile.ok) {
+        const legacyConfigOnly = allowLegacyUpgrade &&
+          profile.issues.length > 0 &&
+          profile.issues.every((issue) =>
+            issue.code === "PROFILE_ADAPTER_ARTIFACT_MISMATCH" &&
+            issue.path === CONFIG_RELATIVE_PATH
+          );
+        if (!legacyConfigOnly) return profile;
+        const snapshot = await snapshots.build(repo, {
+          kind: "commit",
+          object_id: head,
+        });
+        if (!snapshot.ok) return snapshot;
+        return snapshot.value.root_id === plan.root_id &&
+          snapshot.value.profile_lock_hash === plan.profile_lock_hash
+          ? success(true)
+          : failure(
+              "runtime.binding_profile_mismatch",
+              "legacy upgrade snapshot does not match the approved profile",
+              plan.plan_id,
+            );
+      }
       return profile.value.valid &&
         profile.value.root_id === plan.root_id &&
         profile.value.profile_lock_hash === plan.profile_lock_hash
@@ -185,6 +234,43 @@ function createAuthorityValidator(
             "runtime.trusted_integrator_required",
             "lifecycle and import mutation require a separate trusted host adapter",
             plan.mutation_kind,
+          ));
+    },
+  };
+}
+
+export function createRepositoryUpgradeAuthorityValidator(
+  fixedRepo: URL,
+): PlanAuthorityValidator {
+  const changedPaths = [
+    PROJECT_CONTEXT_PATH,
+    REPOSITORY_UPGRADE_RECORD_PATH,
+    CONFIG_RELATIVE_PATH,
+  ].sort(compareUtf8);
+  return {
+    verify(repo, plan) {
+      const metadata = plan.metadata;
+      const writePaths = plan.writes
+        .map((write) => write.relative_path)
+        .sort(compareUtf8);
+      const authorized = sameRoot(repo, fixedRepo) &&
+        plan.mutation_kind === "migration" &&
+        isRecord(metadata) &&
+        metadata.governance_kind === "repository_upgrade" &&
+        metadata.migration_id === "project-memory-v1-1" &&
+        metadata.authority_impact === "none" &&
+        metadata.from_version === "1.0.0" &&
+        metadata.to_version === "1.1.0" &&
+        metadata.migration_record_path === REPOSITORY_UPGRADE_RECORD_PATH &&
+        exactStringArray(metadata.changed_paths, changedPaths) &&
+        exactStringArray(metadata.derived_paths, GENERATED_VIEW_PATHS) &&
+        exactStringArray(writePaths, changedPaths);
+      return Promise.resolve(authorized
+        ? success(true)
+        : failure(
+            "runtime.upgrade_authority_denied",
+            "repository upgrade plan exceeds the exact local upgrade authority",
+            plan.plan_id,
           ));
     },
   };
@@ -332,6 +418,7 @@ function createLocalCoordinator(
   snapshots: CanonicalSnapshotBuilder,
   profiles: ProfileVerifier,
   authority: PlanAuthorityValidator = createAuthorityValidator(repo),
+  allowLegacyUpgrade = false,
 ): IntegrationCoordinator {
   const temporaryRoot = pathToFileURL(
     `${path.join(tmpdir(), "project-memory-runtime")}${path.sep}`,
@@ -362,7 +449,15 @@ function createLocalCoordinator(
     leases: createIntegrationLeaseStore({ clock, git }),
     snapshots,
     views,
-    bindings: createBindingValidator(repo, targetRef, runner, git, profiles),
+    bindings: createBindingValidator(
+      repo,
+      targetRef,
+      runner,
+      git,
+      profiles,
+      snapshots,
+      allowLegacyUpgrade,
+    ),
     authority,
     repository: createRepositoryValidator(snapshots, profiles),
     bootstrap: createBootstrapMutationHooks({ git, verifier: profiles }),
@@ -399,6 +494,10 @@ export interface NodeProjectMemoryServices {
   readonly registry: CommandRegistry;
   readonly start: AgentCommandDependencies["start"];
   readonly applyBootstrap: InitCommandDependencies["apply_plan"];
+  readonly applyUpgrade: (
+    root: URL,
+    savedPlan: RepositoryUpgradePlan,
+  ) => Promise<RuntimeResult<MutationReceipt>>;
   readonly legacyImport: LegacyImportServiceDependencies;
 }
 
@@ -451,6 +550,8 @@ export function createNodeProjectMemoryServices(repo: URL): NodeProjectMemorySer
   const snapshots = createCanonicalSnapshotBuilder(createRevisionTreeReader(runner));
   const profiles = createProfileVerifier();
   const coordinator = createDynamicLocalCoordinator(repo, clock, runner, git, snapshots, profiles);
+  const upgrades = createNodeRepositoryUpgradePlanner(() => clock.now());
+  const migrationRegistry = createProjectMemoryMigrationRegistry();
   const legacyImport: LegacyImportServiceDependencies = {
     now: () => clock.now(),
     async context(root) {
@@ -556,13 +657,60 @@ export function createNodeProjectMemoryServices(repo: URL): NodeProjectMemorySer
     }),
     now: () => clock.now(),
   };
+  const applyUpgrade: NodeProjectMemoryServices["applyUpgrade"] = async (
+    root,
+    savedPlan,
+  ) => {
+    if (!sameRoot(root, repo)) {
+      return failure(
+        "runtime.root_mismatch",
+        "repository upgrade is bound to the configured local repository",
+        root.href,
+      );
+    }
+    const replanned = await upgrades.plan(root, {
+      created_at: savedPlan.created_at,
+      expires_at: savedPlan.expires_at,
+    });
+    if (!replanned.ok) return replanned;
+    if (replanned.value === null) {
+      return failure(
+        "UPGRADE_NO_LONGER_REQUIRED",
+        "repository already uses the current contract",
+        root.href,
+      );
+    }
+    if (replanned.value.plan_hash !== savedPlan.plan_hash) {
+      return failure(
+        "UPGRADE_PLAN_CHANGED",
+        "repository upgrade inputs changed; request a fresh proposal",
+        savedPlan.plan_id,
+        [savedPlan.plan_hash, replanned.value.plan_hash],
+      );
+    }
+    return createLocalCoordinator(
+      repo,
+      replanned.value.target_ref,
+      clock,
+      runner,
+      git,
+      snapshots,
+      profiles,
+      createRepositoryUpgradeAuthorityValidator(repo),
+      true,
+    ).finalizeMutation(replanned.value);
+  };
+  const migration = migrationRegistry.ok
+    ? { service: createMigrationService(migrationRegistry.value), coordinator }
+    : undefined;
   const registry = createDefaultCommandRegistry({
     agent: { start },
     init,
     import: { planner: importer, coordinator },
+    ...(migration === undefined ? {} : { migration }),
     work_lifecycle: { service: lifecycle, coordinator },
   });
-  return { registry, start, applyBootstrap: init.apply_plan, legacyImport };
+  return { registry, start, applyBootstrap: init.apply_plan, applyUpgrade, legacyImport };
 }
 
 export function createNodeCommandRegistry(repo: URL): CommandRegistry {

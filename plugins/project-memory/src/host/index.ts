@@ -10,6 +10,7 @@ export function createNodeProjectMemoryHost(root: URL): ProjectMemoryHost {
   return new ProjectMemoryHost({
     start: services.start,
     applyBootstrap: services.applyBootstrap,
+    applyUpgrade: services.applyUpgrade,
     legacyImport: services.legacyImport,
   });
 }

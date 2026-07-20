@@ -12,6 +12,7 @@ import {
 import { canonicalMutationPlanHash } from "../../src/contracts/canonical-mutation-plan.js";
 import { canonicalJson } from "../../src/core/canonical-json.js";
 import { sha256 } from "../../src/core/hash.js";
+import { GENERATED_VIEW_PATHS } from "../../src/governance/views/generate-views.js";
 import type {
   GuidedLegacyImportInput,
   PendingLegacyReview,
@@ -21,6 +22,7 @@ import {
   FileProposalStore,
   InMemoryProposalStore,
 } from "../../src/host/proposal-store.js";
+import type { RepositoryUpgradePlan } from "../../src/upgrades/contracts.js";
 
 const ROOT = new URL("file:///C:/project/");
 const PLAN_BODY = {
@@ -128,6 +130,63 @@ const IMPORT_PLAN_BODY: Omit<ReviewedImportPlan, "plan_hash"> = {
 const IMPORT_PLAN: ReviewedImportPlan = {
   ...IMPORT_PLAN_BODY,
   plan_hash: canonicalMutationPlanHash(IMPORT_PLAN_BODY),
+};
+const UPGRADE_CHANGED_PATHS = [
+  "PROJECT_CONTEXT.md",
+  "docs/project-memory/governance/migrations/repository-contract-1.0.0-to-1.1.0.json",
+  "tools/project-memory/config.json",
+] as const;
+const UPGRADE_PLAN_BODY: Omit<RepositoryUpgradePlan, "plan_hash"> = {
+  schema_version: "1.0.0",
+  plan_id: "repository-upgrade:ROOT-01J00000000000000000000000:aaaaaaaaaaaa",
+  mutation_kind: "migration",
+  root_id: "ROOT-01J00000000000000000000000",
+  target_ref: "refs/heads/main",
+  expected_head: "1".repeat(40),
+  profile_lock_hash: "2".repeat(64),
+  writes: UPGRADE_CHANGED_PATHS.map((relativePath, index) => ({
+    relative_path: relativePath,
+    bytes: new TextEncoder().encode(`upgrade-${String(index)}\n`),
+    expected_existing_sha256: index === 1 ? null : "3".repeat(64),
+    mode: index === 1 ? "create" as const : "replace" as const,
+  })),
+  record_ids: [], event_ids: [], approval_ids: [], evidence_ids: [],
+  created_by: "project-memory-upgrader",
+  created_at: "2026-07-17T12:00:00.000Z",
+  expires_at: "2026-07-17T13:00:00.000Z",
+  metadata: {
+    governance_kind: "repository_upgrade",
+    migration_id: "project-memory-v1-1",
+    from_version: "1.0.0",
+    to_version: "1.1.0",
+    authority_impact: "none",
+    canonical_source_set_hash: "4".repeat(64),
+    canonical_source_path_count: 12,
+    catalog_lock_hash: "5".repeat(64),
+    config_input_sha256: "6".repeat(64),
+    config_output_sha256: "7".repeat(64),
+    doorway_input_sha256: "8".repeat(64),
+    doorway_output_sha256: "9".repeat(64),
+    changed_paths: UPGRADE_CHANGED_PATHS,
+    derived_paths: [...GENERATED_VIEW_PATHS],
+    migration_record_path: UPGRADE_CHANGED_PATHS[1],
+    steps: [{
+      migration_id: "project-memory-v1-1",
+      from_version: "1.0.0",
+      to_version: "1.1.0",
+      input_sha256: "6".repeat(64),
+      output_sha256: "7".repeat(64),
+      semantic_diff: [{
+        path: "/repository_contract_version",
+        before: null,
+        after: "1.1.0",
+      }],
+    }],
+  },
+};
+const UPGRADE_PLAN: RepositoryUpgradePlan = {
+  ...UPGRADE_PLAN_BODY,
+  plan_hash: canonicalMutationPlanHash(UPGRADE_PLAN_BODY),
 };
 
 afterEach(async () => {
@@ -328,6 +387,50 @@ describe("proposal stores", () => {
     });
     expect(await second.resolve(imported.value.handle, "legacy_import")).toMatchObject({
       ok: true, value: { kind: "legacy_import", plan: IMPORT_PLAN },
+    });
+  });
+
+  it("round-trips an exact upgrade envelope with kind checks", () => {
+    const store = new InMemoryProposalStore({
+      now: () => new Date("2026-07-17T12:05:00.000Z"),
+      handle: () => "pm-proposal-00000000000000000000000000000035",
+    });
+    const issued = store.issue({
+      kind: "upgrade", root: ROOT, adapter_id: "adapter.codex", plan: UPGRADE_PLAN,
+    });
+    expect(issued).toMatchObject({
+      ok: true, value: { kind: "upgrade", plan_hash: UPGRADE_PLAN.plan_hash },
+    });
+    if (!issued.ok) return;
+    expect(store.resolve(issued.value.handle, "upgrade")).toMatchObject({
+      ok: true,
+      value: { kind: "upgrade", adapter_id: "adapter.codex", plan: UPGRADE_PLAN },
+    });
+    expect(store.resolve(issued.value.handle, "bootstrap")).toMatchObject({
+      ok: false, issues: [{ code: "HOST_PROPOSAL_KIND_MISMATCH" }],
+    });
+  });
+
+  it("recovers an upgrade handle in a second file-store process", async () => {
+    const cacheRoot = await mkdtemp(path.join(tmpdir(), "project-memory-upgrade-proposals-"));
+    temporaryRoots.push(cacheRoot);
+    const first = new FileProposalStore({
+      cache_root: cacheRoot,
+      now: () => new Date("2026-07-17T12:05:00.000Z"),
+      handle: () => "pm-proposal-00000000000000000000000000000036",
+    });
+    const issued = await first.issue({
+      kind: "upgrade", root: ROOT, adapter_id: "adapter.codex", plan: UPGRADE_PLAN,
+    });
+    if (!issued.ok) throw new Error("upgrade proposal fixture failed");
+    const second = new FileProposalStore({
+      cache_root: cacheRoot,
+      now: () => new Date("2026-07-17T12:06:00.000Z"),
+      handle: () => "pm-proposal-unused00000000000000000000000",
+    });
+    expect(await second.resolve(issued.value.handle, "upgrade")).toMatchObject({
+      ok: true,
+      value: { kind: "upgrade", plan: { plan_hash: UPGRADE_PLAN.plan_hash } },
     });
   });
 

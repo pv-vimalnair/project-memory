@@ -1,4 +1,4 @@
-import { lstat, readFile } from "node:fs/promises";
+import { lstat } from "node:fs/promises";
 
 import {
   CONFIG_RELATIVE_PATH,
@@ -17,6 +17,7 @@ import {
 } from "../core/git-cli-client.js";
 import { sha256 } from "../core/hash.js";
 import { resolveInside } from "../core/path-safety.js";
+import { IntegrationGitCliClient } from "../governance/integration/integration-git-client.js";
 import { createCanonicalSnapshotBuilder } from "../governance/snapshot/canonical-snapshot-builder.js";
 import { createRevisionTreeReader } from "../governance/snapshot/revision-tree-reader.js";
 import { PROJECT_CONTEXT_PATH } from "../materialize/render-startup-context.js";
@@ -52,9 +53,11 @@ function printableVersion(value: unknown): string {
   return value === null ? "null" : "invalid";
 }
 
-async function readRegularFile(
+async function readCommittedRegularFile(
   root: URL,
+  revision: string,
   relativePath: string,
+  git: IntegrationGitCliClient,
 ): Promise<RuntimeResult<Uint8Array>> {
   const resolved = await resolveInside(root, relativePath);
   if (!resolved.ok) return resolved;
@@ -67,7 +70,14 @@ async function readRegularFile(
         relativePath,
       );
     }
-    return success(new Uint8Array(await readFile(resolved.value)));
+    const committed = await git.readBlob(root, revision, relativePath);
+    return committed === null
+      ? failure(
+          "UPGRADE_INPUT_READ_FAILED",
+          "repository upgrade input is absent from the expected Git revision",
+          relativePath,
+        )
+      : success(new Uint8Array(committed));
   } catch (error: unknown) {
     return failure(
       "UPGRADE_INPUT_READ_FAILED",
@@ -112,6 +122,7 @@ export function createNodeRepositoryUpgradePlanner(
 ): NodeRepositoryUpgradePlanner {
   const runner = new NodeCommandRunner();
   const git = new GitCliClient(runner);
+  const revisionGit = new IntegrationGitCliClient(runner);
   const snapshots = createCanonicalSnapshotBuilder(createRevisionTreeReader(runner));
 
   return {
@@ -181,9 +192,19 @@ export function createNodeRepositoryUpgradePlanner(
       });
       if (!snapshot.ok) return snapshot;
 
-      const configBytes = await readRegularFile(root, CONFIG_RELATIVE_PATH);
+      const configBytes = await readCommittedRegularFile(
+        root,
+        head,
+        CONFIG_RELATIVE_PATH,
+        revisionGit,
+      );
       if (!configBytes.ok) return configBytes;
-      const doorwayBytes = await readRegularFile(root, PROJECT_CONTEXT_PATH);
+      const doorwayBytes = await readCommittedRegularFile(
+        root,
+        head,
+        PROJECT_CONTEXT_PATH,
+        revisionGit,
+      );
       if (!doorwayBytes.ok) return doorwayBytes;
       const stableReplay = replay === undefined ? freshReplay(now) : success(replay);
       if (!stableReplay.ok) return stableReplay;

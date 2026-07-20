@@ -1,3 +1,4 @@
+import { AGENT_READING_ORDER_PREFIX } from "../agent/start.js";
 import type {
   AgentStartDirective,
   AgentStartInput,
@@ -21,6 +22,8 @@ import {
   type LegacyImportServiceDependencies,
   type PlanLegacyImportInput,
 } from "./legacy-import-service.js";
+import type { RepositoryUpgradePlan } from "../upgrades/contracts.js";
+import { REPOSITORY_CONTRACT_VERSION } from "../version.js";
 import {
   FileProposalStore,
   type ProposalStore,
@@ -33,6 +36,10 @@ export interface ProjectMemoryHostDependencies {
   readonly applyBootstrap: (
     input: InitApplyInput,
   ) => Promise<RuntimeResult<BootstrapFinalization>>;
+  readonly applyUpgrade: (
+    root: URL,
+    savedPlan: RepositoryUpgradePlan,
+  ) => Promise<RuntimeResult<MutationReceipt>>;
   readonly legacyImport?: LegacyImportServiceDependencies;
 }
 
@@ -44,6 +51,37 @@ export interface BootstrapApprovalConfirmation {
 export interface ApplyBootstrapProposalInput {
   readonly proposal_handle: string;
   readonly approval: BootstrapApprovalConfirmation;
+}
+
+export interface ApplyRepositoryUpgradeProposalInput {
+  readonly proposal_handle: string;
+  readonly approval: { readonly confirmed: boolean };
+}
+
+export interface VerifiedRepositoryUpgrade {
+  readonly status: "upgraded_verified";
+  readonly receipt: MutationReceipt;
+  readonly repository_contract_version: typeof REPOSITORY_CONTRACT_VERSION;
+  readonly root_id: string;
+  readonly reading_order: readonly string[];
+  readonly post_upgrade_state: "resume" | "legacy_import_review_required";
+}
+
+export interface CompactRepositoryUpgradeSummary {
+  readonly operation: "upgrade";
+  readonly repository: string;
+  readonly from_version: string;
+  readonly to_version: string;
+  readonly plan_hash: string;
+  readonly expected_head: string;
+  readonly changed_paths: readonly string[];
+  readonly derived_paths: readonly string[];
+  readonly canonical_source_path_count: number;
+  readonly canonical_source_set_hash: string;
+  readonly profile_lock_hash: string;
+  readonly catalog_lock_hash: string;
+  readonly authority_impact: "none";
+  readonly preserves_existing_canonical_history: true;
 }
 
 export interface CompactBootstrapSummary {
@@ -84,7 +122,9 @@ export interface CompactLegacyReviewSource {
 
 export type CompactAgentStartDirective =
   | Exclude<AgentStartDirective,
-      { readonly kind: "bootstrap_review_required" | "legacy_import_review_required" }
+      { readonly kind:
+        "bootstrap_review_required" | "legacy_import_review_required" | "upgrade_review_required"
+      }
     >
   | {
       readonly kind: "bootstrap_review_required";
@@ -100,6 +140,14 @@ export type CompactAgentStartDirective =
         AgentStartDirective,
         { readonly kind: "bootstrap_review_required" }
       >["legacy_import_proposal"];
+    }
+  | {
+      readonly kind: "upgrade_review_required";
+      readonly proposal_handle: string;
+      readonly confirmation_required: true;
+      readonly expires_at: string;
+      readonly summary: CompactRepositoryUpgradeSummary;
+      readonly warnings: readonly RuntimeIssue[];
     }
   | {
       readonly kind: "legacy_import_review_required";
@@ -176,6 +224,28 @@ function compactSummary(root: URL, plan: InitPlan): CompactBootstrapSummary {
   };
 }
 
+function compactUpgradeSummary(
+  root: URL,
+  plan: RepositoryUpgradePlan,
+): CompactRepositoryUpgradeSummary {
+  return {
+    operation: "upgrade",
+    repository: root.href,
+    from_version: plan.metadata.from_version,
+    to_version: plan.metadata.to_version,
+    plan_hash: plan.plan_hash,
+    expected_head: plan.expected_head,
+    changed_paths: [...plan.metadata.changed_paths],
+    derived_paths: [...plan.metadata.derived_paths],
+    canonical_source_path_count: plan.metadata.canonical_source_path_count,
+    canonical_source_set_hash: plan.metadata.canonical_source_set_hash,
+    profile_lock_hash: plan.profile_lock_hash,
+    catalog_lock_hash: plan.metadata.catalog_lock_hash,
+    authority_impact: plan.metadata.authority_impact,
+    preserves_existing_canonical_history: true,
+  };
+}
+
 function approvalRecord(
   root: URL,
   plan: InitPlan,
@@ -248,6 +318,24 @@ export class ProjectMemoryHost {
       return dependencyFailure("start");
     }
     if (!started.ok) return started;
+    if (started.value.kind === "upgrade_review_required") {
+      const plan = started.value.proposal.plan;
+      const issued = await this.proposals.issue({
+        kind: "upgrade",
+        root: input.root,
+        adapter_id: input.adapter_id,
+        plan,
+      });
+      if (!issued.ok) return issued;
+      return success({
+        kind: "upgrade_review_required",
+        proposal_handle: issued.value.handle,
+        confirmation_required: true,
+        expires_at: issued.value.expires_at,
+        summary: compactUpgradeSummary(input.root, plan),
+        warnings: started.value.warnings,
+      }, started.warnings);
+    }
     if (started.value.kind === "legacy_import_review_required") {
       const issued = await this.proposals.issue({
         kind: "legacy_review",
@@ -317,6 +405,81 @@ export class ProjectMemoryHost {
           "guided legacy import is unavailable in this host",
         ))
       : this.#legacyImports.applyLegacyImport(input);
+  }
+
+  async applyUpgrade(
+    input: ApplyRepositoryUpgradeProposalInput,
+  ): Promise<RuntimeResult<VerifiedRepositoryUpgrade>> {
+    if (!input.approval.confirmed) {
+      return failure(
+        "HOST_APPROVAL_REQUIRED",
+        "repository upgrade requires explicit confirmation",
+        "approval",
+      );
+    }
+    const proposal = await this.proposals.resolve(
+      input.proposal_handle,
+      "upgrade",
+    );
+    if (!proposal.ok) return proposal;
+
+    let applied: RuntimeResult<MutationReceipt>;
+    try {
+      applied = await this.dependencies.applyUpgrade(
+        proposal.value.root,
+        proposal.value.plan,
+      );
+    } catch {
+      return dependencyFailure("applyUpgrade");
+    }
+    if (!applied.ok) return applied;
+    const consumed = await this.proposals.consume(
+      input.proposal_handle,
+      "upgrade",
+    );
+    if (!consumed.ok) return consumed;
+
+    let verified: RuntimeResult<AgentStartDirective>;
+    try {
+      verified = await this.dependencies.start({
+        root: proposal.value.root,
+        brief_path: null,
+        adapter_id: proposal.value.adapter_id,
+      });
+    } catch {
+      return dependencyFailure("start");
+    }
+    if (!verified.ok) return verified;
+    const directive = verified.value;
+    const verifiedResume = directive.kind === "resume" &&
+      directive.root_id === proposal.value.plan.root_id &&
+      directive.profile_lock_hash === proposal.value.plan.profile_lock_hash &&
+      AGENT_READING_ORDER_PREFIX.every(
+        (relativePath, index) => directive.reading_order[index] === relativePath,
+      );
+    const verifiedLegacyReview =
+      directive.kind === "legacy_import_review_required" &&
+      directive.root_id === proposal.value.plan.root_id &&
+      directive.profile_lock_hash === proposal.value.plan.profile_lock_hash;
+    if (!verifiedResume && !verifiedLegacyReview) {
+      return failure(
+        "HOST_UPGRADE_VERIFICATION_FAILED",
+        "fresh startup did not verify an initialized upgraded repository",
+        proposal.value.root.href,
+      );
+    }
+    const postUpgradeState = directive.kind;
+    const readingOrder = directive.kind === "resume"
+      ? [...directive.reading_order]
+      : [...AGENT_READING_ORDER_PREFIX];
+    return success({
+      status: "upgraded_verified",
+      receipt: applied.value,
+      repository_contract_version: REPOSITORY_CONTRACT_VERSION,
+      root_id: directive.root_id,
+      reading_order: readingOrder,
+      post_upgrade_state: postUpgradeState,
+    }, [...applied.warnings, ...verified.warnings]);
   }
 
   async applyBootstrap(

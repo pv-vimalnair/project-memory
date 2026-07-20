@@ -5,7 +5,10 @@ import {
   type CanonicalMutationPlan,
 } from "../../src/contracts/canonical-mutation-plan.js";
 import { success } from "../../src/contracts/runtime-result.js";
-import { CommandRegistry } from "../../src/cli/command-registry.js";
+import {
+  CommandRegistry,
+  createDefaultCommandRegistry,
+} from "../../src/cli/command-registry.js";
 import { executeCli } from "../../src/cli/main.js";
 import { createCatalogCommands } from "../../src/cli/commands/catalog.js";
 import { createProfileCommands } from "../../src/cli/commands/profile.js";
@@ -235,5 +238,30 @@ describe("governed work lifecycle commands", () => {
       service, coordinator: coordinator(), read_input: inputReader(),
     }), ["initiative", "create", "plan", "--input", "work.json", "--lease-id", "caller-token"]);
     expect(result).toMatchObject({ exit_code: 2, envelope: { issues: [{ code: "CLI_FLAG_UNKNOWN" }] } });
+  });
+});
+
+describe("default migration command wiring", () => {
+  it("uses the injected migration service instead of the unavailable fallback", async () => {
+    const plan = mutationPlan("migration");
+    const service = {
+      list: () => [],
+      plan: vi.fn(() => Promise.resolve(success(plan as never))),
+    };
+    const integration = coordinator();
+    const registry = createDefaultCommandRegistry({
+      migration: {
+        service,
+        coordinator: integration,
+        read_input: inputReader({}),
+      },
+    });
+
+    const result = await executeCli([
+      "migrate", "plan", "--input", "migration.json",
+    ], { registry, current_directory: ROOT });
+    expect(result.exit_code).toBe(0);
+    expect(service.plan).toHaveBeenCalledTimes(1);
+    expect(integration.finalizeMutation).not.toHaveBeenCalled();
   });
 });

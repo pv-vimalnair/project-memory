@@ -18,7 +18,10 @@ import { createArchiveCommands } from "./commands/archive.js";
 import { createIntegrateCommands } from "./commands/integrate.js";
 import { createSatelliteCommands } from "./commands/satellite.js";
 import { createHubCommands } from "./commands/hub.js";
-import { createMigrateCommands } from "./commands/migrate.js";
+import {
+  createMigrateCommands,
+  type MigrateCommandDependencies,
+} from "./commands/migrate.js";
 import {
   createImportCommands,
   type ImportCommandDependencies,
@@ -77,6 +80,7 @@ export interface DefaultCommandRegistryDependencies {
   readonly agent?: AgentCommandDependencies;
   readonly import?: ImportCommandDependencies;
   readonly init?: InitCommandDependencies;
+  readonly migration?: MigrateCommandDependencies;
   readonly work_lifecycle?: LifecycleCommandDependencies;
 }
 
@@ -98,7 +102,7 @@ export function createDefaultCommandRegistry(
     ...createIntegrateCommands(),
     ...createSatelliteCommands(),
     ...createHubCommands(),
-    ...createMigrateCommands(),
+    ...createMigrateCommands(dependencies.migration),
     ...createImportCommands(dependencies.import),
     ...createBenchmarkCommands(),
     ...createAgentCommands(dependencies.agent),

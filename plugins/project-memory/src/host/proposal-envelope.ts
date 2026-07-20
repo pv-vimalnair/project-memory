@@ -10,6 +10,11 @@ import type {
   PendingLegacyReview,
   ReviewedImportPlan,
 } from "../import/contracts.js";
+import type { RepositoryUpgradePlan } from "../upgrades/contracts.js";
+import {
+  LEGACY_REPOSITORY_CONTRACT_VERSION,
+  REPOSITORY_CONTRACT_VERSION,
+} from "../version.js";
 
 const REVIEW_TTL_MILLISECONDS = 60 * 60 * 1000;
 const REVISION_PATTERN = /^[0-9a-f]{40}$/u;
@@ -33,6 +38,12 @@ export type StoredProposalEnvelope =
       readonly root: URL;
       readonly input: GuidedLegacyImportInput;
       readonly plan: ReviewedImportPlan;
+    }
+  | {
+      readonly kind: "upgrade";
+      readonly root: URL;
+      readonly adapter_id: string;
+      readonly plan: RepositoryUpgradePlan;
     };
 
 export type StoredProposalKind = StoredProposalEnvelope["kind"];
@@ -88,6 +99,14 @@ export function cloneProposalEnvelope(
       pending: structuredClone(value.pending),
       expected_head: value.expected_head,
       profile_lock_hash: value.profile_lock_hash,
+    };
+  }
+  if (value.kind === "upgrade") {
+    return {
+      kind: value.kind,
+      root,
+      adapter_id: value.adapter_id,
+      plan: structuredClone(value.plan),
     };
   }
   return {
@@ -177,10 +196,33 @@ function importExact(value: Extract<
   }
 }
 
+function upgradeExact(value: Extract<
+  StoredProposalEnvelope,
+  { readonly kind: "upgrade" }
+>): boolean {
+  try {
+    const { plan_hash: boundPlanHash, ...body } = value.plan;
+    const metadata = value.plan.metadata as unknown as Readonly<Record<string, unknown>>;
+    return value.root.protocol === "file:" &&
+      /^adapter[.][a-z][a-z0-9-]*$/u.test(value.adapter_id) &&
+      HASH_PATTERN.test(boundPlanHash) &&
+      value.plan.mutation_kind === "migration" &&
+      metadata.governance_kind === "repository_upgrade" &&
+      metadata.migration_id === "project-memory-v1-1" &&
+      metadata.from_version === LEGACY_REPOSITORY_CONTRACT_VERSION &&
+      metadata.to_version === REPOSITORY_CONTRACT_VERSION &&
+      metadata.authority_impact === "none" &&
+      canonicalMutationPlanHash(body) === boundPlanHash;
+  } catch {
+    return false;
+  }
+}
+
 function validEnvelope(value: StoredProposalEnvelope): boolean {
   if (value.root.protocol !== "file:") return false;
   if (value.kind === "bootstrap") return bootstrapExact(value.plan);
   if (value.kind === "legacy_review") return reviewExact(value);
+  if (value.kind === "upgrade") return upgradeExact(value);
   return importExact(value);
 }
 
@@ -195,6 +237,12 @@ export function proposalIssuedFields(value: StoredProposalEnvelope) {
     return {
       plan_hash: value.pending.proposal.proposal_hash,
       expected_head: value.expected_head,
+    };
+  }
+  if (value.kind === "upgrade") {
+    return {
+      plan_hash: value.plan.plan_hash,
+      expected_head: value.plan.expected_head,
     };
   }
   return {
@@ -217,6 +265,11 @@ export function proposalExpiryForIssue(
       ? null
       : value.input.expires_at;
   }
+  if (value.kind === "upgrade") {
+    return parsedProposalTimestamp(value.plan.expires_at) === null
+      ? null
+      : value.plan.expires_at;
+  }
   const milliseconds = now.getTime();
   return Number.isFinite(milliseconds)
     ? new Date(milliseconds + REVIEW_TTL_MILLISECONDS).toISOString()
@@ -237,6 +290,10 @@ export function proposalEntryValid(
     entry.value.kind === "legacy_import" &&
     entry.expires_at !== entry.value.input.expires_at
   ) return false;
+  if (
+    entry.value.kind === "upgrade" &&
+    entry.expires_at !== entry.value.plan.expires_at
+  ) return false;
   return entry.value.kind !== "legacy_review" ||
     expiresAt <= now.getTime() + REVIEW_TTL_MILLISECONDS;
 }
@@ -252,6 +309,14 @@ function persistedValue(value: StoredProposalEnvelope): Readonly<Record<string, 
       pending: value.pending,
       expected_head: value.expected_head,
       profile_lock_hash: value.profile_lock_hash,
+    };
+  }
+  if (value.kind === "upgrade") {
+    return {
+      kind: value.kind,
+      root: value.root.href,
+      adapter_id: value.adapter_id,
+      plan: value.plan,
     };
   }
   return {
@@ -326,6 +391,20 @@ export function decodedProposalEntry(
           pending: payload.pending as unknown as PendingLegacyReview,
           expected_head: payload.expected_head,
           profile_lock_hash: payload.profile_lock_hash,
+        },
+        expires_at: value.expires_at,
+      };
+    } else if (
+      payload.kind === "upgrade" &&
+      typeof payload.adapter_id === "string" &&
+      isRecord(payload.plan)
+    ) {
+      entry = {
+        value: {
+          kind: payload.kind,
+          root,
+          adapter_id: payload.adapter_id,
+          plan: payload.plan as unknown as RepositoryUpgradePlan,
         },
         expires_at: value.expires_at,
       };
