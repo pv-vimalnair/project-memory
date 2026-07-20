@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - The approved source is `assets/brand/project-memory-logo.png` with SHA-256 `DF1E9BE53CB65B6B5ABB3DB431C708B4AB004CD494A1CF56D0E85C2B1D44CC67`.
-- Keep Project Memory version `0.1.1`; do not modify or retag v0.1.0.
+- Keep Project Memory base version `0.1.1`; use exactly one helper-generated `+codex.<cachebuster>` build suffix for the local reinstall, and do not modify or retag v0.1.0.
 - Use the same transparent PNG for `interface.logo` and `interface.logoDark`.
 - Do not add `composerIcon`, redraw artwork, add dependencies, publish, or push.
 - The verifier must reject any logo bytes that do not match the approved SHA-256.
@@ -159,7 +159,7 @@ git diff --cached --check
 git commit -m "feat(plugin): display Project Memory logo"
 ```
 
-### Task 3: Validate, merge, and reinstall v0.1.1
+### Task 3: Refresh, validate, merge, and reinstall v0.1.1
 
 **Files:**
 - Verify: `plugins/project-memory/.codex-plugin/plugin.json`
@@ -170,7 +170,20 @@ git commit -m "feat(plugin): display Project Memory logo"
 - Consumes: the committed feature branch, configured `project-memory` marketplace, and Codex CLI.
 - Produces: clean local `main` and an installed v0.1.1 plugin with the approved logo bytes.
 
-- [ ] **Step 1: Run proportionate source and package gates**
+- [ ] **Step 1: Refresh the local-install cachebuster through the official helper**
+
+```powershell
+python "C:\Users\Pv Vimal Nair\.codex\skills\.system\plugin-creator\scripts\update_plugin_cachebuster.py" "C:\tmp\pm\plugins\project-memory"
+python "C:\Users\Pv Vimal Nair\.codex\skills\.system\plugin-creator\scripts\read_marketplace_name.py" --marketplace-path "C:\Users\Pv Vimal Nair\project-memory\.agents\plugins\marketplace.json"
+git diff -- plugins/project-memory/.codex-plugin/plugin.json
+git add plugins/project-memory/.codex-plugin/plugin.json
+git diff --cached --check
+git commit -m "chore(plugin): refresh Codex cachebuster"
+```
+
+Expected: the manifest version has base `0.1.1` and exactly one `+codex.<timestamp>` suffix; the marketplace helper prints `project-memory`; no marketplace/config file changes.
+
+- [ ] **Step 2: Run proportionate source and package gates**
 
 ```powershell
 npm run typecheck
@@ -185,7 +198,7 @@ Run npm commands from: `plugins/project-memory`
 
 Expected: every gate exits `0` and the feature worktree is clean.
 
-- [ ] **Step 2: Fast-forward local main**
+- [ ] **Step 3: Fast-forward local main**
 
 ```powershell
 git -C "C:\Users\Pv Vimal Nair\project-memory" status --porcelain
@@ -194,23 +207,26 @@ git -C "C:\Users\Pv Vimal Nair\project-memory" merge --ff-only codex/project-mem
 
 Expected: main is clean before the merge and fast-forwards without rewriting history.
 
-- [ ] **Step 3: Install the newer plugin from the configured marketplace**
+- [ ] **Step 4: Install the newer plugin from the configured marketplace**
 
 ```powershell
 & "C:\Users\Pv Vimal Nair\AppData\Local\OpenAI\Codex\bin\5dee10576ec7a5b8\codex.exe" plugin add project-memory@project-memory --json
 & "C:\Users\Pv Vimal Nair\AppData\Local\OpenAI\Codex\bin\5dee10576ec7a5b8\codex.exe" plugin list
 ```
 
-Expected: `project-memory@project-memory` is installed and enabled at v0.1.1. If the add command refuses to upgrade an installed plugin, stop and diagnose before removing anything.
+Expected: `project-memory@project-memory` is installed and enabled at `0.1.1+codex.<cachebuster>`. If the add command refuses to upgrade an installed plugin, stop and diagnose before removing anything.
 
-- [ ] **Step 4: Verify installed metadata and bytes**
+- [ ] **Step 5: Verify installed metadata and bytes**
 
 Resolve the v0.1.1 installed cache directory reported by Codex, then verify:
 
 ```powershell
-$installed = "C:\Users\Pv Vimal Nair\.codex\plugins\cache\project-memory\project-memory\0.1.1"
-$manifest = Get-Content -Raw -LiteralPath "$installed\.codex-plugin\plugin.json" | ConvertFrom-Json
-$hash = (Get-FileHash -Algorithm SHA256 -LiteralPath "$installed\assets\project-memory-logo.png").Hash
+$installed = Get-ChildItem -LiteralPath "C:\Users\Pv Vimal Nair\.codex\plugins\cache\project-memory\project-memory" -Directory |
+  Where-Object Name -Like "0.1.1+codex.*" |
+  Sort-Object LastWriteTimeUtc -Descending |
+  Select-Object -First 1
+$manifest = Get-Content -Raw -LiteralPath "$($installed.FullName)\.codex-plugin\plugin.json" | ConvertFrom-Json
+$hash = (Get-FileHash -Algorithm SHA256 -LiteralPath "$($installed.FullName)\assets\project-memory-logo.png").Hash
 $manifest.interface.logo
 $manifest.interface.logoDark
 $hash
@@ -218,6 +234,6 @@ $hash
 
 Expected: both manifest paths are `./assets/project-memory-logo.png` and the hash is `DF1E9BE53CB65B6B5ABB3DB431C708B4AB004CD494A1CF56D0E85C2B1D44CC67`.
 
-- [ ] **Step 5: Record the restart boundary**
+- [ ] **Step 6: Record the restart boundary**
 
 Expected: report that installation is complete but the currently running Codex app may retain its old sidebar cache until Pitaji restarts it. Do not claim visual success before that restart.
