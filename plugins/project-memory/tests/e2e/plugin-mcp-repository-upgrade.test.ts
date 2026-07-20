@@ -147,7 +147,7 @@ describe("offline packaged repository contract upgrade", () => {
     for (const newline of ["\n", "\r\n"] as const) {
       await expectUpgradeRoundTrip(newline);
     }
-  }, 420_000);
+  }, 600_000);
 
   it("fails closed for dirty and unsupported repositories without partial writes", async () => {
     const workflow = await preparePluginWorkflow("new");

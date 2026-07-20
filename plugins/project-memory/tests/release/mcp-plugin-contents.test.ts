@@ -65,6 +65,7 @@ describe("Project Memory Plugin MCP package", () => {
         "project_memory_read",
         "project_memory_apply",
       ],
+      upgrade_approval: "confirmed_only",
       ping: "passed",
       node_modules_present: false,
     });
