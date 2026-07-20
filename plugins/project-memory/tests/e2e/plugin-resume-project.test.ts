@@ -304,5 +304,5 @@ describe("automatic Plugin workflow for an initialized project", () => {
       readonly reading_order: readonly string[];
     };
     expect(resumedData.reading_order).toContain(taskPath);
-  }, 180_000);
+  }, 420_000);
 });

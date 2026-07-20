@@ -16480,7 +16480,7 @@ import path26 from "node:path";
 import { pathToFileURL as pathToFileURL12 } from "node:url";
 
 // src/cli/node-composition.ts
-import { lstat as lstat21, readFile as readFile24 } from "node:fs/promises";
+import { lstat as lstat22, readFile as readFile24 } from "node:fs/promises";
 import { tmpdir as tmpdir3 } from "node:os";
 import path25 from "node:path";
 import { pathToFileURL as pathToFileURL11 } from "node:url";
@@ -16604,11 +16604,27 @@ async function startAgentSession(input, dependencies) {
   const doctor = await callDependency("doctor", () => dependencies.doctor({ root: input.root }));
   const doctorIssues = doctor.ok ? failedDoctorIssues(doctor.value) : doctor.issues;
   const uninitialized = isUninitialized(doctorIssues);
-  if (!doctor.ok || !doctor.value.valid) {
-    if (!uninitialized) {
-      return blocked(doctorIssues.length > 0 ? doctorIssues : [agentIssue("AGENT_DOCTOR_INVALID", "repository diagnostics are not valid")]);
-    }
+  if ((!doctor.ok || !doctor.value.valid) && uninitialized) {
     return bootstrapDirective(input, dependencies);
+  }
+  const upgrade = await callDependency("planRepositoryUpgrade", () => dependencies.planRepositoryUpgrade(input.root));
+  if (!upgrade.ok) return blocked(upgrade.issues);
+  if (upgrade.value !== null) {
+    const warnings2 = stableIssues([
+      ...doctor.ok ? doctor.warnings : [],
+      ...upgrade.warnings
+    ]);
+    return success({
+      kind: "upgrade_review_required",
+      proposal: {
+        confirmation_required: true,
+        plan: upgrade.value
+      },
+      warnings: warnings2
+    }, warnings2);
+  }
+  if (!doctor.ok || !doctor.value.valid) {
+    return blocked(doctorIssues.length > 0 ? doctorIssues : [agentIssue("AGENT_DOCTOR_INVALID", "repository diagnostics are not valid")]);
   }
   const profile = await callDependency("verifyProfile", () => dependencies.verifyProfile(input.root));
   if (!profile.ok) return blocked(profile.issues);
@@ -16714,13 +16730,13 @@ async function startAgentSession(input, dependencies) {
 }
 
 // src/agent/node-dependencies.ts
-import { lstat as lstat14, readdir as readdir10 } from "node:fs/promises";
+import { lstat as lstat15, readdir as readdir10 } from "node:fs/promises";
 import path19 from "node:path";
 import { fileURLToPath as fileURLToPath13 } from "node:url";
 
 // src/cli/commands/doctor.ts
 import { constants } from "node:fs";
-import { access as access2, lstat as lstat11, readFile as readFile15 } from "node:fs/promises";
+import { access as access2, lstat as lstat12, readFile as readFile15 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path16 from "node:path";
 import { fileURLToPath as fileURLToPath10, pathToFileURL as pathToFileURL6 } from "node:url";
@@ -21761,6 +21777,11 @@ var ProjectSelectionSchema = profileSchema(
   )
 );
 
+// src/version.ts
+var PACKAGE_VERSION = "0.1.1";
+var LEGACY_REPOSITORY_CONTRACT_VERSION = "1.0.0";
+var REPOSITORY_CONTRACT_VERSION = "1.1.0";
+
 // src/cli/config.ts
 var CONFIG_RELATIVE_PATH = "tools/project-memory/config.json";
 var TOOL_CONFIG_SCHEMA_ID = "project-memory/v1/tool-config";
@@ -21788,6 +21809,9 @@ var RuntimeGateSchema = Type.Object({
 }, { additionalProperties: false });
 var ToolConfigSchema = Type.Object({
   schema_version: Type.Literal("1.0.0"),
+  repository_contract_version: Type.Optional(
+    Type.Literal(REPOSITORY_CONTRACT_VERSION)
+  ),
   root_id: InstanceIdSchema("ROOT"),
   memory_root: Type.Literal("docs/project-memory"),
   profile_lock: Type.Literal("docs/project-memory/profile.lock.yaml"),
@@ -26204,22 +26228,22 @@ function detectCrossNamespaceCycle(edges) {
     states.set(node, "visiting");
     stack.push(node);
     for (const next of [...graph.get(node) ?? []].sort(compareUtf83)) {
-      const cycle = visit(next);
-      if (cycle !== null) return cycle;
+      const cycle2 = visit(next);
+      if (cycle2 !== null) return cycle2;
     }
     stack.pop();
     states.set(node, "visited");
     return null;
   };
   for (const node of [...graph.keys()].sort(compareUtf83)) {
-    const cycle = visit(node);
-    if (cycle === null) continue;
-    const namespaces = new Set(cycle.map((item) => item.split("\0")[0]));
+    const cycle2 = visit(node);
+    if (cycle2 === null) continue;
+    const namespaces = new Set(cycle2.map((item) => item.split("\0")[0]));
     return failure(
       "ROOT_RELATIONSHIP_CYCLE",
       namespaces.size > 1 ? "cross-namespace root relationships form a dependency cycle" : "root relationships form a dependency cycle",
-      cycle[0] ?? "",
-      cycle
+      cycle2[0] ?? "",
+      cycle2
     );
   }
   return success(true);
@@ -27084,6 +27108,7 @@ function renderConfig(profile) {
   const gates = profile.gates.map(normalizedGate).sort((left, right) => compareUtf83(left.id, right.id));
   const config = {
     schema_version: "1.0.0",
+    repository_contract_version: REPOSITORY_CONTRACT_VERSION,
     root_id: profile.root.id,
     memory_root: "docs/project-memory",
     profile_lock: "docs/project-memory/profile.lock.yaml",
@@ -28581,303 +28606,398 @@ var acceptedProfileSourceRenderer = {
 
 // src/migrations/registry.ts
 var import_semver5 = __toESM(require_semver2(), 1);
-
-// src/import/scanner.ts
-import { lstat as lstat5, readFile as readFile7, readdir as readdir5, realpath as realpath3 } from "node:fs/promises";
-import path10 from "node:path";
-import { fileURLToPath as fileURLToPath7 } from "node:url";
-
-// src/import/classifiers.ts
-import path9 from "node:path";
 function compareUtf85(left, right) {
   return Buffer.compare(Buffer.from(left), Buffer.from(right));
 }
-function classifyLegacyDocument(relativePath) {
-  const name = path9.posix.basename(relativePath).toUpperCase();
-  const roles = /* @__PURE__ */ new Set();
-  if (name.includes("PRD")) roles.add("prd");
-  if (name.includes("REQUIREMENT")) roles.add("requirements");
-  if (name.includes("HANDOFF")) roles.add("handoff");
-  if (name.includes("CHANGELOG")) roles.add("changelog");
-  if (name.includes("DECISION") || name.includes("ADR")) roles.add("decision-log");
-  if (name.includes("TODO") || name.includes("TASK")) roles.add("task-list");
-  if (name === "AGENTS.MD" || name === "CLAUDE.MD") roles.add("agent-instructions");
-  if (name === "README.MD") roles.add("readme");
-  if (roles.size === 0) roles.add("unknown");
-  return [...roles].sort(compareUtf85);
-}
-function findSensitivity(text) {
-  const findings = [];
-  const patterns = [
-    { kind: "credential-pattern", pattern: /AKIA[0-9A-Z]{16}/, message: "AWS-style access key pattern" },
-    { kind: "private-key", pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/, message: "private key header" },
-    { kind: "personal-data", pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i, message: "email address" }
-  ];
-  for (const [index, line] of text.split(/\r?\n/).entries()) {
-    for (const candidate of patterns) {
-      if (candidate.pattern.test(line)) {
-        findings.push({ kind: candidate.kind, line: index + 1, message: candidate.message });
-      }
-    }
+function cycle(definitions) {
+  const edges = /* @__PURE__ */ new Map();
+  for (const definition of definitions) {
+    const targets = edges.get(definition.from_version) ?? [];
+    targets.push(definition.to_version);
+    edges.set(definition.from_version, targets);
   }
-  return findings;
+  const active = /* @__PURE__ */ new Set();
+  const complete = /* @__PURE__ */ new Set();
+  function visit(version) {
+    if (active.has(version)) return true;
+    if (complete.has(version)) return false;
+    active.add(version);
+    for (const target of edges.get(version) ?? []) {
+      if (visit(target)) return true;
+    }
+    active.delete(version);
+    complete.add(version);
+    return false;
+  }
+  return [...edges.keys()].some(visit);
 }
-
-// src/import/scanner.ts
-var ALLOWED_EXTENSIONS = /* @__PURE__ */ new Set([".md", ".txt", ".yaml", ".yml", ".json"]);
-var MAX_FILE_BYTES = 1048576;
-function compareUtf86(left, right) {
-  return Buffer.compare(Buffer.from(left), Buffer.from(right));
+function summaries(definitions) {
+  return definitions.map((definition) => ({
+    id: definition.id,
+    from_version: definition.from_version,
+    to_version: definition.to_version,
+    affected_artifacts: [...definition.affected_artifacts],
+    authority_impact: definition.authority_impact
+  }));
 }
-function inside(root, candidate) {
-  const normalizedRoot = `${path10.resolve(root)}${path10.sep}`.toLowerCase();
-  return path10.resolve(candidate).toLowerCase().startsWith(normalizedRoot);
-}
-function ignoredGeneratedDirectory(relativePath) {
-  const normalized = relativePath.toLowerCase();
-  return normalized === ".tmp/project-memory" || normalized === ".claude/worktrees" || /^(?:linux|windows)\/flutter\/ephemeral\/\.plugin_symlinks$/u.test(normalized) || normalized === "ios/.symlinks" || normalized === "macos/flutter/ephemeral/.symlinks";
-}
-function ignoredProjectMemoryPath(relativePath, options) {
-  if (options.phase !== "post_bootstrap") return false;
-  const normalized = relativePath.toLowerCase();
-  return normalized === "project_context.md" || normalized === "docs/project-memory" || normalized.startsWith("docs/project-memory/");
-}
-function ignoredGeneratedRouter(relativePath, text, options) {
-  if (options.phase !== "post_bootstrap") return false;
-  const normalized = relativePath.toLowerCase();
-  return (normalized === "agents.md" || normalized === "claude.md") && text.startsWith(
-    "<!-- PROJECT MEMORY GENERATED ROUTER - DO NOT EDIT -->\n"
-  );
-}
-async function defaultGitRevision(root, relativePath) {
-  const result = await runCommand({
-    executable: "git",
-    args: ["log", "-n", "1", "--format=%H", "--", relativePath],
-    cwd: root,
-    timeout_ms: 1e4,
-    env_allowlist: { GIT_TERMINAL_PROMPT: "0", LC_ALL: "C", PATH: process.env.PATH ?? "" },
-    max_output_bytes: 65536
-  }, new NodeCommandRunner());
-  if (!result.ok || result.value.exit_code !== 0) return null;
-  const revision = result.value.stdout.trim();
-  return /^[0-9a-f]{40}$/.test(revision) ? revision : null;
-}
-function createLegacyScanner(dependencies = {}) {
-  const gitRevision = dependencies.git_revision ?? defaultGitRevision;
-  return {
-    async scan(root, options = { phase: "bootstrap" }) {
-      if (root.protocol !== "file:") {
-        return failure("LEGACY_ROOT_INVALID", "legacy scan root must be a file URL");
+function createMigrationRegistry(definitions) {
+  const ordered = [...definitions].sort((left, right) => compareUtf85(left.id, right.id));
+  const ids = /* @__PURE__ */ new Set();
+  const edges = /* @__PURE__ */ new Set();
+  for (const definition of ordered) {
+    if (definition.id.trim().length === 0 || import_semver5.default.valid(definition.from_version) === null || import_semver5.default.valid(definition.to_version) === null || definition.affected_artifacts.length === 0) {
+      return failure("MIGRATION_DEFINITION_INVALID", "migration identity, versions, and artifacts must be valid", definition.id);
+    }
+    if (ids.has(definition.id)) {
+      return failure("MIGRATION_ID_DUPLICATE", "migration ID appears more than once", definition.id);
+    }
+    ids.add(definition.id);
+    const edge = `${definition.from_version}\0${definition.to_version}`;
+    if (edges.has(edge)) {
+      return failure("MIGRATION_EDGE_DUPLICATE", "only one migration may own a version edge", edge);
+    }
+    edges.add(edge);
+  }
+  if (cycle(ordered)) {
+    return failure("MIGRATION_REGISTRY_CYCLE", "migration graph must be acyclic");
+  }
+  const downgrade = ordered.find((definition) => !import_semver5.default.lt(definition.from_version, definition.to_version));
+  if (downgrade !== void 0) {
+    return failure("MIGRATION_DOWNGRADE_FORBIDDEN", "migration edges must move strictly forward", downgrade.id);
+  }
+  const outgoing = /* @__PURE__ */ new Map();
+  for (const definition of ordered) {
+    const values = outgoing.get(definition.from_version) ?? [];
+    values.push(definition);
+    outgoing.set(definition.from_version, values);
+  }
+  const registry = {
+    list: () => summaries(ordered),
+    path(fromVersion, toVersion) {
+      if (import_semver5.default.valid(fromVersion) === null || import_semver5.default.valid(toVersion) === null) {
+        return failure("MIGRATION_VERSION_INVALID", "migration path versions must be semantic versions");
       }
-      const rootPath = await realpath3(fileURLToPath7(root));
-      const files = [];
-      async function visit(directory) {
-        const entries = await readdir5(directory, { withFileTypes: true });
-        entries.sort((left, right) => compareUtf86(left.name, right.name));
-        for (const entry of entries) {
-          const absolute = path10.join(directory, entry.name);
-          if (entry.name === ".git" || entry.name === "node_modules" || entry.name === "build") continue;
-          const relative = path10.relative(rootPath, absolute).split(path10.sep).join("/");
-          if (ignoredProjectMemoryPath(relative, options)) continue;
-          if (entry.isDirectory() && ignoredGeneratedDirectory(relative)) continue;
-          const stat2 = await lstat5(absolute);
-          if (stat2.isSymbolicLink()) {
-            const target = await realpath3(absolute);
-            if (!inside(rootPath, target)) {
-              return failure("LEGACY_SYMLINK_ESCAPE", "legacy scan symlink escapes the root", absolute);
-            }
+      if (import_semver5.default.gt(fromVersion, toVersion)) {
+        return failure("MIGRATION_DOWNGRADE_FORBIDDEN", "migration paths cannot move backward");
+      }
+      if (fromVersion === toVersion) return success([]);
+      const queue = [
+        { version: fromVersion, steps: [] }
+      ];
+      const bestDepth = /* @__PURE__ */ new Map([[fromVersion, 0]]);
+      const matches = [];
+      let shortest = null;
+      for (let cursor = 0; cursor < queue.length; cursor += 1) {
+        const current = queue[cursor];
+        if (current === void 0 || shortest !== null && current.steps.length >= shortest) continue;
+        for (const edge of outgoing.get(current.version) ?? []) {
+          const steps = [...current.steps, edge];
+          if (edge.to_version === toVersion) {
+            shortest ??= steps.length;
+            if (steps.length === shortest) matches.push(steps);
             continue;
           }
-          if (stat2.isDirectory()) {
-            const nested = await visit(absolute);
-            if (!nested.ok) return nested;
-          } else if (stat2.isFile() && ALLOWED_EXTENSIONS.has(path10.extname(entry.name).toLowerCase())) {
-            if (stat2.size > MAX_FILE_BYTES) {
-              return failure("LEGACY_FILE_TOO_LARGE", "legacy source exceeds the scan byte bound", absolute);
-            }
-            files.push(absolute);
-          }
+          const prior = bestDepth.get(edge.to_version);
+          if (prior !== void 0 && prior < steps.length) continue;
+          bestDepth.set(edge.to_version, steps.length);
+          queue.push({ version: edge.to_version, steps });
         }
-        return success(true);
       }
-      try {
-        const visited = await visit(rootPath);
-        if (!visited.ok) return visited;
-        const artifacts = [];
-        for (const absolute of files) {
-          const relativePath = path10.relative(rootPath, absolute).split(path10.sep).join("/");
-          const bytes = new Uint8Array(await readFile7(absolute));
-          const decoded = decodeStrictUtf8(bytes, relativePath);
-          if (!decoded.ok) {
-            return failure("LEGACY_ENCODING_INVALID", "legacy source must be strict UTF-8", relativePath);
-          }
-          if (ignoredGeneratedRouter(relativePath, decoded.value, options)) continue;
-          artifacts.push({
-            relative_path: relativePath,
-            sha256: sha256(bytes),
-            byte_length: bytes.byteLength,
-            git_revision: await gitRevision(root, relativePath),
-            detected_roles: classifyLegacyDocument(relativePath),
-            sensitivity_findings: findSensitivity(decoded.value)
-          });
-        }
-        artifacts.sort((left, right) => compareUtf86(left.relative_path, right.relative_path));
-        const body = { schema_version: "1.0.0", root: root.href, artifacts };
-        return success({ ...body, scan_hash: sha256(canonicalJson(body)) });
-      } catch (error) {
-        return failure("LEGACY_SCAN_FAILED", error instanceof Error ? error.message : String(error));
+      if (matches.length === 0) {
+        return failure("MIGRATION_PATH_MISSING", `no migration path exists from ${fromVersion} to ${toVersion}`);
       }
+      if (matches.length !== 1) {
+        return failure("MIGRATION_PATH_AMBIGUOUS", "migration path has more than one shortest route");
+      }
+      return success(matches[0] ?? []);
     }
   };
+  return success(registry);
 }
 
-// src/import/planner.ts
-function compareUtf87(left, right) {
-  return Buffer.compare(Buffer.from(left), Buffer.from(right));
-}
-function mapping(artifact, context) {
-  const roles = artifact.detected_roles;
-  if (roles.includes("prd") || roles.includes("requirements")) {
-    return {
-      source_path: artifact.relative_path,
-      source_sha256: artifact.sha256,
-      classification: "directional_candidate",
-      destination_kind: "canonical_document_patch",
-      destination_path: context.governing_document,
-      accepted: false,
-      rationale: "Requirements may only propose a reviewed patch to the governing source document."
-    };
+// src/migrations/apply-path.ts
+function executeMigrationPath(registry, input) {
+  const path27 = registry.path(input.from_version, input.to_version);
+  if (!path27.ok) return path27;
+  if (path27.value.some((definition) => !definition.affected_artifacts.includes(input.artifact_kind))) {
+    return failure(
+      "MIGRATION_ARTIFACT_UNSUPPORTED",
+      "migration path does not support the requested artifact kind",
+      input.artifact_kind
+    );
   }
-  if (roles.includes("handoff") || roles.includes("changelog")) {
-    return {
-      source_path: artifact.relative_path,
-      source_sha256: artifact.sha256,
-      classification: "historical_status",
-      destination_kind: "view_candidate",
-      destination_path: null,
-      accepted: false,
-      rationale: "Historical status may inform regenerated views but is not canonical truth."
-    };
-  }
-  if (roles.includes("decision-log")) {
-    return {
-      source_path: artifact.relative_path,
-      source_sha256: artifact.sha256,
-      classification: "directional_candidate",
-      destination_kind: "archive_only",
-      destination_path: null,
-      accepted: false,
-      rationale: "Legacy decisions require independent authority review before canonicalization."
-    };
-  }
-  return {
-    source_path: artifact.relative_path,
-    source_sha256: artifact.sha256,
-    classification: roles.includes("readme") || roles.includes("agent-instructions") ? "observation" : "archive_only",
-    destination_kind: "archive_only",
-    destination_path: null,
-    accepted: false,
-    rationale: "Unaccepted legacy material remains archive-only evidence."
-  };
-}
-function proposeLegacyImport(scan, context) {
-  const mappings = scan.artifacts.map((artifact) => mapping(artifact, context)).sort((left, right) => compareUtf87(left.source_path, right.source_path));
-  const destinations = /* @__PURE__ */ new Set();
-  for (const candidate of mappings) {
-    if (candidate.destination_path === null) continue;
-    if (destinations.has(candidate.destination_path)) {
+  let bytes = new Uint8Array(input.bytes);
+  const steps = [];
+  for (const definition of path27.value) {
+    const transformed = definition.transform({
+      ...input,
+      from_version: definition.from_version,
+      to_version: definition.to_version,
+      bytes: new Uint8Array(bytes)
+    });
+    if (!transformed.ok) return transformed;
+    if (!(transformed.value.bytes instanceof Uint8Array)) {
       return failure(
-        "LEGACY_DESTINATION_DUPLICATE",
-        "two legacy sources propose the same canonical destination",
-        candidate.destination_path
+        "MIGRATION_OUTPUT_INVALID",
+        "migration transform must return bytes",
+        definition.id
       );
     }
-    destinations.add(candidate.destination_path);
+    const output = new Uint8Array(transformed.value.bytes);
+    steps.push({
+      migration_id: definition.id,
+      from_version: definition.from_version,
+      to_version: definition.to_version,
+      input_sha256: sha256(bytes),
+      output_sha256: sha256(output),
+      semantic_diff: transformed.value.semantic_diff
+    });
+    bytes = output;
   }
-  const body = {
-    schema_version: "1.0.0",
-    root_id: context.root_id,
-    status: "review_required",
-    scan_hash: scan.scan_hash,
-    mappings
-  };
-  return success({ ...body, proposal_hash: sha256(canonicalJson(body)) });
+  return success({
+    bytes,
+    steps,
+    authority_impact: path27.value.some(
+      (definition) => definition.authority_impact === "directional"
+    ) ? "directional" : "none"
+  });
 }
-function planLegacyImport(input) {
-  if (input.approval_ids.length === 0) {
-    return failure("LEGACY_APPROVAL_REQUIRED", "reviewed import requires exact Pitaji approval");
-  }
-  const sourcePaths = /* @__PURE__ */ new Set();
-  const destinationPaths = /* @__PURE__ */ new Set();
-  const writes = [];
-  for (const decision of input.decisions) {
-    if (sourcePaths.has(decision.source_path)) {
-      return failure("LEGACY_SOURCE_DUPLICATE", "legacy source has more than one reviewed decision", decision.source_path);
-    }
-    sourcePaths.add(decision.source_path);
-    if (sha256(decision.source_bytes) !== decision.source_sha256) {
-      return failure("LEGACY_SOURCE_HASH_MISMATCH", "reviewed legacy bytes do not match their hash", decision.source_path);
-    }
-    if (decision.destination_kind === "canonical_record") {
-      return failure("LEGACY_GENERIC_RECORD_FORBIDDEN", "legacy facts cannot map to generic canonical records", decision.source_path);
-    }
-    if (decision.destination_path !== null) {
-      if (destinationPaths.has(decision.destination_path)) {
-        return failure("LEGACY_DESTINATION_DUPLICATE", "reviewed decisions repeat a canonical destination", decision.destination_path);
-      }
-      destinationPaths.add(decision.destination_path);
-    }
-    if (decision.decision === "exclude") continue;
-    writes.push({
-      relative_path: `docs/project-memory/archive/imports/${decision.source_sha256}.bin`,
-      bytes: new Uint8Array(decision.source_bytes),
+
+// src/migrations/plan-mutation.ts
+function compareUtf86(left, right) {
+  return Buffer.compare(Buffer.from(left.relative_path), Buffer.from(right.relative_path));
+}
+function buildMigrationMutationPlan(input) {
+  const migrationId = input.steps.map((step) => step.migration_id).join("+") || "no-op";
+  const inputHash = input.request.artifact.sha256;
+  const outputHash = sha256(input.output_bytes);
+  const changed = inputHash !== outputHash;
+  const preimages = [input.request.artifact, ...input.request.related_preimages ?? []];
+  const archivePaths = changed ? preimages.map((artifact) => `docs/project-memory/archive/migrations/${artifact.sha256}.bin`).sort() : [];
+  const archivePath = archivePaths[0] ?? null;
+  const recordPath = changed ? `docs/project-memory/governance/migrations/${migrationId}.json` : null;
+  const archiveWrites = changed ? preimages.map((artifact) => ({
+    relative_path: `docs/project-memory/archive/migrations/${artifact.sha256}.bin`,
+    bytes: new Uint8Array(artifact.bytes),
+    expected_existing_sha256: null,
+    mode: "create"
+  })) : [];
+  const writes = changed ? [
+    ...archiveWrites,
+    {
+      relative_path: recordPath,
+      bytes: new TextEncoder().encode(canonicalJson({
+        schema_version: "1.0.0",
+        migration_id: migrationId,
+        artifact_path: input.request.artifact.relative_path,
+        from_version: input.request.from_version,
+        to_version: input.request.to_version,
+        input_sha256: inputHash,
+        output_sha256: outputHash,
+        preimages: preimages.map((artifact) => ({
+          artifact_path: artifact.relative_path,
+          sha256: artifact.sha256
+        })),
+        steps: input.steps,
+        created_at: input.request.created_at
+      })),
       expected_existing_sha256: null,
       mode: "create"
-    });
-    if (decision.decision === "accept" && decision.destination_kind === "canonical_document_patch") {
-      writes.push({
-        relative_path: `docs/project-memory/import/proposals/${decision.source_sha256}.md`,
-        bytes: new Uint8Array(decision.source_bytes),
-        expected_existing_sha256: null,
-        mode: "create"
-      });
+    },
+    {
+      relative_path: input.request.artifact.relative_path,
+      bytes: new Uint8Array(input.output_bytes),
+      expected_existing_sha256: inputHash,
+      mode: "replace"
     }
-  }
-  writes.sort((left, right) => compareUtf87(left.relative_path, right.relative_path));
+  ].sort(compareUtf86) : [];
   const metadata = {
-    governance_kind: "import",
-    proposal_hash: input.proposal_hash,
-    imported_source_hashes: input.decisions.filter((decision) => decision.decision !== "exclude").map((decision) => decision.source_sha256).sort(compareUtf87),
-    excluded_source_paths: input.decisions.filter((decision) => decision.decision === "exclude").map((decision) => decision.source_path).sort(compareUtf87),
-    destination_paths: [...destinationPaths].sort(compareUtf87)
+    governance_kind: "migration",
+    migration_id: migrationId,
+    artifact_kind: input.request.artifact.kind,
+    artifact_path: input.request.artifact.relative_path,
+    from_version: input.request.from_version,
+    to_version: input.request.to_version,
+    input_sha256: inputHash,
+    output_sha256: outputHash,
+    authority_impact: input.authority_impact,
+    steps: input.steps,
+    archive_preimage_path: archivePath,
+    archive_preimage_paths: archivePaths,
+    migration_record_path: recordPath
   };
   const body = {
     schema_version: "1.0.0",
-    plan_id: `import:${input.proposal_hash.slice(0, 16)}`,
-    mutation_kind: "import",
-    root_id: input.root_id,
-    target_ref: input.target_ref,
-    expected_head: input.expected_head,
-    profile_lock_hash: input.profile_lock_hash,
+    plan_id: `migration:${migrationId}:${inputHash.slice(0, 12)}`,
+    mutation_kind: "migration",
+    root_id: input.request.root_id,
+    target_ref: input.request.target_ref,
+    expected_head: input.request.expected_head,
+    profile_lock_hash: input.request.profile_lock_hash,
     writes,
     record_ids: [],
     event_ids: [],
-    approval_ids: [...new Set(input.approval_ids)].sort(compareUtf87),
+    approval_ids: [...new Set(input.request.approval_ids)].sort(),
     evidence_ids: [],
-    created_by: input.created_by,
-    created_at: input.created_at,
-    expires_at: input.expires_at,
+    created_by: input.request.created_by,
+    created_at: input.request.created_at,
+    expires_at: input.request.expires_at,
     metadata
   };
-  return success({ ...body, plan_hash: canonicalMutationPlanHash(body) });
+  return { ...body, plan_hash: canonicalMutationPlanHash(body) };
 }
 
+// src/migrations/planner.ts
+function createMigrationService(registry) {
+  return {
+    list: () => registry.list(),
+    async plan(input) {
+      await Promise.resolve();
+      const actualHash = sha256(input.artifact.bytes);
+      if (actualHash !== input.artifact.sha256) {
+        return failure(
+          "MIGRATION_INPUT_HASH_MISMATCH",
+          "migration input bytes do not match the supplied source hash",
+          input.artifact.relative_path
+        );
+      }
+      const related = input.related_preimages ?? [];
+      const seenPaths = /* @__PURE__ */ new Set([input.artifact.relative_path]);
+      const seenHashes = /* @__PURE__ */ new Set([input.artifact.sha256]);
+      for (const artifact of related) {
+        if (sha256(artifact.bytes) !== artifact.sha256) {
+          return failure(
+            "MIGRATION_INPUT_HASH_MISMATCH",
+            "migration preimage bytes do not match the supplied source hash",
+            artifact.relative_path
+          );
+        }
+        if (seenPaths.has(artifact.relative_path) || seenHashes.has(artifact.sha256)) {
+          return failure(
+            "MIGRATION_PREIMAGE_DUPLICATE",
+            "migration preimages must have unique paths and content hashes",
+            artifact.relative_path
+          );
+        }
+        seenPaths.add(artifact.relative_path);
+        seenHashes.add(artifact.sha256);
+      }
+      const executed = executeMigrationPath(registry, {
+        artifact_kind: input.artifact.kind,
+        relative_path: input.artifact.relative_path,
+        from_version: input.from_version,
+        to_version: input.to_version,
+        bytes: input.artifact.bytes,
+        context: input.context ?? {}
+      });
+      if (!executed.ok) return executed;
+      if (executed.value.authority_impact === "directional" && input.approval_ids.length === 0) {
+        return failure("MIGRATION_APPROVAL_REQUIRED", "directional migration requires Pitaji approval");
+      }
+      return success(buildMigrationMutationPlan({
+        request: input,
+        steps: executed.value.steps,
+        output_bytes: executed.value.bytes,
+        authority_impact: executed.value.authority_impact
+      }));
+    }
+  };
+}
+
+// src/migrations/v1/project-memory-v1-1.ts
+var LEGACY_HEADER = /^# generated_at: ([^\r\n]+)(\r?\n)/;
+var NORMALIZED_HEADER = /^# generated_metadata: normalized(?:\r?\n)/;
+function isRecord3(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function normalizeProfileMetadata(input) {
+  const decoded = decodeStrictUtf8(input.bytes, input.relative_path);
+  if (!decoded.ok) return decoded;
+  if (NORMALIZED_HEADER.test(decoded.value)) {
+    return success({ bytes: new Uint8Array(input.bytes), semantic_diff: [] });
+  }
+  const match = LEGACY_HEADER.exec(decoded.value);
+  if (match === null) {
+    return failure(
+      "MIGRATION_METADATA_HEADER_MISSING",
+      "profile lock has neither legacy nor normalized generated metadata",
+      input.relative_path
+    );
+  }
+  const generatedAt2 = match[1] ?? "";
+  const newline = match[2] ?? "\n";
+  const normalized = decoded.value.replace(
+    LEGACY_HEADER,
+    `# generated_metadata: normalized${newline}`
+  );
+  return success({
+    bytes: new TextEncoder().encode(normalized),
+    semantic_diff: [{
+      path: "/generated_metadata",
+      before: generatedAt2,
+      after: "normalized"
+    }]
+  });
+}
+function addRepositoryContractVersion(input) {
+  const decoded = decodeStrictUtf8(input.bytes, input.relative_path);
+  if (!decoded.ok) return decoded;
+  const parsed = parseJsonDocument(decoded.value, input.relative_path);
+  if (!parsed.ok) return parsed;
+  if (!isRecord3(parsed.value)) {
+    return failure(
+      "MIGRATION_CONFIG_INVALID",
+      "tool configuration must be a JSON object",
+      input.relative_path
+    );
+  }
+  if (Object.hasOwn(parsed.value, "repository_contract_version")) {
+    return failure(
+      "MIGRATION_CONFIG_NOT_LEGACY",
+      "pre-marker configuration must not contain a repository contract version",
+      input.relative_path
+    );
+  }
+  return success({
+    bytes: new TextEncoder().encode(canonicalJson({
+      ...parsed.value,
+      repository_contract_version: REPOSITORY_CONTRACT_VERSION
+    })),
+    semantic_diff: [{
+      path: "/repository_contract_version",
+      before: null,
+      after: REPOSITORY_CONTRACT_VERSION
+    }]
+  });
+}
+var projectMemoryV1_1Migration = {
+  id: "project-memory-v1-1",
+  from_version: LEGACY_REPOSITORY_CONTRACT_VERSION,
+  to_version: REPOSITORY_CONTRACT_VERSION,
+  affected_artifacts: ["profile-lock", "tool-config"],
+  authority_impact: "none",
+  transform(input) {
+    if (input.artifact_kind === "profile-lock") {
+      return normalizeProfileMetadata(input);
+    }
+    if (input.artifact_kind === "tool-config") {
+      return addRepositoryContractVersion(input);
+    }
+    return failure(
+      "MIGRATION_ARTIFACT_UNSUPPORTED",
+      "v1.1 migration cannot transform this artifact",
+      input.relative_path
+    );
+  }
+};
+var createProjectMemoryMigrationRegistry = () => createMigrationRegistry([projectMemoryV1_1Migration]);
+
 // src/governance/views/view-rendering.ts
-function compareUtf88(left, right) {
+function compareUtf87(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function sourceSetHash(snapshot) {
-  const sources = [...snapshot.source_paths].sort(compareUtf88).map((relativePath) => ({
+  const sources = [...snapshot.source_paths].sort(compareUtf87).map((relativePath) => ({
     relative_path: relativePath,
     sha256: snapshot.source_hashes[relativePath] ?? null,
     object_id: snapshot.blob_object_ids[relativePath] ?? null
@@ -28923,17 +29043,17 @@ function payloadStrings(payload, key) {
 }
 function sortedRecords(records3) {
   return [...records3].sort(
-    (left, right) => left.created_at.localeCompare(right.created_at) || compareUtf88(left.id, right.id)
+    (left, right) => left.created_at.localeCompare(right.created_at) || compareUtf87(left.id, right.id)
   );
 }
 function sortedEvents(events) {
   return [...events].sort(
-    (left, right) => left.occurred_at.localeCompare(right.occurred_at) || compareUtf88(left.event_hash, right.event_hash)
+    (left, right) => left.occurred_at.localeCompare(right.occurred_at) || compareUtf87(left.event_hash, right.event_hash)
   );
 }
 function sortedDocuments(documents) {
   return [...documents].sort(
-    (left, right) => compareUtf88(left.envelope.id, right.envelope.id)
+    (left, right) => compareUtf87(left.envelope.id, right.envelope.id)
   );
 }
 function documentTitle(document) {
@@ -29213,7 +29333,7 @@ function renderWorkstreams(context) {
 }
 
 // src/governance/views/view-drift.ts
-import { lstat as lstat6, readFile as readFile8 } from "node:fs/promises";
+import { lstat as lstat5, readFile as readFile7 } from "node:fs/promises";
 var UTC_TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 function byteEqual4(left, right) {
   return Buffer.from(left).equals(Buffer.from(right));
@@ -29240,7 +29360,7 @@ var FilesystemViewTargetReader = class {
     const resolved = await resolveInside(root, relativePath);
     if (!resolved.ok) return resolved;
     try {
-      const stat2 = await lstat6(resolved.value);
+      const stat2 = await lstat5(resolved.value);
       if (stat2.isSymbolicLink() || !stat2.isFile()) {
         return failure(
           "view.target_unsafe",
@@ -29249,7 +29369,7 @@ var FilesystemViewTargetReader = class {
         );
       }
       return success(normalizeGitTextBytes(
-        new Uint8Array(await readFile8(resolved.value))
+        new Uint8Array(await readFile7(resolved.value))
       ));
     } catch (error) {
       if (error.code === "ENOENT") return success(null);
@@ -29432,6 +29552,1934 @@ function createViewGenerator(dependencies) {
   };
 }
 
+// src/upgrades/plan-repository-upgrade.ts
+var REPOSITORY_UPGRADE_RECORD_PATH = "docs/project-memory/governance/migrations/repository-contract-1.0.0-to-1.1.0.json";
+var CREATED_BY = "project-memory-upgrader";
+var UTC_TIMESTAMP3 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+var ONE_HOUR_MS = 60 * 60 * 1e3;
+function compareUtf88(left, right) {
+  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
+}
+function validateReplayWindow(createdAt, expiresAt) {
+  if (!UTC_TIMESTAMP3.test(createdAt) || !UTC_TIMESTAMP3.test(expiresAt)) {
+    return failure(
+      "UPGRADE_REPLAY_WINDOW_INVALID",
+      "repository upgrade timestamps must be canonical UTC timestamps"
+    );
+  }
+  const created = Date.parse(createdAt);
+  const expires = Date.parse(expiresAt);
+  if (!Number.isFinite(created) || !Number.isFinite(expires) || expires - created !== ONE_HOUR_MS) {
+    return failure(
+      "UPGRADE_REPLAY_WINDOW_INVALID",
+      "repository upgrade proposals must remain valid for exactly one hour"
+    );
+  }
+  return success(true);
+}
+function validateInputBindings(input) {
+  if (input.snapshot.source_revision !== input.expected_head) {
+    return failure(
+      "UPGRADE_SNAPSHOT_HEAD_MISMATCH",
+      "upgrade snapshot must bind the expected HEAD",
+      input.expected_head
+    );
+  }
+  if (sha256(input.config_bytes) !== input.config_sha256 || sha256(input.doorway_bytes) !== input.doorway_sha256) {
+    return failure(
+      "UPGRADE_INPUT_HASH_MISMATCH",
+      "upgrade input bytes must match their supplied preimage hashes"
+    );
+  }
+  return validateReplayWindow(input.created_at, input.expires_at);
+}
+function migrationRecordBytes(metadata, createdAt) {
+  return new TextEncoder().encode(canonicalJson({
+    schema_version: "1.0.0",
+    migration_id: metadata.migration_id,
+    from_version: metadata.from_version,
+    to_version: metadata.to_version,
+    authority_impact: metadata.authority_impact,
+    canonical_source_set_hash: metadata.canonical_source_set_hash,
+    canonical_source_path_count: metadata.canonical_source_path_count,
+    catalog_lock_hash: metadata.catalog_lock_hash,
+    config_input_sha256: metadata.config_input_sha256,
+    config_output_sha256: metadata.config_output_sha256,
+    doorway_input_sha256: metadata.doorway_input_sha256,
+    doorway_output_sha256: metadata.doorway_output_sha256,
+    changed_paths: metadata.changed_paths,
+    derived_paths: metadata.derived_paths,
+    steps: metadata.steps,
+    created_at: createdAt,
+    created_by: CREATED_BY
+  }));
+}
+function buildRepositoryUpgradePlan(input, registry) {
+  const bindings = validateInputBindings(input);
+  if (!bindings.ok) return bindings;
+  const migrated = executeMigrationPath(registry, {
+    artifact_kind: "tool-config",
+    relative_path: CONFIG_RELATIVE_PATH,
+    from_version: LEGACY_REPOSITORY_CONTRACT_VERSION,
+    to_version: REPOSITORY_CONTRACT_VERSION,
+    bytes: input.config_bytes,
+    context: {}
+  });
+  if (!migrated.ok) return migrated;
+  if (migrated.value.authority_impact !== "none") {
+    return failure(
+      "UPGRADE_AUTHORITY_UNEXPECTED",
+      "repository contract v1.1 upgrade must remain non-directional",
+      migrated.value.authority_impact
+    );
+  }
+  const doorway = renderStartupContext(
+    input.snapshot.project,
+    input.snapshot.profile_lock.profile,
+    input.snapshot.profile_lock
+  );
+  if (!doorway.ok) return doorway;
+  const changedPaths = [
+    PROJECT_CONTEXT_PATH,
+    REPOSITORY_UPGRADE_RECORD_PATH,
+    CONFIG_RELATIVE_PATH
+  ].sort(compareUtf88);
+  const metadata = {
+    governance_kind: "repository_upgrade",
+    migration_id: "project-memory-v1-1",
+    from_version: LEGACY_REPOSITORY_CONTRACT_VERSION,
+    to_version: REPOSITORY_CONTRACT_VERSION,
+    authority_impact: "none",
+    canonical_source_set_hash: sourceSetHash(input.snapshot),
+    canonical_source_path_count: input.snapshot.source_paths.length,
+    catalog_lock_hash: input.snapshot.selected_catalog_lock_hash,
+    config_input_sha256: input.config_sha256,
+    config_output_sha256: sha256(migrated.value.bytes),
+    doorway_input_sha256: input.doorway_sha256,
+    doorway_output_sha256: sha256(doorway.value.bytes),
+    changed_paths: changedPaths,
+    derived_paths: [...GENERATED_VIEW_PATHS],
+    migration_record_path: REPOSITORY_UPGRADE_RECORD_PATH,
+    steps: migrated.value.steps
+  };
+  const writes = [
+    {
+      relative_path: PROJECT_CONTEXT_PATH,
+      bytes: new Uint8Array(doorway.value.bytes),
+      expected_existing_sha256: input.doorway_sha256,
+      mode: "replace"
+    },
+    {
+      relative_path: REPOSITORY_UPGRADE_RECORD_PATH,
+      bytes: migrationRecordBytes(metadata, input.created_at),
+      expected_existing_sha256: null,
+      mode: "create"
+    },
+    {
+      relative_path: CONFIG_RELATIVE_PATH,
+      bytes: new Uint8Array(migrated.value.bytes),
+      expected_existing_sha256: input.config_sha256,
+      mode: "replace"
+    }
+  ].sort((left, right) => compareUtf88(left.relative_path, right.relative_path));
+  const body = {
+    schema_version: "1.0.0",
+    plan_id: `repository-upgrade:${input.snapshot.root_id}:${input.config_sha256.slice(0, 12)}`,
+    mutation_kind: "migration",
+    root_id: input.snapshot.root_id,
+    target_ref: input.target_ref,
+    expected_head: input.expected_head,
+    profile_lock_hash: input.snapshot.profile_lock_hash,
+    writes,
+    record_ids: [],
+    event_ids: [],
+    approval_ids: [],
+    evidence_ids: [],
+    created_by: CREATED_BY,
+    created_at: input.created_at,
+    expires_at: input.expires_at,
+    metadata
+  };
+  return success({
+    ...body,
+    plan_hash: canonicalMutationPlanHash(body)
+  });
+}
+
+// src/upgrades/node-repository-upgrade.ts
+import { lstat as lstat7 } from "node:fs/promises";
+
+// src/governance/integration/integration-git-client.ts
+import { fileURLToPath as fileURLToPath7 } from "node:url";
+var OBJECT_ID = /^[0-9a-f]{40}$/;
+var FORBIDDEN_REF_CHARACTERS = /* @__PURE__ */ new Set(["~", "^", ":", "?", "*", "[", "\\"]);
+function gitEnvironment2() {
+  const result = {
+    GIT_MERGE_AUTOEDIT: "no",
+    GIT_TERMINAL_PROMPT: "0",
+    LC_ALL: "C"
+  };
+  for (const name of ["PATH", "SystemRoot", "HOME", "USERPROFILE"]) {
+    const value = process.env[name];
+    if (value !== void 0) result[name] = value;
+  }
+  return result;
+}
+function assertObjectId(value) {
+  if (!OBJECT_ID.test(value)) throw new TypeError(`unsafe Git object ID: ${value}`);
+}
+function assertRef(value) {
+  let unsafeCharacter = false;
+  for (const character of value) {
+    if (character.charCodeAt(0) <= 32 || FORBIDDEN_REF_CHARACTERS.has(character)) {
+      unsafeCharacter = true;
+      break;
+    }
+  }
+  if (!value.startsWith("refs/") || value.length > 512 || unsafeCharacter || value.includes("..") || value.includes("@{") || value.includes("//") || value.endsWith("/") || value.endsWith(".") || value.endsWith(".lock")) {
+    throw new TypeError(`unsafe Git ref: ${value}`);
+  }
+}
+function assertPathspec(value) {
+  if (value.length === 0 || value.includes("\0") || value.includes("\\") || value.startsWith("/") || value.startsWith(":") || /^[A-Za-z]:/.test(value) || value.split("/").some((part) => part === "..")) {
+    throw new TypeError(`unsafe Git pathspec: ${value}`);
+  }
+}
+function assertMessage(value) {
+  if (value.trim().length === 0 || value.includes("\0")) {
+    throw new TypeError("Git commit message must be non-empty and NUL-free");
+  }
+}
+function records2(value) {
+  const parts = value.split("\0");
+  if (parts.at(-1) === "") parts.pop();
+  return parts;
+}
+var IntegrationGitCliClient = class extends GitCliClient {
+  constructor(integrationRunner) {
+    super(integrationRunner);
+    this.integrationRunner = integrationRunner;
+  }
+  integrationRunner;
+  async #execute(cwd, args, maxOutputBytes = 4194304) {
+    const result = await this.integrationRunner.run({
+      executable: "git",
+      args: ["-c", "core.longpaths=true", ...args],
+      cwd,
+      timeout_ms: 12e4,
+      env_allowlist: gitEnvironment2(),
+      max_output_bytes: maxOutputBytes
+    });
+    if (result.timed_out) throw new Error("Git command timed out");
+    if (result.output_truncated) throw new Error("Git command output exceeded its bound");
+    return result;
+  }
+  async #checked(cwd, args) {
+    const result = await this.#execute(cwd, args);
+    if (result.exit_code !== 0) {
+      throw new Error(
+        `Git command failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
+      );
+    }
+    return result.stdout;
+  }
+  async resolveRef(repo, ref) {
+    assertRef(ref);
+    const revision = (await this.#checked(repo, [
+      "rev-parse",
+      "--verify",
+      `${ref}^{commit}`
+    ])).trim();
+    assertObjectId(revision);
+    return revision;
+  }
+  async commitParents(repo, revision) {
+    assertObjectId(revision);
+    const values = (await this.#checked(repo, [
+      "rev-list",
+      "--parents",
+      "-n",
+      "1",
+      revision
+    ])).trim().split(/\s+/u);
+    const commit = values.shift();
+    if (commit !== revision) throw new Error("Git returned the wrong commit ancestry");
+    values.forEach(assertObjectId);
+    return values;
+  }
+  async listTree(repo, revision, pathspec) {
+    assertObjectId(revision);
+    assertPathspec(pathspec);
+    return records2(await this.#checked(repo, [
+      "ls-tree",
+      "-r",
+      "--name-only",
+      "-z",
+      revision,
+      "--",
+      pathspec
+    ]));
+  }
+  async readBlob(repo, revision, relativePath) {
+    assertObjectId(revision);
+    assertPathspec(relativePath);
+    const entries = await this.listTree(repo, revision, relativePath);
+    if (!entries.includes(relativePath)) return null;
+    const result = await this.#execute(
+      repo,
+      ["show", `${revision}:${relativePath}`],
+      67108864
+    );
+    if (result.exit_code !== 0) {
+      throw new Error(
+        `Git blob read failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
+      );
+    }
+    return new TextEncoder().encode(result.stdout);
+  }
+  async listCommits(repo, base, head) {
+    assertObjectId(base);
+    assertObjectId(head);
+    const output = await this.#checked(repo, ["rev-list", "--reverse", `${base}..${head}`]);
+    const commits = output.split(/\r?\n/u).filter((value) => value.length > 0);
+    commits.forEach(assertObjectId);
+    return commits;
+  }
+  async cherryPickNoCommit(worktree, commit) {
+    assertObjectId(commit);
+    return this.#execute(worktree, ["cherry-pick", "--no-commit", commit]);
+  }
+  async stageAll(worktree) {
+    await this.#checked(worktree, ["add", "--all", "--", "."]);
+  }
+  async writeTree(worktree) {
+    const tree = (await this.#checked(worktree, ["write-tree"])).trim();
+    assertObjectId(tree);
+    return tree;
+  }
+  async commitTree(repo, tree, parent, message) {
+    assertObjectId(tree);
+    assertObjectId(parent);
+    assertMessage(message);
+    const commit = (await this.#checked(repo, [
+      "commit-tree",
+      tree,
+      "-p",
+      parent,
+      "-m",
+      message
+    ])).trim();
+    assertObjectId(commit);
+    return commit;
+  }
+  async updateRef(repo, ref, next, expected) {
+    assertRef(ref);
+    assertObjectId(next);
+    assertObjectId(expected);
+    const result = await this.#execute(repo, ["update-ref", ref, next, expected]);
+    if (result.exit_code === 0) return true;
+    if (result.stderr.includes("cannot lock ref") || result.stderr.includes("but expected")) return false;
+    throw new Error(
+      `Git update-ref failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
+    );
+  }
+  async removeWorktree(repo, destination) {
+    await this.#checked(repo, [
+      "worktree",
+      "remove",
+      "--force",
+      fileURLToPath7(destination)
+    ]);
+  }
+};
+
+// src/governance/records/supersession-index.ts
+function compareUtf89(left, right) {
+  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
+}
+function sortedMap(source) {
+  return new Map(
+    [...source.entries()].sort(([left], [right]) => compareUtf89(left, right)).map(([id, values]) => [id, Object.freeze([...values].sort(compareUtf89))])
+  );
+}
+function detectCycle(ids, edges) {
+  const state = /* @__PURE__ */ new Map();
+  function visit(id) {
+    const current = state.get(id);
+    if (current === "visiting") {
+      return failure(
+        "record.supersession_cycle",
+        "supersession relationships must form an acyclic history",
+        id
+      );
+    }
+    if (current === "visited") return success(true);
+    state.set(id, "visiting");
+    for (const target of edges.get(id) ?? []) {
+      const result = visit(target);
+      if (!result.ok) return result;
+    }
+    state.set(id, "visited");
+    return success(true);
+  }
+  for (const id of ids) {
+    const result = visit(id);
+    if (!result.ok) return result;
+  }
+  return success(true);
+}
+function buildSupersessionIndex(records3) {
+  const recordsById = /* @__PURE__ */ new Map();
+  for (const record5 of records3) {
+    if (recordsById.has(record5.id)) {
+      return failure(
+        "record.id_duplicate",
+        "canonical record IDs must be unique across every record directory",
+        record5.id
+      );
+    }
+    recordsById.set(record5.id, record5);
+  }
+  const supersedesById = /* @__PURE__ */ new Map();
+  const supersededById = /* @__PURE__ */ new Map();
+  for (const record5 of records3) {
+    const targets = record5.relationships.filter((relationship) => relationship.type === "supersedes").map((relationship) => relationship.target_id).sort(compareUtf89);
+    supersedesById.set(record5.id, targets);
+    for (const targetId of targets) {
+      const target = recordsById.get(targetId);
+      if (target === void 0) {
+        return failure(
+          "record.supersession_target_missing",
+          "a supersession relationship must reference an existing immutable record",
+          record5.id,
+          [targetId]
+        );
+      }
+      if (target.root_id !== record5.root_id) {
+        return failure(
+          "record.root_mismatch",
+          "a supersession relationship cannot cross product roots",
+          record5.id,
+          [targetId]
+        );
+      }
+      if (target.type !== record5.type) {
+        return failure(
+          "record.fact_class_mismatch",
+          "a supersession relationship must preserve the canonical fact class",
+          record5.id,
+          [targetId]
+        );
+      }
+      const replacements = supersededById.get(targetId) ?? [];
+      replacements.push(record5.id);
+      supersededById.set(targetId, replacements);
+    }
+  }
+  const sortedIds = [...recordsById.keys()].sort(compareUtf89);
+  const acyclic = detectCycle(sortedIds, supersedesById);
+  if (!acyclic.ok) return acyclic;
+  return success({
+    records_by_id: new Map(
+      [...recordsById.entries()].sort(([left], [right]) => compareUtf89(left, right))
+    ),
+    supersedes_by_id: sortedMap(supersedesById),
+    superseded_by_id: sortedMap(supersededById),
+    superseded_ids: new Set([...supersededById.keys()].sort(compareUtf89))
+  });
+}
+
+// src/governance/events/append-only-event-store.ts
+import { lstat as lstat6, readFile as readFile8, readdir as readdir5 } from "node:fs/promises";
+
+// src/governance/events/event-chain-verifier.ts
+function unsignedEvent(event) {
+  return {
+    aggregate_id: event.aggregate_id,
+    event_type: event.event_type,
+    occurred_at: event.occurred_at,
+    actor_id: event.actor_id,
+    authority_class: event.authority_class,
+    evidence_ids: event.evidence_ids,
+    payload: event.payload
+  };
+}
+function signEvent(unsigned, previous) {
+  const payloadHash = sha256(canonicalJson(unsigned.payload));
+  const body = {
+    ...unsigned,
+    sequence: previous === null ? 1 : previous.sequence + 1,
+    previous_event_hash: previous?.event_hash ?? null,
+    payload_hash: payloadHash
+  };
+  return { ...body, event_hash: sha256(canonicalJson(body)) };
+}
+function verifyEventChain(events) {
+  if (events.length === 0) {
+    return success({
+      valid: true,
+      aggregate_id: null,
+      event_count: 0,
+      last_sequence: 0,
+      head_event_hash: null
+    });
+  }
+  const aggregateId = events[0]?.aggregate_id ?? null;
+  let previous = null;
+  for (let index = 0; index < events.length; index += 1) {
+    const event = events[index];
+    if (event === void 0) continue;
+    const expectedPayloadHash = sha256(canonicalJson(event.payload));
+    const { event_hash: eventHash, ...body } = event;
+    const expectedEventHash = sha256(canonicalJson(body));
+    if (event.payload_hash !== expectedPayloadHash || eventHash !== expectedEventHash) {
+      return failure(
+        "event.hash_mismatch",
+        "event payload or body hash does not match its canonical content",
+        eventHash
+      );
+    }
+    if (event.aggregate_id !== aggregateId) {
+      return failure(
+        "event.aggregate_mismatch",
+        "every event in a chain must use the same aggregate ID",
+        eventHash,
+        [aggregateId ?? ""]
+      );
+    }
+    const expectedSequence = index + 1;
+    if (event.sequence !== expectedSequence) {
+      return failure(
+        "event.sequence_gap",
+        "event sequences must be contiguous and begin at one",
+        eventHash,
+        [String(expectedSequence), String(event.sequence)]
+      );
+    }
+    const expectedPreviousHash = previous?.event_hash ?? null;
+    if (event.previous_event_hash !== expectedPreviousHash) {
+      return failure(
+        "event.previous_hash_mismatch",
+        "event does not reference the immediately preceding event hash",
+        eventHash,
+        expectedPreviousHash === null ? [] : [expectedPreviousHash]
+      );
+    }
+    previous = event;
+  }
+  const head = events.at(-1);
+  return success({
+    valid: true,
+    aggregate_id: aggregateId,
+    event_count: events.length,
+    last_sequence: head?.sequence ?? 0,
+    head_event_hash: head?.event_hash ?? null
+  });
+}
+
+// src/governance/events/append-only-event-store.ts
+var EVENT_SCHEMA_ID = "project-memory/v1/governance-event";
+var SAFE_AGGREGATE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+function compareUtf810(left, right) {
+  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
+}
+function translatedFailure(code, message, path27, issues) {
+  return failure(
+    code,
+    message,
+    path27,
+    issues.map((issue5) => `${issue5.code}:${issue5.path}`)
+  );
+}
+function validateAggregateId(aggregateId) {
+  return SAFE_AGGREGATE_ID.test(aggregateId) ? success(true) : failure(
+    "event.aggregate_id_unsafe",
+    "event aggregate IDs must be portable single path segments",
+    aggregateId
+  );
+}
+function filenameSafeUtc(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}\.\d{3})Z$/.exec(value);
+  if (match === null) {
+    throw new TypeError("event.occurred_at must be RFC3339 UTC with milliseconds");
+  }
+  const [, year = "", month = "", day = "", hour = "", minute = "", second = ""] = match;
+  return `${year}${month}${day}T${hour}${minute}${second}Z`;
+}
+function eventPath(event) {
+  const timestamp = filenameSafeUtc(event.occurred_at);
+  return `docs/project-memory/governance/events/${event.aggregate_id}/${timestamp}-${event.event_hash}.json`;
+}
+function eventWrite(event) {
+  return {
+    relative_path: eventPath(event),
+    bytes: new TextEncoder().encode(canonicalJson(event)),
+    expected_existing_sha256: null,
+    mode: "create"
+  };
+}
+function validateEvent(value, source) {
+  const result = validateWithSchema(EVENT_SCHEMA_ID, value);
+  return result.ok ? result : translatedFailure(
+    "event.schema_invalid",
+    "governance event does not satisfy its registered schema",
+    source,
+    result.issues
+  );
+}
+function byteEqual5(left, right) {
+  return Buffer.from(left).equals(Buffer.from(right));
+}
+async function readEvent(root, relativePath, aggregateId) {
+  const resolved = await resolveInside(root, relativePath);
+  if (!resolved.ok) return resolved;
+  let bytes;
+  try {
+    const stat2 = await lstat6(resolved.value);
+    if (stat2.isSymbolicLink() || !stat2.isFile()) {
+      return failure(
+        "event.path_unsafe",
+        "governance events must be regular files",
+        relativePath
+      );
+    }
+    bytes = new Uint8Array(await readFile8(resolved.value));
+  } catch (error) {
+    return failure(
+      "event.read_failed",
+      error instanceof Error ? error.message : String(error),
+      relativePath
+    );
+  }
+  const decoded = decodeStrictUtf8(bytes, relativePath);
+  if (!decoded.ok) {
+    return translatedFailure(
+      "event.document_invalid",
+      "governance event must use strict UTF-8",
+      relativePath,
+      decoded.issues
+    );
+  }
+  const parsed = parseJsonDocument(decoded.value, relativePath);
+  if (!parsed.ok) {
+    return translatedFailure(
+      "event.document_invalid",
+      "governance event must be strict JSON",
+      relativePath,
+      parsed.issues
+    );
+  }
+  const validated = validateEvent(parsed.value, relativePath);
+  if (!validated.ok) return validated;
+  if (validated.value.aggregate_id !== aggregateId) {
+    return failure(
+      "event.aggregate_mismatch",
+      "event aggregate does not match its canonical directory",
+      relativePath,
+      [aggregateId]
+    );
+  }
+  let expectedPath;
+  try {
+    expectedPath = eventPath(validated.value);
+  } catch (error) {
+    return failure(
+      "event.timestamp_invalid",
+      error instanceof Error ? error.message : String(error),
+      relativePath
+    );
+  }
+  if (expectedPath !== relativePath) {
+    return failure(
+      "event.path_mismatch",
+      "event timestamp and hash must match its canonical filename",
+      relativePath,
+      [expectedPath]
+    );
+  }
+  const expectedBytes = new TextEncoder().encode(canonicalJson(validated.value));
+  if (!byteEqual5(bytes, expectedBytes)) {
+    return failure(
+      "event.noncanonical",
+      "event bytes must match deterministic canonical JSON",
+      relativePath
+    );
+  }
+  return success(validated.value);
+}
+async function loadChain(root, aggregateId) {
+  const safeAggregate = validateAggregateId(aggregateId);
+  if (!safeAggregate.ok) return safeAggregate;
+  const relativeDirectory = `docs/project-memory/governance/events/${aggregateId}`;
+  const resolved = await resolveInside(root, relativeDirectory);
+  if (!resolved.ok) return resolved;
+  let entries;
+  try {
+    const stat2 = await lstat6(resolved.value);
+    if (stat2.isSymbolicLink() || !stat2.isDirectory()) {
+      return failure(
+        "event.directory_unsafe",
+        "event-chain paths must be real directories",
+        relativeDirectory
+      );
+    }
+    entries = await readdir5(resolved.value, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === "ENOENT") return success([]);
+    return failure(
+      "event.directory_read_failed",
+      error instanceof Error ? error.message : String(error),
+      relativeDirectory
+    );
+  }
+  const events = [];
+  for (const entry of entries.sort((left, right) => compareUtf810(left.name, right.name))) {
+    const relativePath = `${relativeDirectory}/${entry.name}`;
+    if (!entry.isFile() || entry.isSymbolicLink() || !entry.name.endsWith(".json")) {
+      return failure(
+        "event.directory_entry_unsafe",
+        "event directories may contain canonical JSON files only",
+        relativePath
+      );
+    }
+    const event = await readEvent(root, relativePath, aggregateId);
+    if (!event.ok) return event;
+    events.push(event.value);
+  }
+  events.sort(
+    (left, right) => left.sequence - right.sequence || compareUtf810(left.event_hash, right.event_hash)
+  );
+  return success(events);
+}
+function sameUnsigned(event, unsigned) {
+  return canonicalJson(unsignedEvent(event)) === canonicalJson(unsigned);
+}
+function createAppendOnlyEventStore() {
+  async function readChain(root, aggregateId) {
+    const events = await loadChain(root, aggregateId);
+    if (!events.ok) return events;
+    const verified = verifyEventChain(events.value);
+    return verified.ok ? success(events.value) : verified;
+  }
+  async function verifyChain(root, aggregateId) {
+    const events = await loadChain(root, aggregateId);
+    if (!events.ok) return events;
+    const verified = verifyEventChain(events.value);
+    if (!verified.ok) return verified;
+    return success({
+      ...verified.value,
+      aggregate_id: verified.value.aggregate_id ?? aggregateId
+    });
+  }
+  async function planAppend(root, unsigned) {
+    const safeAggregate = validateAggregateId(unsigned.aggregate_id);
+    if (!safeAggregate.ok) return safeAggregate;
+    const existing = await readChain(root, unsigned.aggregate_id);
+    if (!existing.ok) return existing;
+    try {
+      const identical = existing.value.find((event) => sameUnsigned(event, unsigned));
+      if (identical !== void 0) {
+        return success(eventWrite(identical), [
+          {
+            code: "event.already_appended",
+            severity: "warning",
+            path: eventPath(identical),
+            message: "the identical immutable event is already present",
+            references: [identical.event_hash]
+          }
+        ]);
+      }
+      const signed = signEvent(unsigned, existing.value.at(-1) ?? null);
+      const validated = validateEvent(signed, unsigned.aggregate_id);
+      if (!validated.ok) return validated;
+      const write = eventWrite(validated.value);
+      const confined2 = await resolveInside(root, write.relative_path);
+      return confined2.ok ? success(write) : confined2;
+    } catch (error) {
+      return failure(
+        "event.payload_invalid",
+        error instanceof Error ? error.message : String(error),
+        unsigned.aggregate_id
+      );
+    }
+  }
+  return { planAppend, readChain, verifyChain };
+}
+
+// src/governance/records/record-path.ts
+var RECORD_DIRECTORIES = Object.freeze({
+  decision: "decisions",
+  idea: "ideas",
+  change: "changes",
+  finding: "findings",
+  risk: "risks",
+  evidence: "evidence",
+  lesson: "lessons",
+  approval: "approvals"
+});
+function canonicalRecordPath(record5) {
+  return `docs/project-memory/records/${RECORD_DIRECTORIES[record5.type]}/${record5.id}.json`;
+}
+function recordWrite(record5) {
+  return {
+    relative_path: canonicalRecordPath(record5),
+    bytes: new TextEncoder().encode(canonicalJson(record5)),
+    expected_existing_sha256: null,
+    mode: "create"
+  };
+}
+
+// src/governance/snapshot/snapshot-parsers.ts
+var PROJECT_PATH = "docs/project-memory/project.yaml";
+var PROFILE_PATH = "docs/project-memory/profile.lock.yaml";
+var CATALOG_LOCK_PATH = "docs/project-memory/catalog.lock.json";
+function compareUtf811(left, right) {
+  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
+}
+function byteEqual6(left, right) {
+  return Buffer.from(left).equals(Buffer.from(right));
+}
+function translatedFailure2(code, message, path27, issues) {
+  return failure(
+    code,
+    message,
+    path27,
+    issues.map((issue5) => `${issue5.code}:${issue5.path}`)
+  );
+}
+function strictJson(blob, schemaId, errorCode) {
+  const decoded = decodeStrictUtf8(blob.bytes, blob.relative_path);
+  if (!decoded.ok) {
+    return translatedFailure2(
+      errorCode,
+      "canonical JSON must use strict UTF-8",
+      blob.relative_path,
+      decoded.issues
+    );
+  }
+  const parsed = parseJsonDocument(decoded.value, blob.relative_path);
+  if (!parsed.ok) {
+    return translatedFailure2(
+      errorCode,
+      "canonical JSON could not be parsed",
+      blob.relative_path,
+      parsed.issues
+    );
+  }
+  const validated = validateWithSchema(schemaId, parsed.value);
+  if (!validated.ok) {
+    return translatedFailure2(
+      errorCode,
+      "canonical JSON failed schema validation",
+      blob.relative_path,
+      validated.issues
+    );
+  }
+  if (!byteEqual6(blob.bytes, new TextEncoder().encode(canonicalJson(validated.value)))) {
+    return failure(errorCode, "canonical JSON bytes are not deterministic", blob.relative_path);
+  }
+  return validated;
+}
+function strictYaml(blob, schemaId, errorCode) {
+  const decoded = decodeStrictUtf8(blob.bytes, blob.relative_path);
+  if (!decoded.ok) {
+    return translatedFailure2(
+      errorCode,
+      "canonical YAML must use strict UTF-8",
+      blob.relative_path,
+      decoded.issues
+    );
+  }
+  const parsed = parseYamlDocument(decoded.value, blob.relative_path);
+  if (!parsed.ok) {
+    return translatedFailure2(
+      errorCode,
+      "canonical YAML could not be parsed",
+      blob.relative_path,
+      parsed.issues
+    );
+  }
+  const validated = validateWithSchema(schemaId, parsed.value);
+  if (!validated.ok) {
+    return translatedFailure2(
+      errorCode,
+      "canonical YAML failed schema validation",
+      blob.relative_path,
+      validated.issues
+    );
+  }
+  const emitted = emitGeneratedYaml(validated.value);
+  if (!emitted.ok) {
+    return translatedFailure2(
+      errorCode,
+      "canonical YAML could not be emitted",
+      blob.relative_path,
+      emitted.issues
+    );
+  }
+  if (!byteEqual6(blob.bytes, new TextEncoder().encode(emitted.value))) {
+    return failure(errorCode, "canonical YAML bytes are not deterministic", blob.relative_path);
+  }
+  return validated;
+}
+function requiredBlob(indexed, relativePath) {
+  const blob = indexed.get(relativePath);
+  return blob === void 0 ? failure(
+    "snapshot.profile_missing",
+    "required canonical profile source is missing",
+    relativePath
+  ) : success(blob);
+}
+function validateLocks(indexed) {
+  const projectBlob = requiredBlob(indexed, PROJECT_PATH);
+  if (!projectBlob.ok) return projectBlob;
+  const profileBlob = requiredBlob(indexed, PROFILE_PATH);
+  if (!profileBlob.ok) return profileBlob;
+  const catalogBlob = requiredBlob(indexed, CATALOG_LOCK_PATH);
+  if (!catalogBlob.ok) return catalogBlob;
+  const project = strictYaml(
+    projectBlob.value,
+    "project-memory/v1/project-selection",
+    "snapshot.project_invalid"
+  );
+  if (!project.ok) return project;
+  const profile = strictYaml(
+    profileBlob.value,
+    "project-memory/v1/profile-lock",
+    "snapshot.profile_invalid"
+  );
+  if (!profile.ok) return profile;
+  const catalog = strictJson(
+    catalogBlob.value,
+    "project-memory/v1/selected-catalog-lock",
+    "snapshot.catalog_lock_invalid"
+  );
+  if (!catalog.ok) return catalog;
+  const { lock_hash: profileHash, ...profileBody } = profile.value;
+  const { lock_hash: catalogHash, ...catalogBody } = catalog.value;
+  if (sha256(canonicalJson(profileBody)) !== profileHash) {
+    return failure(
+      "snapshot.profile_hash_mismatch",
+      "profile lock self-hash is invalid",
+      PROFILE_PATH
+    );
+  }
+  if (sha256(canonicalJson(catalogBody)) !== catalogHash) {
+    return failure(
+      "snapshot.catalog_hash_mismatch",
+      "catalog lock self-hash is invalid",
+      CATALOG_LOCK_PATH
+    );
+  }
+  if (profile.value.root_id !== project.value.root.id || profile.value.profile.root.id !== project.value.root.id) {
+    return failure(
+      "snapshot.root_mismatch",
+      "project and profile roots do not match",
+      PROFILE_PATH
+    );
+  }
+  if (profile.value.project_hash !== sha256(projectBlob.value.bytes)) {
+    return failure(
+      "snapshot.project_hash_mismatch",
+      "profile lock does not bind project.yaml",
+      PROJECT_PATH
+    );
+  }
+  if (profile.value.selected_catalog_lock_hash !== catalogHash) {
+    return failure(
+      "snapshot.catalog_reference_mismatch",
+      "profile lock does not bind the selected catalog lock",
+      CATALOG_LOCK_PATH
+    );
+  }
+  for (const entry of profile.value.accepted_source_entries) {
+    const source = indexed.get(entry.target_path);
+    if (source === void 0 || sha256(source.bytes) !== entry.sha256) {
+      return failure(
+        "snapshot.profile_source_hash_mismatch",
+        "profile lock accepted-source reference is missing or stale",
+        entry.target_path,
+        [entry.sha256]
+      );
+    }
+  }
+  return success({
+    project: project.value,
+    profile: profile.value,
+    catalog: catalog.value
+  });
+}
+function parseSourceDocuments(indexed) {
+  const documents = [];
+  for (const [relativePath, blob] of indexed) {
+    if (!relativePath.startsWith("docs/project-memory/source/")) continue;
+    const decoded = decodeStrictUtf8(blob.bytes, relativePath);
+    if (!decoded.ok) {
+      return translatedFailure2(
+        "snapshot.source_invalid",
+        "source document is not UTF-8",
+        relativePath,
+        decoded.issues
+      );
+    }
+    documents.push({ relative_path: relativePath, text: decoded.value });
+  }
+  return success(documents);
+}
+function markdownCandidate(relativePath) {
+  return relativePath === "docs/project-memory/source/PROJECT.md" || relativePath.startsWith("docs/project-memory/components/") || relativePath.startsWith("docs/project-memory/domains/") || relativePath.startsWith("docs/project-memory/initiatives/") || relativePath.startsWith("docs/project-memory/workstreams/");
+}
+function parseMarkdown(indexed, rootId) {
+  const documents = [];
+  const ids = /* @__PURE__ */ new Set();
+  for (const [relativePath, blob] of indexed) {
+    if (!markdownCandidate(relativePath) || !relativePath.endsWith(".md")) continue;
+    const parsed = parseCanonicalMarkdown(blob.bytes);
+    if (!parsed.ok) {
+      return translatedFailure2(
+        "snapshot.markdown_invalid",
+        "canonical Markdown is invalid",
+        relativePath,
+        parsed.issues
+      );
+    }
+    if (parsed.value.envelope.root_id !== rootId) {
+      return failure(
+        "snapshot.root_mismatch",
+        "canonical Markdown belongs to another root",
+        relativePath
+      );
+    }
+    if (ids.has(parsed.value.envelope.id)) {
+      return failure(
+        "snapshot.id_duplicate",
+        "canonical artifact ID appears more than once",
+        parsed.value.envelope.id
+      );
+    }
+    if (parsed.value.envelope.type !== "project" && !relativePath.split("/").includes(parsed.value.envelope.id)) {
+      return failure(
+        "snapshot.artifact_path_mismatch",
+        "artifact ID does not match its path",
+        relativePath
+      );
+    }
+    ids.add(parsed.value.envelope.id);
+    documents.push(parsed.value);
+  }
+  return success(
+    documents.sort(
+      (left, right) => compareUtf811(left.envelope.id, right.envelope.id)
+    )
+  );
+}
+function parseRecords(indexed, rootId) {
+  const records3 = [];
+  for (const [relativePath, blob] of indexed) {
+    if (!relativePath.startsWith("docs/project-memory/records/") || !relativePath.endsWith(".json")) {
+      continue;
+    }
+    const parsed = strictJson(
+      blob,
+      "project-memory/v1/canonical-record",
+      "snapshot.record_schema_invalid"
+    );
+    if (!parsed.ok) return parsed;
+    if (canonicalRecordPath(parsed.value) !== relativePath) {
+      return failure(
+        "snapshot.record_path_mismatch",
+        "record ID and type do not match its path",
+        relativePath
+      );
+    }
+    if (parsed.value.root_id !== rootId) {
+      return failure(
+        "snapshot.root_mismatch",
+        "canonical record belongs to another root",
+        relativePath
+      );
+    }
+    records3.push(parsed.value);
+  }
+  records3.sort((left, right) => compareUtf811(left.id, right.id));
+  const index = buildSupersessionIndex(records3);
+  return index.ok ? success(records3) : index;
+}
+function parseClaims(indexed) {
+  const claims = [];
+  for (const [relativePath, blob] of indexed) {
+    if (!relativePath.startsWith("docs/project-memory/governance/claims/") || !relativePath.endsWith(".json")) {
+      continue;
+    }
+    const parsed = strictJson(
+      blob,
+      "project-memory/v1/claim",
+      "snapshot.claim_invalid"
+    );
+    if (!parsed.ok) return parsed;
+    claims.push({ relative_path: relativePath, value: parsed.value });
+  }
+  return success(claims);
+}
+function parseEvents(indexed) {
+  const groups = /* @__PURE__ */ new Map();
+  for (const [relativePath, blob] of indexed) {
+    if (!relativePath.startsWith("docs/project-memory/governance/events/") || !relativePath.endsWith(".json")) {
+      continue;
+    }
+    const parsed = strictJson(
+      blob,
+      "project-memory/v1/governance-event",
+      "snapshot.event_invalid"
+    );
+    if (!parsed.ok) return parsed;
+    if (eventPath(parsed.value) !== relativePath) {
+      return failure(
+        "snapshot.event_path_mismatch",
+        "event hash and timestamp do not match its path",
+        relativePath
+      );
+    }
+    const values = groups.get(parsed.value.aggregate_id) ?? [];
+    values.push(parsed.value);
+    groups.set(parsed.value.aggregate_id, values);
+  }
+  const events = [];
+  for (const aggregateId of [...groups.keys()].sort(compareUtf811)) {
+    const chain = groups.get(aggregateId) ?? [];
+    chain.sort((left, right) => left.sequence - right.sequence);
+    const verified = verifyEventChain(chain);
+    if (!verified.ok) return verified;
+    events.push(...chain);
+  }
+  return success(events);
+}
+function parseSnapshot(indexed) {
+  const locks = validateLocks(indexed);
+  if (!locks.ok) return locks;
+  const sourceDocuments = parseSourceDocuments(indexed);
+  if (!sourceDocuments.ok) return sourceDocuments;
+  const markdown = parseMarkdown(indexed, locks.value.project.root.id);
+  if (!markdown.ok) return markdown;
+  const records3 = parseRecords(indexed, locks.value.project.root.id);
+  if (!records3.ok) return records3;
+  const claims = parseClaims(indexed);
+  if (!claims.ok) return claims;
+  const events = parseEvents(indexed);
+  if (!events.ok) return events;
+  return success({
+    project: locks.value.project,
+    profile: locks.value.profile,
+    catalog: locks.value.catalog,
+    source_documents: sourceDocuments.value,
+    markdown: markdown.value,
+    records: records3.value,
+    claims: claims.value,
+    events: events.value
+  });
+}
+
+// src/governance/snapshot/revision-tree-reader.ts
+var OBJECT_ID2 = /^[0-9a-f]{40}$/;
+function compareUtf812(left, right) {
+  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
+}
+function gitEnvironment3() {
+  const environment = {
+    GIT_TERMINAL_PROMPT: "0",
+    LC_ALL: "C"
+  };
+  for (const name of ["PATH", "SystemRoot", "HOME", "USERPROFILE"]) {
+    const value = process.env[name];
+    if (value !== void 0) environment[name] = value;
+  }
+  return environment;
+}
+async function git(root, runner, args, maximumBytes = 16777216) {
+  const result = await runCommand(
+    {
+      executable: "git",
+      args,
+      cwd: root,
+      timeout_ms: 3e4,
+      env_allowlist: gitEnvironment3(),
+      max_output_bytes: maximumBytes
+    },
+    runner
+  );
+  if (!result.ok) return result;
+  if (result.value.timed_out) {
+    return failure("snapshot.git_timeout", "Git object read timed out");
+  }
+  if (result.value.output_truncated) {
+    return failure("snapshot.git_output_truncated", "Git object output exceeded its bound");
+  }
+  if (result.value.exit_code !== 0) {
+    return failure(
+      "snapshot.git_failed",
+      result.value.stderr.trim() || `Git exited with ${String(result.value.exit_code)}`,
+      args.join(" ")
+    );
+  }
+  return success(result.value.stdout);
+}
+function isForbiddenTruthSource(relativePath) {
+  return relativePath.startsWith("docs/project-memory/views/") || relativePath.startsWith("docs/project-memory/archive/");
+}
+function isCanonicalSnapshotPath(relativePath) {
+  if (isForbiddenTruthSource(relativePath) || relativePath.endsWith("/.gitkeep")) {
+    return false;
+  }
+  if (relativePath === "docs/project-memory/project.yaml" || relativePath === "docs/project-memory/profile.lock.yaml" || relativePath === "docs/project-memory/catalog.lock.json") {
+    return true;
+  }
+  return [
+    "docs/project-memory/source/",
+    "docs/project-memory/components/",
+    "docs/project-memory/domains/",
+    "docs/project-memory/initiatives/",
+    "docs/project-memory/workstreams/",
+    "docs/project-memory/records/",
+    "docs/project-memory/governance/events/",
+    "docs/project-memory/governance/claims/",
+    "docs/project-memory/governance/integration/"
+  ].some((prefix) => relativePath.startsWith(prefix));
+}
+function parseTreeEntries(value) {
+  const rawEntries = value.split("\0");
+  if (rawEntries.at(-1) === "") rawEntries.pop();
+  const entries = [];
+  const paths = /* @__PURE__ */ new Set();
+  for (const raw of rawEntries) {
+    const tab = raw.indexOf("	");
+    if (tab < 0) {
+      return failure("snapshot.tree_malformed", "Git ls-tree entry has no path delimiter");
+    }
+    const header = raw.slice(0, tab).split(" ");
+    const [mode, type, objectId] = header;
+    const relativePath = raw.slice(tab + 1);
+    if (header.length !== 3 || mode === void 0 || type === void 0 || objectId === void 0 || !OBJECT_ID2.test(objectId) || relativePath.length === 0) {
+      return failure(
+        "snapshot.tree_malformed",
+        "Git ls-tree returned a malformed canonical entry",
+        relativePath
+      );
+    }
+    if (!isCanonicalSnapshotPath(relativePath)) continue;
+    if (paths.has(relativePath)) {
+      return failure(
+        "snapshot.path_duplicate",
+        "one Git tree cannot provide a canonical path more than once",
+        relativePath
+      );
+    }
+    paths.add(relativePath);
+    entries.push({ mode, type, object_id: objectId, relative_path: relativePath });
+  }
+  return success(entries.sort((left, right) => compareUtf812(left.relative_path, right.relative_path)));
+}
+async function verifySource(root, source, runner) {
+  if (!OBJECT_ID2.test(source.object_id)) {
+    return failure(
+      "snapshot.revision_invalid",
+      "snapshot object IDs must be exact lowercase SHA-1 values",
+      source.object_id
+    );
+  }
+  const type = await runCommand(
+    {
+      executable: "git",
+      args: ["cat-file", "-t", source.object_id],
+      cwd: root,
+      timeout_ms: 3e4,
+      env_allowlist: gitEnvironment3(),
+      max_output_bytes: 65536
+    },
+    runner
+  );
+  if (!type.ok) return type;
+  if (type.value.exit_code === 1 || type.value.exit_code === 128) {
+    return failure(
+      "snapshot.revision_not_found",
+      "the requested Git object does not exist",
+      source.object_id
+    );
+  }
+  if (type.value.exit_code !== 0 || type.value.timed_out || type.value.output_truncated) {
+    return failure(
+      "snapshot.git_failed",
+      type.value.stderr.trim() || "could not inspect requested Git object",
+      source.object_id
+    );
+  }
+  if (type.value.stdout.trim() !== source.kind) {
+    return failure(
+      "snapshot.revision_type_mismatch",
+      `requested ${source.kind} object has type ${type.value.stdout.trim()}`,
+      source.object_id
+    );
+  }
+  const exists2 = await git(root, runner, [
+    "cat-file",
+    "-e",
+    `${source.object_id}^{${source.kind}}`
+  ]);
+  return exists2.ok ? success(true) : exists2;
+}
+function createRevisionTreeReader(runner) {
+  return {
+    async readCanonicalBlobs(root, source) {
+      const verified = await verifySource(root, source, runner);
+      if (!verified.ok) return verified;
+      const listed = await git(root, runner, [
+        "ls-tree",
+        "-rz",
+        "--full-tree",
+        source.object_id,
+        "--",
+        "docs/project-memory"
+      ]);
+      if (!listed.ok) return listed;
+      const entries = parseTreeEntries(listed.value);
+      if (!entries.ok) return entries;
+      const blobs = [];
+      for (const entry of entries.value) {
+        if (entry.type !== "blob" || entry.mode !== "100644") {
+          return failure(
+            "snapshot.non_blob_entry",
+            "canonical snapshot paths must be regular non-executable blobs",
+            entry.relative_path,
+            [entry.mode, entry.type]
+          );
+        }
+        const content = await git(root, runner, [
+          "cat-file",
+          "blob",
+          entry.object_id
+        ]);
+        if (!content.ok) return content;
+        blobs.push({
+          relative_path: entry.relative_path,
+          object_id: entry.object_id,
+          bytes: new TextEncoder().encode(content.value)
+        });
+      }
+      return success(blobs);
+    }
+  };
+}
+
+// src/governance/snapshot/canonical-snapshot-builder.ts
+function compareUtf813(left, right) {
+  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
+}
+async function indexBlobs(root, blobs) {
+  const indexed = /* @__PURE__ */ new Map();
+  for (const blob of blobs) {
+    if (isForbiddenTruthSource(blob.relative_path)) {
+      return failure(
+        "snapshot.forbidden_truth_source",
+        "generated views and archives cannot become current truth",
+        blob.relative_path
+      );
+    }
+    if (!isCanonicalSnapshotPath(blob.relative_path)) {
+      return failure(
+        "snapshot.source_path_forbidden",
+        "reader returned a path outside the canonical snapshot boundary",
+        blob.relative_path
+      );
+    }
+    if (!/^[0-9a-f]{40}$/.test(blob.object_id)) {
+      return failure("snapshot.blob_id_invalid", "blob object ID is malformed", blob.relative_path);
+    }
+    if (indexed.has(blob.relative_path)) {
+      return failure(
+        "snapshot.path_duplicate",
+        "canonical snapshot path appears more than once",
+        blob.relative_path
+      );
+    }
+    const confined2 = await resolveInside(root, blob.relative_path);
+    if (!confined2.ok) return confined2;
+    indexed.set(blob.relative_path, blob);
+  }
+  return success(
+    new Map([...indexed.entries()].sort(([left], [right]) => compareUtf813(left, right)))
+  );
+}
+function claimId(claim) {
+  const id = claim.value.id ?? claim.value.claim_id;
+  return typeof id === "string" ? id : null;
+}
+function validateReferences(parsed) {
+  const approvals = new Set(
+    parsed.records.filter((record5) => record5.type === "approval").map((record5) => record5.id)
+  );
+  const approvalRefs = [
+    parsed.project.acceptance.approval_id,
+    ...parsed.profile.accepted_source_entries.flatMap((entry) => entry.approval_refs),
+    ...parsed.markdown.flatMap((document) => document.envelope.approval_refs)
+  ];
+  const missingApproval = approvalRefs.find((id) => !approvals.has(id));
+  if (missingApproval !== void 0) {
+    return failure("snapshot.approval_missing", "accepted truth lacks canonical approval", missingApproval);
+  }
+  const known = /* @__PURE__ */ new Set([
+    parsed.project.root.id,
+    ...parsed.markdown.map((document) => document.envelope.id),
+    ...parsed.records.map((record5) => record5.id),
+    ...parsed.events.map((event) => event.aggregate_id),
+    ...parsed.claims.flatMap((claim) => claimId(claim) === null ? [] : [claimId(claim)])
+  ]);
+  for (const record5 of parsed.records) {
+    const structuralIds = [
+      ...record5.component_ids,
+      record5.initiative_id,
+      record5.workstream_id,
+      record5.task_id
+    ].filter((value) => value !== null);
+    const missingStructural = structuralIds.find((id) => !known.has(id));
+    if (missingStructural !== void 0) {
+      return failure("snapshot.relationship_missing", "record structural reference is missing", record5.id, [missingStructural]);
+    }
+    const missingRelationship = record5.relationships.find(
+      (relationship) => !known.has(relationship.target_id)
+    );
+    if (missingRelationship !== void 0) {
+      return failure(
+        "snapshot.relationship_missing",
+        "record relationship target is absent from current truth",
+        record5.id,
+        [missingRelationship.target_id]
+      );
+    }
+  }
+  const evidenceIds = new Set(
+    parsed.records.filter((record5) => record5.type === "evidence").map((record5) => record5.id)
+  );
+  for (const event of parsed.events) {
+    const missingEvidence = event.evidence_ids.find((id) => !evidenceIds.has(id));
+    if (missingEvidence !== void 0) {
+      return failure("snapshot.evidence_missing", "event evidence is absent", event.event_hash, [missingEvidence]);
+    }
+  }
+  return success(true);
+}
+async function buildCanonicalSnapshot(root, source, reader) {
+  const blobs = await reader.readCanonicalBlobs(root, source);
+  if (!blobs.ok) return blobs;
+  const indexed = await indexBlobs(root, blobs.value);
+  if (!indexed.ok) return indexed;
+  const parsed = parseSnapshot(indexed.value);
+  if (!parsed.ok) return parsed;
+  const references = validateReferences(parsed.value);
+  if (!references.ok) return references;
+  const supersession = buildSupersessionIndex(parsed.value.records);
+  if (!supersession.ok) return supersession;
+  const sourcePaths = [...indexed.value.keys()];
+  const sourceHashes = Object.fromEntries(
+    sourcePaths.map((relativePath) => [relativePath, sha256(indexed.value.get(relativePath)?.bytes ?? new Uint8Array())])
+  );
+  const objectIds = Object.fromEntries(
+    sourcePaths.map((relativePath) => [relativePath, indexed.value.get(relativePath)?.object_id ?? ""])
+  );
+  const byType = (type) => parsed.value.records.filter((record5) => record5.type === type);
+  const markdownByType = (type) => parsed.value.markdown.filter((document) => document.envelope.type === type);
+  return success({
+    source_revision: source.object_id,
+    source_kind: source.kind,
+    root_id: parsed.value.project.root.id,
+    profile_revision: parsed.value.profile.profile_revision,
+    profile_lock_hash: parsed.value.profile.lock_hash,
+    selected_catalog_lock_hash: parsed.value.catalog.lock_hash,
+    catalog_versions: [parsed.value.profile.profile.catalog.release],
+    source_paths: sourcePaths,
+    source_hashes: sourceHashes,
+    blob_object_ids: objectIds,
+    project: parsed.value.project,
+    profile_lock: parsed.value.profile,
+    source_documents: parsed.value.source_documents,
+    components: markdownByType("component"),
+    domains: markdownByType("domain"),
+    initiatives: markdownByType("initiative"),
+    workstreams: markdownByType("workstream"),
+    tasks: markdownByType("task"),
+    records: parsed.value.records,
+    effective_records: parsed.value.records.filter(
+      (record5) => !supersession.value.superseded_ids.has(record5.id)
+    ),
+    evidence: byType("evidence"),
+    risks: byType("risk"),
+    approvals: byType("approval"),
+    claims: parsed.value.claims,
+    events: parsed.value.events
+  });
+}
+function createCanonicalSnapshotBuilder(reader) {
+  return { build: (root, source) => buildCanonicalSnapshot(root, source, reader) };
+}
+
+// src/upgrades/node-repository-upgrade.ts
+var PROJECT_SELECTION_SCHEMA_ID = "project-memory/v1/project-selection";
+var ONE_HOUR_MS2 = 60 * 60 * 1e3;
+function isRecord4(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function printableVersion(value) {
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean" || typeof value === "bigint") {
+    return String(value);
+  }
+  return value === null ? "null" : "invalid";
+}
+async function readCommittedRegularFile(root, revision, relativePath, git2) {
+  const resolved = await resolveInside(root, relativePath);
+  if (!resolved.ok) return resolved;
+  try {
+    const stat2 = await lstat7(resolved.value);
+    if (stat2.isSymbolicLink() || !stat2.isFile()) {
+      return failure(
+        "UPGRADE_INPUT_UNSAFE",
+        "repository upgrade inputs must be regular files",
+        relativePath
+      );
+    }
+    const committed = await git2.readBlob(root, revision, relativePath);
+    return committed === null ? failure(
+      "UPGRADE_INPUT_READ_FAILED",
+      "repository upgrade input is absent from the expected Git revision",
+      relativePath
+    ) : success(new Uint8Array(committed));
+  } catch (error) {
+    return failure(
+      "UPGRADE_INPUT_READ_FAILED",
+      error instanceof Error ? error.message : String(error),
+      relativePath
+    );
+  }
+}
+function ensureProjectSchemas() {
+  if (getSchemaValidator(PROJECT_SELECTION_SCHEMA_ID) !== void 0) {
+    return success(true);
+  }
+  const registered2 = registerProjectSchemas(PROJECT_SCHEMA_REGISTRARS);
+  return registered2.ok ? success(true, registered2.warnings) : registered2;
+}
+function freshReplay(now) {
+  try {
+    const created = now();
+    if (!Number.isFinite(created.getTime())) {
+      return failure("UPGRADE_CLOCK_INVALID", "repository upgrade clock must be valid");
+    }
+    return success({
+      created_at: created.toISOString(),
+      expires_at: new Date(created.getTime() + ONE_HOUR_MS2).toISOString()
+    });
+  } catch {
+    return failure("UPGRADE_CLOCK_FAILED", "repository upgrade clock failed");
+  }
+}
+function createNodeRepositoryUpgradePlanner(now = () => /* @__PURE__ */ new Date()) {
+  const runner = new NodeCommandRunner();
+  const git2 = new GitCliClient(runner);
+  const revisionGit = new IntegrationGitCliClient(runner);
+  const snapshots = createCanonicalSnapshotBuilder(createRevisionTreeReader(runner));
+  return {
+    async plan(root, replay) {
+      const document = await readToolConfigDocument(root);
+      if (!document.ok) return document;
+      const rawVersion = isRecord4(document.value) ? document.value.repository_contract_version : void 0;
+      if (rawVersion === REPOSITORY_CONTRACT_VERSION) {
+        return success(null, document.warnings);
+      }
+      if (rawVersion !== void 0) {
+        return failure(
+          "REPOSITORY_CONTRACT_UNSUPPORTED",
+          `repository contract ${printableVersion(rawVersion)} is not supported by this plugin`,
+          CONFIG_RELATIVE_PATH,
+          [REPOSITORY_CONTRACT_VERSION]
+        );
+      }
+      const config = validateToolConfigDocument(document.value);
+      if (!config.ok) return config;
+      let status;
+      try {
+        status = await git2.statusPorcelain(root);
+      } catch (error) {
+        return failure(
+          "GIT_STATUS_FAILED",
+          error instanceof Error ? error.message : String(error),
+          root.href
+        );
+      }
+      if (status.length > 0) {
+        return failure(
+          "GIT_DIRTY_ROOT",
+          "repository upgrade requires a clean local checkout; no files were changed",
+          root.href
+        );
+      }
+      const targetRef = await currentGitBranchRef(root, runner);
+      if (!targetRef.ok) return targetRef;
+      let head;
+      try {
+        head = await git2.head(root);
+      } catch (error) {
+        return failure(
+          "GIT_HEAD_FAILED",
+          error instanceof Error ? error.message : String(error),
+          root.href
+        );
+      }
+      if (!/^[0-9a-f]{40}$/u.test(head)) {
+        return failure(
+          "GIT_HEAD_INVALID",
+          "repository upgrade requires an exact Git commit HEAD",
+          root.href
+        );
+      }
+      const schemas2 = ensureProjectSchemas();
+      if (!schemas2.ok) return schemas2;
+      const snapshot = await snapshots.build(root, {
+        kind: "commit",
+        object_id: head
+      });
+      if (!snapshot.ok) return snapshot;
+      const configBytes = await readCommittedRegularFile(
+        root,
+        head,
+        CONFIG_RELATIVE_PATH,
+        revisionGit
+      );
+      if (!configBytes.ok) return configBytes;
+      const doorwayBytes = await readCommittedRegularFile(
+        root,
+        head,
+        PROJECT_CONTEXT_PATH,
+        revisionGit
+      );
+      if (!doorwayBytes.ok) return doorwayBytes;
+      const stableReplay = replay === void 0 ? freshReplay(now) : success(replay);
+      if (!stableReplay.ok) return stableReplay;
+      const registry = createProjectMemoryMigrationRegistry();
+      if (!registry.ok) return registry;
+      const planned = buildRepositoryUpgradePlan({
+        snapshot: snapshot.value,
+        target_ref: targetRef.value,
+        expected_head: head,
+        config_bytes: configBytes.value,
+        config_sha256: sha256(configBytes.value),
+        doorway_bytes: doorwayBytes.value,
+        doorway_sha256: sha256(doorwayBytes.value),
+        created_at: stableReplay.value.created_at,
+        expires_at: stableReplay.value.expires_at
+      }, registry.value);
+      return planned.ok ? success(planned.value, [
+        ...document.warnings,
+        ...config.warnings,
+        ...targetRef.warnings,
+        ...schemas2.warnings,
+        ...snapshot.warnings,
+        ...configBytes.warnings,
+        ...doorwayBytes.warnings,
+        ...stableReplay.warnings,
+        ...registry.warnings,
+        ...planned.warnings
+      ]) : planned;
+    }
+  };
+}
+
+// src/import/scanner.ts
+import { lstat as lstat8, readFile as readFile9, readdir as readdir6, realpath as realpath3 } from "node:fs/promises";
+import path10 from "node:path";
+import { fileURLToPath as fileURLToPath8 } from "node:url";
+
+// src/import/classifiers.ts
+import path9 from "node:path";
+function compareUtf814(left, right) {
+  return Buffer.compare(Buffer.from(left), Buffer.from(right));
+}
+function classifyLegacyDocument(relativePath) {
+  const name = path9.posix.basename(relativePath).toUpperCase();
+  const roles = /* @__PURE__ */ new Set();
+  if (name.includes("PRD")) roles.add("prd");
+  if (name.includes("REQUIREMENT")) roles.add("requirements");
+  if (name.includes("HANDOFF")) roles.add("handoff");
+  if (name.includes("CHANGELOG")) roles.add("changelog");
+  if (name.includes("DECISION") || name.includes("ADR")) roles.add("decision-log");
+  if (name.includes("TODO") || name.includes("TASK")) roles.add("task-list");
+  if (name === "AGENTS.MD" || name === "CLAUDE.MD") roles.add("agent-instructions");
+  if (name === "README.MD") roles.add("readme");
+  if (roles.size === 0) roles.add("unknown");
+  return [...roles].sort(compareUtf814);
+}
+function findSensitivity(text) {
+  const findings = [];
+  const patterns = [
+    { kind: "credential-pattern", pattern: /AKIA[0-9A-Z]{16}/, message: "AWS-style access key pattern" },
+    { kind: "private-key", pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/, message: "private key header" },
+    { kind: "personal-data", pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i, message: "email address" }
+  ];
+  for (const [index, line] of text.split(/\r?\n/).entries()) {
+    for (const candidate of patterns) {
+      if (candidate.pattern.test(line)) {
+        findings.push({ kind: candidate.kind, line: index + 1, message: candidate.message });
+      }
+    }
+  }
+  return findings;
+}
+
+// src/import/scanner.ts
+var ALLOWED_EXTENSIONS = /* @__PURE__ */ new Set([".md", ".txt", ".yaml", ".yml", ".json"]);
+var MAX_FILE_BYTES = 1048576;
+function compareUtf815(left, right) {
+  return Buffer.compare(Buffer.from(left), Buffer.from(right));
+}
+function inside(root, candidate) {
+  const normalizedRoot = `${path10.resolve(root)}${path10.sep}`.toLowerCase();
+  return path10.resolve(candidate).toLowerCase().startsWith(normalizedRoot);
+}
+function ignoredGeneratedDirectory(relativePath) {
+  const normalized = relativePath.toLowerCase();
+  return normalized === ".tmp/project-memory" || normalized === ".claude/worktrees" || /^(?:linux|windows)\/flutter\/ephemeral\/\.plugin_symlinks$/u.test(normalized) || normalized === "ios/.symlinks" || normalized === "macos/flutter/ephemeral/.symlinks";
+}
+function ignoredProjectMemoryPath(relativePath, options) {
+  if (options.phase !== "post_bootstrap") return false;
+  const normalized = relativePath.toLowerCase();
+  return normalized === "project_context.md" || normalized === "docs/project-memory" || normalized.startsWith("docs/project-memory/");
+}
+function ignoredGeneratedRouter(relativePath, text, options) {
+  if (options.phase !== "post_bootstrap") return false;
+  const normalized = relativePath.toLowerCase();
+  return (normalized === "agents.md" || normalized === "claude.md") && text.startsWith(
+    "<!-- PROJECT MEMORY GENERATED ROUTER - DO NOT EDIT -->\n"
+  );
+}
+async function defaultGitRevision(root, relativePath) {
+  const result = await runCommand({
+    executable: "git",
+    args: ["log", "-n", "1", "--format=%H", "--", relativePath],
+    cwd: root,
+    timeout_ms: 1e4,
+    env_allowlist: { GIT_TERMINAL_PROMPT: "0", LC_ALL: "C", PATH: process.env.PATH ?? "" },
+    max_output_bytes: 65536
+  }, new NodeCommandRunner());
+  if (!result.ok || result.value.exit_code !== 0) return null;
+  const revision = result.value.stdout.trim();
+  return /^[0-9a-f]{40}$/.test(revision) ? revision : null;
+}
+function createLegacyScanner(dependencies = {}) {
+  const gitRevision = dependencies.git_revision ?? defaultGitRevision;
+  return {
+    async scan(root, options = { phase: "bootstrap" }) {
+      if (root.protocol !== "file:") {
+        return failure("LEGACY_ROOT_INVALID", "legacy scan root must be a file URL");
+      }
+      const rootPath = await realpath3(fileURLToPath8(root));
+      const files = [];
+      async function visit(directory) {
+        const entries = await readdir6(directory, { withFileTypes: true });
+        entries.sort((left, right) => compareUtf815(left.name, right.name));
+        for (const entry of entries) {
+          const absolute = path10.join(directory, entry.name);
+          if (entry.name === ".git" || entry.name === "node_modules" || entry.name === "build") continue;
+          const relative = path10.relative(rootPath, absolute).split(path10.sep).join("/");
+          if (ignoredProjectMemoryPath(relative, options)) continue;
+          if (entry.isDirectory() && ignoredGeneratedDirectory(relative)) continue;
+          const stat2 = await lstat8(absolute);
+          if (stat2.isSymbolicLink()) {
+            const target = await realpath3(absolute);
+            if (!inside(rootPath, target)) {
+              return failure("LEGACY_SYMLINK_ESCAPE", "legacy scan symlink escapes the root", absolute);
+            }
+            continue;
+          }
+          if (stat2.isDirectory()) {
+            const nested = await visit(absolute);
+            if (!nested.ok) return nested;
+          } else if (stat2.isFile() && ALLOWED_EXTENSIONS.has(path10.extname(entry.name).toLowerCase())) {
+            if (stat2.size > MAX_FILE_BYTES) {
+              return failure("LEGACY_FILE_TOO_LARGE", "legacy source exceeds the scan byte bound", absolute);
+            }
+            files.push(absolute);
+          }
+        }
+        return success(true);
+      }
+      try {
+        const visited = await visit(rootPath);
+        if (!visited.ok) return visited;
+        const artifacts = [];
+        for (const absolute of files) {
+          const relativePath = path10.relative(rootPath, absolute).split(path10.sep).join("/");
+          const bytes = new Uint8Array(await readFile9(absolute));
+          const decoded = decodeStrictUtf8(bytes, relativePath);
+          if (!decoded.ok) {
+            return failure("LEGACY_ENCODING_INVALID", "legacy source must be strict UTF-8", relativePath);
+          }
+          if (ignoredGeneratedRouter(relativePath, decoded.value, options)) continue;
+          artifacts.push({
+            relative_path: relativePath,
+            sha256: sha256(bytes),
+            byte_length: bytes.byteLength,
+            git_revision: await gitRevision(root, relativePath),
+            detected_roles: classifyLegacyDocument(relativePath),
+            sensitivity_findings: findSensitivity(decoded.value)
+          });
+        }
+        artifacts.sort((left, right) => compareUtf815(left.relative_path, right.relative_path));
+        const body = { schema_version: "1.0.0", root: root.href, artifacts };
+        return success({ ...body, scan_hash: sha256(canonicalJson(body)) });
+      } catch (error) {
+        return failure("LEGACY_SCAN_FAILED", error instanceof Error ? error.message : String(error));
+      }
+    }
+  };
+}
+
+// src/import/planner.ts
+function compareUtf816(left, right) {
+  return Buffer.compare(Buffer.from(left), Buffer.from(right));
+}
+function mapping(artifact, context) {
+  const roles = artifact.detected_roles;
+  if (roles.includes("prd") || roles.includes("requirements")) {
+    return {
+      source_path: artifact.relative_path,
+      source_sha256: artifact.sha256,
+      classification: "directional_candidate",
+      destination_kind: "canonical_document_patch",
+      destination_path: context.governing_document,
+      accepted: false,
+      rationale: "Requirements may only propose a reviewed patch to the governing source document."
+    };
+  }
+  if (roles.includes("handoff") || roles.includes("changelog")) {
+    return {
+      source_path: artifact.relative_path,
+      source_sha256: artifact.sha256,
+      classification: "historical_status",
+      destination_kind: "view_candidate",
+      destination_path: null,
+      accepted: false,
+      rationale: "Historical status may inform regenerated views but is not canonical truth."
+    };
+  }
+  if (roles.includes("decision-log")) {
+    return {
+      source_path: artifact.relative_path,
+      source_sha256: artifact.sha256,
+      classification: "directional_candidate",
+      destination_kind: "archive_only",
+      destination_path: null,
+      accepted: false,
+      rationale: "Legacy decisions require independent authority review before canonicalization."
+    };
+  }
+  return {
+    source_path: artifact.relative_path,
+    source_sha256: artifact.sha256,
+    classification: roles.includes("readme") || roles.includes("agent-instructions") ? "observation" : "archive_only",
+    destination_kind: "archive_only",
+    destination_path: null,
+    accepted: false,
+    rationale: "Unaccepted legacy material remains archive-only evidence."
+  };
+}
+function proposeLegacyImport(scan, context) {
+  const mappings = scan.artifacts.map((artifact) => mapping(artifact, context)).sort((left, right) => compareUtf816(left.source_path, right.source_path));
+  const destinations = /* @__PURE__ */ new Set();
+  for (const candidate of mappings) {
+    if (candidate.destination_path === null) continue;
+    if (destinations.has(candidate.destination_path)) {
+      return failure(
+        "LEGACY_DESTINATION_DUPLICATE",
+        "two legacy sources propose the same canonical destination",
+        candidate.destination_path
+      );
+    }
+    destinations.add(candidate.destination_path);
+  }
+  const body = {
+    schema_version: "1.0.0",
+    root_id: context.root_id,
+    status: "review_required",
+    scan_hash: scan.scan_hash,
+    mappings
+  };
+  return success({ ...body, proposal_hash: sha256(canonicalJson(body)) });
+}
+function planLegacyImport(input) {
+  if (input.approval_ids.length === 0) {
+    return failure("LEGACY_APPROVAL_REQUIRED", "reviewed import requires exact Pitaji approval");
+  }
+  const sourcePaths = /* @__PURE__ */ new Set();
+  const destinationPaths = /* @__PURE__ */ new Set();
+  const writes = [];
+  for (const decision of input.decisions) {
+    if (sourcePaths.has(decision.source_path)) {
+      return failure("LEGACY_SOURCE_DUPLICATE", "legacy source has more than one reviewed decision", decision.source_path);
+    }
+    sourcePaths.add(decision.source_path);
+    if (sha256(decision.source_bytes) !== decision.source_sha256) {
+      return failure("LEGACY_SOURCE_HASH_MISMATCH", "reviewed legacy bytes do not match their hash", decision.source_path);
+    }
+    if (decision.destination_kind === "canonical_record") {
+      return failure("LEGACY_GENERIC_RECORD_FORBIDDEN", "legacy facts cannot map to generic canonical records", decision.source_path);
+    }
+    if (decision.destination_path !== null) {
+      if (destinationPaths.has(decision.destination_path)) {
+        return failure("LEGACY_DESTINATION_DUPLICATE", "reviewed decisions repeat a canonical destination", decision.destination_path);
+      }
+      destinationPaths.add(decision.destination_path);
+    }
+    if (decision.decision === "exclude") continue;
+    writes.push({
+      relative_path: `docs/project-memory/archive/imports/${decision.source_sha256}.bin`,
+      bytes: new Uint8Array(decision.source_bytes),
+      expected_existing_sha256: null,
+      mode: "create"
+    });
+    if (decision.decision === "accept" && decision.destination_kind === "canonical_document_patch") {
+      writes.push({
+        relative_path: `docs/project-memory/import/proposals/${decision.source_sha256}.md`,
+        bytes: new Uint8Array(decision.source_bytes),
+        expected_existing_sha256: null,
+        mode: "create"
+      });
+    }
+  }
+  writes.sort((left, right) => compareUtf816(left.relative_path, right.relative_path));
+  const metadata = {
+    governance_kind: "import",
+    proposal_hash: input.proposal_hash,
+    imported_source_hashes: input.decisions.filter((decision) => decision.decision !== "exclude").map((decision) => decision.source_sha256).sort(compareUtf816),
+    excluded_source_paths: input.decisions.filter((decision) => decision.decision === "exclude").map((decision) => decision.source_path).sort(compareUtf816),
+    destination_paths: [...destinationPaths].sort(compareUtf816)
+  };
+  const body = {
+    schema_version: "1.0.0",
+    plan_id: `import:${input.proposal_hash.slice(0, 16)}`,
+    mutation_kind: "import",
+    root_id: input.root_id,
+    target_ref: input.target_ref,
+    expected_head: input.expected_head,
+    profile_lock_hash: input.profile_lock_hash,
+    writes,
+    record_ids: [],
+    event_ids: [],
+    approval_ids: [...new Set(input.approval_ids)].sort(compareUtf816),
+    evidence_ids: [],
+    created_by: input.created_by,
+    created_at: input.created_at,
+    expires_at: input.expires_at,
+    metadata
+  };
+  return success({ ...body, plan_hash: canonicalMutationPlanHash(body) });
+}
+
 // src/import/render-import-report.ts
 function reportDestination(destination) {
   if (destination === null) return null;
@@ -29495,7 +31543,7 @@ function renderGuidedImportReport(input, candidates, metadata) {
 }
 
 // src/import/plan-reviewed-import.ts
-function compareUtf89(left, right) {
+function compareUtf817(left, right) {
   return Buffer.compare(Buffer.from(left), Buffer.from(right));
 }
 function defaultArchivePlan(candidate) {
@@ -29617,16 +31665,16 @@ function planReviewedImport(input, dependencies = { plan_archive: defaultArchive
     imported.push(candidate);
   }
   const reportPath = `docs/project-memory/governance/imports/${input.proposal_hash}.json`;
-  const originalPaths = writes.map((write) => write.relative_path).filter((path27) => path27.includes("/archive/imports/original/")).sort(compareUtf89);
-  const redactedPaths = writes.map((write) => write.relative_path).filter((path27) => path27.includes("/archive/imports/redacted/")).sort(compareUtf89);
+  const originalPaths = writes.map((write) => write.relative_path).filter((path27) => path27.includes("/archive/imports/original/")).sort(compareUtf817);
+  const redactedPaths = writes.map((write) => write.relative_path).filter((path27) => path27.includes("/archive/imports/redacted/")).sort(compareUtf817);
   const reportMetadata = {
     governance_kind: "import",
     proposal_hash: input.proposal_hash,
-    imported_candidate_ids: imported.map((candidate) => candidate.candidate_id).sort(compareUtf89),
-    rejected_candidate_ids: rejected.map((candidate) => candidate.candidate_id).sort(compareUtf89),
+    imported_candidate_ids: imported.map((candidate) => candidate.candidate_id).sort(compareUtf817),
+    rejected_candidate_ids: rejected.map((candidate) => candidate.candidate_id).sort(compareUtf817),
     original_archive_paths: originalPaths,
     redacted_archive_paths: redactedPaths,
-    destination_paths: [...destinations].sort(compareUtf89),
+    destination_paths: [...destinations].sort(compareUtf817),
     import_report_path: reportPath,
     required_view_paths: [...GENERATED_VIEW_PATHS]
   };
@@ -29642,8 +31690,8 @@ function planReviewedImport(input, dependencies = { plan_archive: defaultArchive
     mode: "create"
   });
   const orderedWrites = [
-    ...writes.filter((write) => write.relative_path.includes("/archive/imports/")).sort((left, right) => compareUtf89(left.relative_path, right.relative_path)),
-    ...writes.filter((write) => !write.relative_path.includes("/archive/imports/") && write.relative_path !== reportPath).sort((left, right) => compareUtf89(left.relative_path, right.relative_path)),
+    ...writes.filter((write) => write.relative_path.includes("/archive/imports/")).sort((left, right) => compareUtf817(left.relative_path, right.relative_path)),
+    ...writes.filter((write) => !write.relative_path.includes("/archive/imports/") && write.relative_path !== reportPath).sort((left, right) => compareUtf817(left.relative_path, right.relative_path)),
     ...writes.filter((write) => write.relative_path === reportPath)
   ];
   const body = {
@@ -29655,9 +31703,9 @@ function planReviewedImport(input, dependencies = { plan_archive: defaultArchive
     expected_head: input.expected_head,
     profile_lock_hash: input.profile_lock_hash,
     writes: orderedWrites,
-    record_ids: recordIds.sort(compareUtf89),
+    record_ids: recordIds.sort(compareUtf817),
     event_ids: [],
-    approval_ids: [...new Set(input.approval_ids)].sort(compareUtf89),
+    approval_ids: [...new Set(input.approval_ids)].sort(compareUtf817),
     evidence_ids: [metadata.import_report_hash],
     created_by: input.created_by,
     created_at: input.created_at,
@@ -29668,7 +31716,7 @@ function planReviewedImport(input, dependencies = { plan_archive: defaultArchive
 }
 
 // src/import/pending-review.ts
-import { lstat as lstat7, readFile as readFile9, readdir as readdir6 } from "node:fs/promises";
+import { lstat as lstat9, readFile as readFile10, readdir as readdir7 } from "node:fs/promises";
 import path11 from "node:path";
 var IMPORT_REPORT_DIRECTORY = "docs/project-memory/governance/imports";
 var SHA256_PATTERN3 = /^[0-9a-f]{64}$/u;
@@ -29684,10 +31732,10 @@ var REVIEWABLE_ROLES = /* @__PURE__ */ new Set([
   "agent-instructions",
   "readme"
 ]);
-function compareUtf810(left, right) {
+function compareUtf818(left, right) {
   return Buffer.compare(Buffer.from(left), Buffer.from(right));
 }
-function isRecord3(value) {
+function isRecord5(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 function isSafeSourcePath(value) {
@@ -29706,7 +31754,7 @@ async function resolvedSources(root, rootId) {
   }
   let directoryStat;
   try {
-    directoryStat = await lstat7(resolvedDirectory.value);
+    directoryStat = await lstat9(resolvedDirectory.value);
   } catch (error) {
     if (error.code === "ENOENT") return success(/* @__PURE__ */ new Set());
     return reportFailure(
@@ -29723,14 +31771,14 @@ async function resolvedSources(root, rootId) {
   const decisions = /* @__PURE__ */ new Map();
   let entries;
   try {
-    entries = await readdir6(resolvedDirectory.value, { withFileTypes: true });
+    entries = await readdir7(resolvedDirectory.value, { withFileTypes: true });
   } catch {
     return reportFailure(
       "LEGACY_REPORT_DIRECTORY_UNSAFE",
       "legacy import report directory could not be read"
     );
   }
-  entries.sort((left, right) => compareUtf810(left.name, right.name));
+  entries.sort((left, right) => compareUtf818(left.name, right.name));
   for (const entry of entries) {
     if (!entry.name.endsWith(".json")) continue;
     const reportPath = `${IMPORT_REPORT_DIRECTORY}/${entry.name}`;
@@ -29748,11 +31796,11 @@ async function resolvedSources(root, rootId) {
     }
     let bytes;
     try {
-      const reportStat = await lstat7(resolvedReport.value);
+      const reportStat = await lstat9(resolvedReport.value);
       if (!reportStat.isFile() || reportStat.isSymbolicLink()) {
         return reportFailure("LEGACY_REPORT_INVALID", "legacy import report must be a real file", reportPath);
       }
-      bytes = new Uint8Array(await readFile9(resolvedReport.value));
+      bytes = new Uint8Array(await readFile10(resolvedReport.value));
     } catch {
       return reportFailure("LEGACY_REPORT_INVALID", "legacy import report could not be read", reportPath);
     }
@@ -29761,7 +31809,7 @@ async function resolvedSources(root, rootId) {
       return reportFailure("LEGACY_REPORT_INVALID", "legacy import report must be strict UTF-8", reportPath);
     }
     const parsed = parseJsonDocument(decoded.value, reportPath);
-    if (!parsed.ok || !isRecord3(parsed.value)) {
+    if (!parsed.ok || !isRecord5(parsed.value)) {
       return reportFailure("LEGACY_REPORT_INVALID", "legacy import report must be valid JSON", reportPath);
     }
     const report = parsed.value;
@@ -29769,7 +31817,7 @@ async function resolvedSources(root, rootId) {
       return reportFailure("LEGACY_REPORT_INVALID", "legacy import report identity is invalid", reportPath);
     }
     for (const rawCandidate of report.candidates) {
-      if (!isRecord3(rawCandidate)) {
+      if (!isRecord5(rawCandidate)) {
         return reportFailure("LEGACY_REPORT_INVALID", "legacy import report candidate is invalid", reportPath);
       }
       const sourcePath = rawCandidate.source_path;
@@ -29836,7 +31884,7 @@ var FACT_CATEGORIES = /* @__PURE__ */ new Set([
 ]);
 var DISPOSITIONS = /* @__PURE__ */ new Set(["import", "archive", "reject", "unresolved"]);
 var REVISION = /^[0-9a-f]{40}$/u;
-function compareUtf811(left, right) {
+function compareUtf819(left, right) {
   return Buffer.compare(Buffer.from(left), Buffer.from(right));
 }
 function safeSourcePath(value) {
@@ -29863,7 +31911,7 @@ function recordDirectory(type) {
   }
   throw new RangeError(`Unknown canonical record type: ${type}`);
 }
-function recordWrite(record5) {
+function recordWrite2(record5) {
   return {
     relative_path: `docs/project-memory/records/${recordDirectory(record5.type)}/${record5.id}.json`,
     bytes: new TextEncoder().encode(canonicalJson(record5)),
@@ -30069,7 +32117,7 @@ async function planGuidedLegacyImport(input, dependencies) {
   const unresolvedSourcePaths = [];
   const reportCandidates = [];
   for (const source of input.sources.toSorted(
-    (left, right) => compareUtf811(left.source_path, right.source_path)
+    (left, right) => compareUtf819(left.source_path, right.source_path)
   )) {
     if (!safeSourcePath(source.source_path) || seenSources.has(source.source_path)) {
       return failure(
@@ -30176,8 +32224,8 @@ async function planGuidedLegacyImport(input, dependencies) {
         evidenceId2
       ));
       if (!record5.ok) return record5;
-      const evidenceWrite = recordWrite(evidence.value);
-      const factWrite = recordWrite(record5.value);
+      const evidenceWrite = recordWrite2(evidence.value);
+      const factWrite = recordWrite2(record5.value);
       writes.push(evidenceWrite, factWrite);
       destinationPaths.push(evidenceWrite.relative_path, factWrite.relative_path);
       recordIds.push(evidenceId2, recordId);
@@ -30234,16 +32282,16 @@ async function planGuidedLegacyImport(input, dependencies) {
   const reportMetadata = {
     governance_kind: "import",
     proposal_hash: input.proposal_hash,
-    imported_candidate_ids: importedCandidateIds.sort(compareUtf811),
-    rejected_candidate_ids: rejectedCandidateIds.sort(compareUtf811),
-    original_archive_paths: [...archivePaths].sort(compareUtf811),
+    imported_candidate_ids: importedCandidateIds.sort(compareUtf819),
+    rejected_candidate_ids: rejectedCandidateIds.sort(compareUtf819),
+    original_archive_paths: [...archivePaths].sort(compareUtf819),
     redacted_archive_paths: [],
-    destination_paths: destinationPaths.sort(compareUtf811),
+    destination_paths: destinationPaths.sort(compareUtf819),
     import_report_path: reportPath,
     required_view_paths: [...GENERATED_VIEW_PATHS],
-    resolved_source_paths: resolvedSourcePaths.sort(compareUtf811),
-    unresolved_source_paths: unresolvedSourcePaths.sort(compareUtf811),
-    imported_fact_record_ids: recordIds.filter((id) => !id.startsWith("EVD-")).sort(compareUtf811),
+    resolved_source_paths: resolvedSourcePaths.sort(compareUtf819),
+    unresolved_source_paths: unresolvedSourcePaths.sort(compareUtf819),
+    imported_fact_record_ids: recordIds.filter((id) => !id.startsWith("EVD-")).sort(compareUtf819),
     guided_input_hash: sha256(canonicalJson(input))
   };
   const report = renderGuidedImportReport(input, reportCandidates, reportMetadata);
@@ -30259,7 +32307,7 @@ async function planGuidedLegacyImport(input, dependencies) {
   });
   const orderedWrites = writes.toSorted((left, right) => {
     const rank = (value) => value.includes("/archive/imports/") ? 0 : value.includes("/records/") ? 1 : value === reportPath ? 2 : 1;
-    return rank(left.relative_path) - rank(right.relative_path) || compareUtf811(left.relative_path, right.relative_path);
+    return rank(left.relative_path) - rank(right.relative_path) || compareUtf819(left.relative_path, right.relative_path);
   });
   const body = {
     schema_version: "1.0.0",
@@ -30270,10 +32318,10 @@ async function planGuidedLegacyImport(input, dependencies) {
     expected_head: input.expected_head,
     profile_lock_hash: input.profile_lock_hash,
     writes: orderedWrites,
-    record_ids: recordIds.sort(compareUtf811),
+    record_ids: recordIds.sort(compareUtf819),
     event_ids: [],
     approval_ids: [],
-    evidence_ids: evidenceIds.sort(compareUtf811),
+    evidence_ids: evidenceIds.sort(compareUtf819),
     created_by: input.created_by,
     created_at: input.created_at,
     expires_at: input.expires_at,
@@ -30302,7 +32350,7 @@ var REQUIRED_TRIAL_RUNS = 2;
 var REQUIRED_SUPPORTED_BRIEFS_PER_RUN = 30;
 var SHA2562 = /^[0-9a-f]{64}$/;
 var GIT_SHA = /^[0-9a-f]{40}$/;
-function compareUtf812(left, right) {
+function compareUtf820(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function hasCredentialLikePath(path27) {
@@ -30338,7 +32386,7 @@ function assessLowerReasoningTrials(trials) {
   const runIds = /* @__PURE__ */ new Set();
   const issues = [];
   let qualifyingRuns = 0;
-  for (const trial of [...trials].sort((left, right) => compareUtf812(left.run_id, right.run_id))) {
+  for (const trial of [...trials].sort((left, right) => compareUtf820(left.run_id, right.run_id))) {
     if (runIds.has(trial.run_id)) {
       issues.push(`TRIAL_RUN_ID_DUPLICATE:${trial.run_id}`);
       continue;
@@ -30399,7 +32447,7 @@ function buildBenchmarkReport(cases, results, trials) {
     max_clarification_questions: maxClarificationQuestions,
     deterministic_gate_passed: deterministicGatePassed,
     gate_failures: gateFailures,
-    results: [...results].sort((left, right) => compareUtf812(left.case_id, right.case_id)),
+    results: [...results].sort((left, right) => compareUtf820(left.case_id, right.case_id)),
     lower_reasoning_trials: trialAssessment,
     v1_accepted: deterministicGatePassed && trialAssessment.accepted
   };
@@ -30418,12 +32466,12 @@ var PLUGIN_AGENT_REPORT_THRESHOLDS = Object.freeze({
 });
 
 // src/benchmark/run-benchmark.ts
-import { lstat as lstat8, readFile as readFile10, readdir as readdir7 } from "node:fs/promises";
+import { lstat as lstat10, readFile as readFile11, readdir as readdir8 } from "node:fs/promises";
 import path13 from "node:path";
-import { fileURLToPath as fileURLToPath8 } from "node:url";
+import { fileURLToPath as fileURLToPath9 } from "node:url";
 
 // src/selection/evaluate-predicate.ts
-function compareUtf813(left, right) {
+function compareUtf821(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function evaluation(predicate, matched, code, evidenceIds) {
@@ -30431,7 +32479,7 @@ function evaluation(predicate, matched, code, evidenceIds) {
     predicate_id: predicate.id,
     matched,
     code,
-    evidence_ids: [...evidenceIds].sort(compareUtf813)
+    evidence_ids: [...evidenceIds].sort(compareUtf821)
   };
 }
 function isStringArray(value) {
@@ -30439,7 +32487,7 @@ function isStringArray(value) {
 }
 function equalValues(left, right) {
   if (isStringArray(left) && isStringArray(right)) {
-    return JSON.stringify([...left].sort(compareUtf813)) === JSON.stringify([...right].sort(compareUtf813));
+    return JSON.stringify([...left].sort(compareUtf821)) === JSON.stringify([...right].sort(compareUtf821));
   }
   return typeof left === typeof right && Object.is(left, right);
 }
@@ -30530,7 +32578,7 @@ var SOURCE_KINDS2 = /* @__PURE__ */ new Set([
   "profile",
   "classifier"
 ]);
-function compareUtf814(left, right) {
+function compareUtf822(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function canonicalValue(observation) {
@@ -30545,7 +32593,7 @@ function canonicalValue(observation) {
     return success(value);
   }
   if (valueType === "string-set" && Array.isArray(value) && value.every((entry) => typeof entry === "string")) {
-    return success([...new Set(value)].sort(compareUtf814));
+    return success([...new Set(value)].sort(compareUtf822));
   }
   return failure(
     "selection.feature_type_mismatch",
@@ -30578,8 +32626,8 @@ function sameJsonValue(left, right) {
 function normalizeFeatureMap(observations2) {
   const accumulators = /* @__PURE__ */ new Map();
   const ordered = [...observations2].sort((left, right) => {
-    const byId2 = compareUtf814(left.id, right.id);
-    return byId2 === 0 ? compareUtf814(left.evidenceId, right.evidenceId) : byId2;
+    const byId2 = compareUtf822(left.id, right.id);
+    return byId2 === 0 ? compareUtf822(left.evidenceId, right.evidenceId) : byId2;
   });
   for (const observation of ordered) {
     if (!FEATURE_ID.test(observation.id)) {
@@ -30623,7 +32671,7 @@ function normalizeFeatureMap(observations2) {
     existing.evidence.set(evidence.value.evidence_id, evidence.value);
   }
   const features = {};
-  for (const id of [...accumulators.keys()].sort(compareUtf814)) {
+  for (const id of [...accumulators.keys()].sort(compareUtf822)) {
     const feature = accumulators.get(id);
     if (feature === void 0) continue;
     features[id] = {
@@ -30631,7 +32679,7 @@ function normalizeFeatureMap(observations2) {
       value_type: feature.value_type,
       value: feature.value,
       evidence: [...feature.evidence.values()].sort(
-        (left, right) => compareUtf814(left.evidence_id, right.evidence_id)
+        (left, right) => compareUtf822(left.evidence_id, right.evidence_id)
       )
     };
   }
@@ -30639,7 +32687,7 @@ function normalizeFeatureMap(observations2) {
 }
 
 // src/selection/score-candidates.ts
-function compareUtf815(left, right) {
+function compareUtf823(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function issue2(code, path27, message, references = []) {
@@ -30649,7 +32697,7 @@ function validateCandidateContracts(definitions) {
   const issues = [];
   const definitionIds = /* @__PURE__ */ new Set();
   for (const definition of [...definitions].sort(
-    (left, right) => compareUtf815(left.id, right.id)
+    (left, right) => compareUtf823(left.id, right.id)
   )) {
     if (definitionIds.has(definition.id)) {
       issues.push(
@@ -30705,8 +32753,8 @@ function validateCandidateContracts(definitions) {
     }
   }
   return issues.sort((left, right) => {
-    const byPath = compareUtf815(left.path, right.path);
-    return byPath === 0 ? compareUtf815(left.code, right.code) : byPath;
+    const byPath = compareUtf823(left.path, right.path);
+    return byPath === 0 ? compareUtf823(left.code, right.code) : byPath;
   });
 }
 function authorityRank(definition) {
@@ -30792,9 +32840,9 @@ function scoreCandidate(definition, features, context) {
       version: definition.version,
       eligible: disqualifications.length === 0,
       score,
-      matched_positive_ids: [...new Set(matchedPositive.map((item) => item.id))].sort(compareUtf815),
-      matched_negative_ids: [...new Set(matchedNegative.map((item) => item.id))].sort(compareUtf815),
-      disqualification_codes: [...new Set(disqualifications)].sort(compareUtf815),
+      matched_positive_ids: [...new Set(matchedPositive.map((item) => item.id))].sort(compareUtf823),
+      matched_negative_ids: [...new Set(matchedNegative.map((item) => item.id))].sort(compareUtf823),
+      disqualification_codes: [...new Set(disqualifications)].sort(compareUtf823),
       specificity_rank: definition.selection.specificity_rank,
       precedence: definition.selection.precedence,
       authority_rank: authorityRank(definition)
@@ -30820,8 +32868,8 @@ function compareScored(left, right) {
   if (left.trace.authority_rank !== right.trace.authority_rank) {
     return left.trace.authority_rank - right.trace.authority_rank;
   }
-  const byId2 = compareUtf815(left.trace.definition_id, right.trace.definition_id);
-  return byId2 === 0 ? compareUtf815(right.trace.version, left.trace.version) : byId2;
+  const byId2 = compareUtf823(left.trace.definition_id, right.trace.definition_id);
+  return byId2 === 0 ? compareUtf823(right.trace.version, left.trace.version) : byId2;
 }
 function semanticTie(left, right) {
   return left.trace.score === right.trace.score && left.trace.specificity_rank === right.trace.specificity_rank && left.profile_exact === right.profile_exact && left.trace.precedence === right.trace.precedence && left.trace.authority_rank === right.trace.authority_rank;
@@ -30877,11 +32925,11 @@ var TAXONOMY_FIELDS2 = new Set(
 );
 
 // src/catalog/fixtures/run-integrated-blueprint-fixtures.ts
-function compareUtf816(left, right) {
+function compareUtf824(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function projectBlueprints(catalog) {
-  return [...catalog.blueprints.values()].sort((left, right) => compareUtf816(left.id, right.id)).map((blueprint) => ({
+  return [...catalog.blueprints.values()].sort((left, right) => compareUtf824(left.id, right.id)).map((blueprint) => ({
     id: blueprint.id,
     version: blueprint.version,
     status: blueprint.status,
@@ -30898,7 +32946,7 @@ function projectBlueprints(catalog) {
   }));
 }
 function observations(fixture) {
-  return Object.entries(fixture.normalized_features).sort(([left], [right]) => compareUtf816(left, right)).map(([id, value], index) => ({
+  return Object.entries(fixture.normalized_features).sort(([left], [right]) => compareUtf824(left, right)).map(([id, value], index) => ({
     id,
     valueType: Array.isArray(value) ? "string-set" : typeof value === "boolean" ? "boolean" : typeof value === "number" ? "number" : "string",
     value,
@@ -30969,7 +33017,7 @@ function observedReasonCodes(fixture, decision) {
       }
     }
   }
-  return [...codes].sort(compareUtf816);
+  return [...codes].sort(compareUtf824);
 }
 function outcomeMatches(fixture, decision) {
   if (fixture.expected.decision === "review_required") {
@@ -30991,7 +33039,7 @@ function runIntegratedBlueprintFixtures(input) {
   const candidates = projectBlueprints(input.catalog);
   const failures = [];
   const fixtures = [...input.fixtures].sort(
-    (left, right) => compareUtf816(left.id, right.id)
+    (left, right) => compareUtf824(left.id, right.id)
   );
   for (const fixture of fixtures) {
     const normalized = normalizeFeatureMap(observations(fixture));
@@ -31002,7 +33050,7 @@ function runIntegratedBlueprintFixtures(input) {
         observed_disposition: "selector_error",
         observed_winner_id: null,
         missing_reason_codes: fixture.expected.reason_codes,
-        selector_issue_codes: normalized.issues.map((issue5) => issue5.code).sort(compareUtf816)
+        selector_issue_codes: normalized.issues.map((issue5) => issue5.code).sort(compareUtf824)
       });
       continue;
     }
@@ -31014,7 +33062,7 @@ function runIntegratedBlueprintFixtures(input) {
         observed_disposition: "selector_error",
         observed_winner_id: null,
         missing_reason_codes: fixture.expected.reason_codes,
-        selector_issue_codes: context.issues.map((issue5) => issue5.code).sort(compareUtf816)
+        selector_issue_codes: context.issues.map((issue5) => issue5.code).sort(compareUtf824)
       });
       continue;
     }
@@ -31026,7 +33074,7 @@ function runIntegratedBlueprintFixtures(input) {
         observed_disposition: "selector_error",
         observed_winner_id: null,
         missing_reason_codes: fixture.expected.reason_codes,
-        selector_issue_codes: selected.issues.map((issue5) => issue5.code).sort(compareUtf816)
+        selector_issue_codes: selected.issues.map((issue5) => issue5.code).sort(compareUtf824)
       });
       continue;
     }
@@ -31040,7 +33088,7 @@ function runIntegratedBlueprintFixtures(input) {
         expected_decision: fixture.expected.decision,
         observed_disposition: selected.value.disposition,
         observed_winner_id: selected.value.winner?.definition_id ?? null,
-        missing_reason_codes: [...missingCodes].sort(compareUtf816),
+        missing_reason_codes: [...missingCodes].sort(compareUtf824),
         selector_issue_codes: []
       });
     }
@@ -31054,11 +33102,11 @@ function runIntegratedBlueprintFixtures(input) {
 }
 
 // src/benchmark/run-benchmark.ts
-function compareUtf817(left, right) {
+function compareUtf825(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function sorted(values) {
-  return [...new Set(values)].sort(compareUtf817);
+  return [...new Set(values)].sort(compareUtf825);
 }
 function record2(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value) ? value : null;
@@ -31140,7 +33188,7 @@ function benchmarkCase(value, sourcePath) {
 }
 async function collectYamlFiles(rootPath) {
   try {
-    const rootStat = await lstat8(rootPath);
+    const rootStat = await lstat10(rootPath);
     if (rootStat.isSymbolicLink() || !rootStat.isDirectory()) {
       return failure("BENCHMARK_INPUT_UNSAFE", "benchmark input must be a regular directory", rootPath);
     }
@@ -31149,7 +33197,7 @@ async function collectYamlFiles(rootPath) {
     while (pending.length > 0) {
       const current = pending.pop();
       if (current === void 0) continue;
-      const entries = await readdir7(current, { withFileTypes: true });
+      const entries = await readdir8(current, { withFileTypes: true });
       for (const entry of entries) {
         const target = path13.join(current, entry.name);
         if (entry.isSymbolicLink()) {
@@ -31159,7 +33207,7 @@ async function collectYamlFiles(rootPath) {
         if (entry.isFile() && /\.ya?ml$/i.test(entry.name)) files.push(target);
       }
     }
-    return success(files.sort(compareUtf817));
+    return success(files.sort(compareUtf825));
   } catch (error) {
     return failure(
       "BENCHMARK_INPUT_READ_FAILED",
@@ -31172,7 +33220,7 @@ async function loadBenchmarkCases(inputRoot) {
   if (inputRoot.protocol !== "file:") {
     return failure("BENCHMARK_INPUT_INVALID", "benchmark input must use a file URL", inputRoot.href);
   }
-  const files = await collectYamlFiles(fileURLToPath8(inputRoot));
+  const files = await collectYamlFiles(fileURLToPath9(inputRoot));
   if (!files.ok) return files;
   if (files.value.length === 0) {
     return failure("BENCHMARK_INPUT_EMPTY", "benchmark input contains no YAML files", inputRoot.href);
@@ -31181,7 +33229,7 @@ async function loadBenchmarkCases(inputRoot) {
   for (const file of files.value) {
     let bytes;
     try {
-      bytes = new Uint8Array(await readFile10(file));
+      bytes = new Uint8Array(await readFile11(file));
     } catch (error) {
       return failure("BENCHMARK_INPUT_READ_FAILED", error instanceof Error ? error.message : String(error), file);
     }
@@ -31204,7 +33252,7 @@ async function loadBenchmarkCases(inputRoot) {
     if (ids.has(item.id)) return failure("BENCHMARK_CASE_DUPLICATE", `duplicate benchmark case ${item.id}`, item.id);
     ids.add(item.id);
   }
-  return success(cases.sort((left, right) => compareUtf817(left.id, right.id)));
+  return success(cases.sort((left, right) => compareUtf825(left.id, right.id)));
 }
 function fixtureFromCase(item) {
   return {
@@ -31301,7 +33349,7 @@ var PRIVATE_KEY_BLOCK = /-----BEGIN ((?:(?:RSA|EC|DSA|OPENSSH|ENCRYPTED) )?PRIVA
 var PRIVATE_KEY_MARKER = /-----(?:BEGIN|END) (?:(?:RSA|EC|DSA|OPENSSH|ENCRYPTED) )?PRIVATE KEY-----/u;
 var URI_CREDENTIAL = /\b([a-z][a-z0-9+.-]*:\/\/[^:\s/@]+:)([^@\s/]+)(@)/giu;
 var BEARER_TOKEN = /\b(Bearer\s+)([A-Za-z0-9._~+/=-]+)/giu;
-function compareUtf818(left, right) {
+function compareUtf826(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function redactionReplacement(ruleId, secret) {
@@ -31370,351 +33418,11 @@ function redactArchiveBytes(bytes) {
     bytes: new TextEncoder().encode(redacted),
     report: {
       redacted: state.replacementCount > 0,
-      rule_ids: [...state.ruleIds].sort(compareUtf818),
+      rule_ids: [...state.ruleIds].sort(compareUtf826),
       replacement_count: state.replacementCount,
       review_required: false
     }
   });
-}
-
-// src/governance/events/append-only-event-store.ts
-import { lstat as lstat9, readFile as readFile11, readdir as readdir8 } from "node:fs/promises";
-
-// src/governance/events/event-chain-verifier.ts
-function unsignedEvent(event) {
-  return {
-    aggregate_id: event.aggregate_id,
-    event_type: event.event_type,
-    occurred_at: event.occurred_at,
-    actor_id: event.actor_id,
-    authority_class: event.authority_class,
-    evidence_ids: event.evidence_ids,
-    payload: event.payload
-  };
-}
-function signEvent(unsigned, previous) {
-  const payloadHash = sha256(canonicalJson(unsigned.payload));
-  const body = {
-    ...unsigned,
-    sequence: previous === null ? 1 : previous.sequence + 1,
-    previous_event_hash: previous?.event_hash ?? null,
-    payload_hash: payloadHash
-  };
-  return { ...body, event_hash: sha256(canonicalJson(body)) };
-}
-function verifyEventChain(events) {
-  if (events.length === 0) {
-    return success({
-      valid: true,
-      aggregate_id: null,
-      event_count: 0,
-      last_sequence: 0,
-      head_event_hash: null
-    });
-  }
-  const aggregateId = events[0]?.aggregate_id ?? null;
-  let previous = null;
-  for (let index = 0; index < events.length; index += 1) {
-    const event = events[index];
-    if (event === void 0) continue;
-    const expectedPayloadHash = sha256(canonicalJson(event.payload));
-    const { event_hash: eventHash, ...body } = event;
-    const expectedEventHash = sha256(canonicalJson(body));
-    if (event.payload_hash !== expectedPayloadHash || eventHash !== expectedEventHash) {
-      return failure(
-        "event.hash_mismatch",
-        "event payload or body hash does not match its canonical content",
-        eventHash
-      );
-    }
-    if (event.aggregate_id !== aggregateId) {
-      return failure(
-        "event.aggregate_mismatch",
-        "every event in a chain must use the same aggregate ID",
-        eventHash,
-        [aggregateId ?? ""]
-      );
-    }
-    const expectedSequence = index + 1;
-    if (event.sequence !== expectedSequence) {
-      return failure(
-        "event.sequence_gap",
-        "event sequences must be contiguous and begin at one",
-        eventHash,
-        [String(expectedSequence), String(event.sequence)]
-      );
-    }
-    const expectedPreviousHash = previous?.event_hash ?? null;
-    if (event.previous_event_hash !== expectedPreviousHash) {
-      return failure(
-        "event.previous_hash_mismatch",
-        "event does not reference the immediately preceding event hash",
-        eventHash,
-        expectedPreviousHash === null ? [] : [expectedPreviousHash]
-      );
-    }
-    previous = event;
-  }
-  const head = events.at(-1);
-  return success({
-    valid: true,
-    aggregate_id: aggregateId,
-    event_count: events.length,
-    last_sequence: head?.sequence ?? 0,
-    head_event_hash: head?.event_hash ?? null
-  });
-}
-
-// src/governance/events/append-only-event-store.ts
-var EVENT_SCHEMA_ID = "project-memory/v1/governance-event";
-var SAFE_AGGREGATE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
-function compareUtf819(left, right) {
-  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
-}
-function translatedFailure(code, message, path27, issues) {
-  return failure(
-    code,
-    message,
-    path27,
-    issues.map((issue5) => `${issue5.code}:${issue5.path}`)
-  );
-}
-function validateAggregateId(aggregateId) {
-  return SAFE_AGGREGATE_ID.test(aggregateId) ? success(true) : failure(
-    "event.aggregate_id_unsafe",
-    "event aggregate IDs must be portable single path segments",
-    aggregateId
-  );
-}
-function filenameSafeUtc(value) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}\.\d{3})Z$/.exec(value);
-  if (match === null) {
-    throw new TypeError("event.occurred_at must be RFC3339 UTC with milliseconds");
-  }
-  const [, year = "", month = "", day = "", hour = "", minute = "", second = ""] = match;
-  return `${year}${month}${day}T${hour}${minute}${second}Z`;
-}
-function eventPath(event) {
-  const timestamp = filenameSafeUtc(event.occurred_at);
-  return `docs/project-memory/governance/events/${event.aggregate_id}/${timestamp}-${event.event_hash}.json`;
-}
-function eventWrite(event) {
-  return {
-    relative_path: eventPath(event),
-    bytes: new TextEncoder().encode(canonicalJson(event)),
-    expected_existing_sha256: null,
-    mode: "create"
-  };
-}
-function validateEvent(value, source) {
-  const result = validateWithSchema(EVENT_SCHEMA_ID, value);
-  return result.ok ? result : translatedFailure(
-    "event.schema_invalid",
-    "governance event does not satisfy its registered schema",
-    source,
-    result.issues
-  );
-}
-function byteEqual5(left, right) {
-  return Buffer.from(left).equals(Buffer.from(right));
-}
-async function readEvent(root, relativePath, aggregateId) {
-  const resolved = await resolveInside(root, relativePath);
-  if (!resolved.ok) return resolved;
-  let bytes;
-  try {
-    const stat2 = await lstat9(resolved.value);
-    if (stat2.isSymbolicLink() || !stat2.isFile()) {
-      return failure(
-        "event.path_unsafe",
-        "governance events must be regular files",
-        relativePath
-      );
-    }
-    bytes = new Uint8Array(await readFile11(resolved.value));
-  } catch (error) {
-    return failure(
-      "event.read_failed",
-      error instanceof Error ? error.message : String(error),
-      relativePath
-    );
-  }
-  const decoded = decodeStrictUtf8(bytes, relativePath);
-  if (!decoded.ok) {
-    return translatedFailure(
-      "event.document_invalid",
-      "governance event must use strict UTF-8",
-      relativePath,
-      decoded.issues
-    );
-  }
-  const parsed = parseJsonDocument(decoded.value, relativePath);
-  if (!parsed.ok) {
-    return translatedFailure(
-      "event.document_invalid",
-      "governance event must be strict JSON",
-      relativePath,
-      parsed.issues
-    );
-  }
-  const validated = validateEvent(parsed.value, relativePath);
-  if (!validated.ok) return validated;
-  if (validated.value.aggregate_id !== aggregateId) {
-    return failure(
-      "event.aggregate_mismatch",
-      "event aggregate does not match its canonical directory",
-      relativePath,
-      [aggregateId]
-    );
-  }
-  let expectedPath;
-  try {
-    expectedPath = eventPath(validated.value);
-  } catch (error) {
-    return failure(
-      "event.timestamp_invalid",
-      error instanceof Error ? error.message : String(error),
-      relativePath
-    );
-  }
-  if (expectedPath !== relativePath) {
-    return failure(
-      "event.path_mismatch",
-      "event timestamp and hash must match its canonical filename",
-      relativePath,
-      [expectedPath]
-    );
-  }
-  const expectedBytes = new TextEncoder().encode(canonicalJson(validated.value));
-  if (!byteEqual5(bytes, expectedBytes)) {
-    return failure(
-      "event.noncanonical",
-      "event bytes must match deterministic canonical JSON",
-      relativePath
-    );
-  }
-  return success(validated.value);
-}
-async function loadChain(root, aggregateId) {
-  const safeAggregate = validateAggregateId(aggregateId);
-  if (!safeAggregate.ok) return safeAggregate;
-  const relativeDirectory = `docs/project-memory/governance/events/${aggregateId}`;
-  const resolved = await resolveInside(root, relativeDirectory);
-  if (!resolved.ok) return resolved;
-  let entries;
-  try {
-    const stat2 = await lstat9(resolved.value);
-    if (stat2.isSymbolicLink() || !stat2.isDirectory()) {
-      return failure(
-        "event.directory_unsafe",
-        "event-chain paths must be real directories",
-        relativeDirectory
-      );
-    }
-    entries = await readdir8(resolved.value, { withFileTypes: true });
-  } catch (error) {
-    if (error.code === "ENOENT") return success([]);
-    return failure(
-      "event.directory_read_failed",
-      error instanceof Error ? error.message : String(error),
-      relativeDirectory
-    );
-  }
-  const events = [];
-  for (const entry of entries.sort((left, right) => compareUtf819(left.name, right.name))) {
-    const relativePath = `${relativeDirectory}/${entry.name}`;
-    if (!entry.isFile() || entry.isSymbolicLink() || !entry.name.endsWith(".json")) {
-      return failure(
-        "event.directory_entry_unsafe",
-        "event directories may contain canonical JSON files only",
-        relativePath
-      );
-    }
-    const event = await readEvent(root, relativePath, aggregateId);
-    if (!event.ok) return event;
-    events.push(event.value);
-  }
-  events.sort(
-    (left, right) => left.sequence - right.sequence || compareUtf819(left.event_hash, right.event_hash)
-  );
-  return success(events);
-}
-function sameUnsigned(event, unsigned) {
-  return canonicalJson(unsignedEvent(event)) === canonicalJson(unsigned);
-}
-function createAppendOnlyEventStore() {
-  async function readChain(root, aggregateId) {
-    const events = await loadChain(root, aggregateId);
-    if (!events.ok) return events;
-    const verified = verifyEventChain(events.value);
-    return verified.ok ? success(events.value) : verified;
-  }
-  async function verifyChain(root, aggregateId) {
-    const events = await loadChain(root, aggregateId);
-    if (!events.ok) return events;
-    const verified = verifyEventChain(events.value);
-    if (!verified.ok) return verified;
-    return success({
-      ...verified.value,
-      aggregate_id: verified.value.aggregate_id ?? aggregateId
-    });
-  }
-  async function planAppend(root, unsigned) {
-    const safeAggregate = validateAggregateId(unsigned.aggregate_id);
-    if (!safeAggregate.ok) return safeAggregate;
-    const existing = await readChain(root, unsigned.aggregate_id);
-    if (!existing.ok) return existing;
-    try {
-      const identical = existing.value.find((event) => sameUnsigned(event, unsigned));
-      if (identical !== void 0) {
-        return success(eventWrite(identical), [
-          {
-            code: "event.already_appended",
-            severity: "warning",
-            path: eventPath(identical),
-            message: "the identical immutable event is already present",
-            references: [identical.event_hash]
-          }
-        ]);
-      }
-      const signed = signEvent(unsigned, existing.value.at(-1) ?? null);
-      const validated = validateEvent(signed, unsigned.aggregate_id);
-      if (!validated.ok) return validated;
-      const write = eventWrite(validated.value);
-      const confined2 = await resolveInside(root, write.relative_path);
-      return confined2.ok ? success(write) : confined2;
-    } catch (error) {
-      return failure(
-        "event.payload_invalid",
-        error instanceof Error ? error.message : String(error),
-        unsigned.aggregate_id
-      );
-    }
-  }
-  return { planAppend, readChain, verifyChain };
-}
-
-// src/governance/records/record-path.ts
-var RECORD_DIRECTORIES = Object.freeze({
-  decision: "decisions",
-  idea: "ideas",
-  change: "changes",
-  finding: "findings",
-  risk: "risks",
-  evidence: "evidence",
-  lesson: "lessons",
-  approval: "approvals"
-});
-function canonicalRecordPath(record5) {
-  return `docs/project-memory/records/${RECORD_DIRECTORIES[record5.type]}/${record5.id}.json`;
-}
-function recordWrite2(record5) {
-  return {
-    relative_path: canonicalRecordPath(record5),
-    bytes: new TextEncoder().encode(canonicalJson(record5)),
-    expected_existing_sha256: null,
-    mode: "create"
-  };
 }
 
 // src/governance/integration/canonical-mutation-validation.ts
@@ -31724,7 +33432,7 @@ var SHA2563 = /^[0-9a-f]{64}$/;
 var TARGET_REF = /^refs\/[A-Za-z0-9][A-Za-z0-9._/-]*$/;
 var PLAN_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 var ROOT_ID = /^ROOT-[0-9A-HJKMNP-TV-Z]{26}$/;
-var UTC_TIMESTAMP3 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+var UTC_TIMESTAMP4 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 var MUTATION_KINDS = /* @__PURE__ */ new Set([
   "profile.bootstrap",
   "profile.evolution",
@@ -31841,7 +33549,7 @@ function validateCanonicalMutationPlan(plan, now) {
   }
   const createdAt = Date.parse(plan.created_at);
   const expiresAt = Date.parse(plan.expires_at);
-  if (!UTC_TIMESTAMP3.test(plan.created_at) || !UTC_TIMESTAMP3.test(plan.expires_at) || !Number.isFinite(createdAt) || !Number.isFinite(expiresAt) || expiresAt <= createdAt) {
+  if (!UTC_TIMESTAMP4.test(plan.created_at) || !UTC_TIMESTAMP4.test(plan.expires_at) || !Number.isFinite(createdAt) || !Number.isFinite(expiresAt) || expiresAt <= createdAt) {
     return failure("mutation.plan_time_invalid", "canonical mutation plan time window is invalid", plan.plan_id);
   }
   if (!Number.isFinite(now.getTime())) {
@@ -31874,7 +33582,7 @@ function validateCanonicalMutationPlan(plan, now) {
 
 // src/governance/integration/bootstrap-plan.ts
 var CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
-function compareUtf820(left, right) {
+function compareUtf827(left, right) {
   return Buffer.from(left).compare(Buffer.from(right));
 }
 function exactStrings(left, right) {
@@ -31891,7 +33599,7 @@ function bootstrapApprovalBinding(input) {
       `root:${input.root_id}`,
       `source-proposal:${input.source_proposal_hash}`,
       `target-ref:${input.target_ref}`
-    ].sort(compareUtf820),
+    ].sort(compareUtf827),
     timing: `window:${input.created_at}/${input.expires_at}`
   };
 }
@@ -31963,8 +33671,8 @@ function bootstrapExactAcceptedSources(writes, sources, metadata) {
   if (!selection.ok) return selection;
   const rendered = renderAcceptedProfileSources(selection.value, sourceSet.value, metadata.profile);
   if (!rendered.ok) return rendered;
-  const expectedPaths = rendered.value.map((write) => write.relative_path).sort(compareUtf820);
-  const actualPaths = writes.filter((write) => write.relative_path.startsWith("docs/project-memory/source/") && !write.relative_path.endsWith("/.gitkeep") || /^docs\/project-memory\/components\/[^/]+\/COMPONENT[.]md$/u.test(write.relative_path) || /^docs\/project-memory\/domains\/[^/]+\/DOMAIN[.]md$/u.test(write.relative_path)).map((write) => write.relative_path).sort(compareUtf820);
+  const expectedPaths = rendered.value.map((write) => write.relative_path).sort(compareUtf827);
+  const actualPaths = writes.filter((write) => write.relative_path.startsWith("docs/project-memory/source/") && !write.relative_path.endsWith("/.gitkeep") || /^docs\/project-memory\/components\/[^/]+\/COMPONENT[.]md$/u.test(write.relative_path) || /^docs\/project-memory\/domains\/[^/]+\/DOMAIN[.]md$/u.test(write.relative_path)).map((write) => write.relative_path).sort(compareUtf827);
   if (!exactStrings(actualPaths, expectedPaths)) {
     return failure(
       "bootstrap.source_artifact_invalid",
@@ -32044,7 +33752,7 @@ function validateBootstrapCompilationInput(input, now) {
 }
 function bootstrapPlanHashes(writes) {
   return Object.fromEntries(
-    [...writes].sort((left, right) => compareUtf820(left.relative_path, right.relative_path)).map((write) => [write.relative_path, sha256(write.bytes)])
+    [...writes].sort((left, right) => compareUtf827(left.relative_path, right.relative_path)).map((write) => [write.relative_path, sha256(write.bytes)])
   );
 }
 function deterministicId(prefix, hash) {
@@ -32137,10 +33845,10 @@ function buildBootstrapMutationPlan(input, validated) {
       approval_record_id: validated.approval_record.id
     }
   }, null);
-  const approvalWrite = recordWrite2(validated.approval_record);
-  const evidenceWrite = recordWrite2(evidence);
+  const approvalWrite = recordWrite(validated.approval_record);
+  const evidenceWrite = recordWrite(evidence);
   const eventWrite2 = jsonWrite(eventPath(event), event);
-  const writes = [...plan.writes, approvalWrite, evidenceWrite, eventWrite2].sort((left, right) => compareUtf820(left.relative_path, right.relative_path));
+  const writes = [...plan.writes, approvalWrite, evidenceWrite, eventWrite2].sort((left, right) => compareUtf827(left.relative_path, right.relative_path));
   const plannedContentHashes = bootstrapPlanHashes(writes);
   const checks = [
     "git_repository",
@@ -32161,8 +33869,8 @@ function buildBootstrapMutationPlan(input, validated) {
     compilation_plan_hash: plan.plan_hash,
     source_proposal_hash: input.source_proposal_hash,
     catalog_lock_hash: catalogHash,
-    compiler_write_paths: plan.writes.map((write) => write.relative_path).sort(compareUtf820),
-    audit_write_paths: [approvalWrite, evidenceWrite, eventWrite2].map((write) => write.relative_path).sort(compareUtf820),
+    compiler_write_paths: plan.writes.map((write) => write.relative_path).sort(compareUtf827),
+    audit_write_paths: [approvalWrite, evidenceWrite, eventWrite2].map((write) => write.relative_path).sort(compareUtf827),
     planned_content_hashes: plannedContentHashes,
     bootstrap_content_hash: sha256(canonicalJson(plannedContentHashes)),
     approval_record_id: validated.approval_record.id,
@@ -32179,7 +33887,7 @@ function buildBootstrapMutationPlan(input, validated) {
   const withoutHash = {
     ...plan,
     writes,
-    record_ids: [validated.approval_record.id, evidenceId2].sort(compareUtf820),
+    record_ids: [validated.approval_record.id, evidenceId2].sort(compareUtf827),
     event_ids: [event.event_hash],
     approval_ids: [validated.approval_record.id],
     evidence_ids: [evidenceId2],
@@ -32196,191 +33904,7 @@ function buildBootstrapMutationPlan(input, validated) {
 var REVIEW_TTL_MILLISECONDS = 60 * 60 * 1e3;
 
 // src/cli/init/build-init-plan.ts
-import { lstat as lstat10, readFile as readFile14 } from "node:fs/promises";
-
-// src/governance/integration/integration-git-client.ts
-import { fileURLToPath as fileURLToPath9 } from "node:url";
-var OBJECT_ID = /^[0-9a-f]{40}$/;
-var FORBIDDEN_REF_CHARACTERS = /* @__PURE__ */ new Set(["~", "^", ":", "?", "*", "[", "\\"]);
-function gitEnvironment2() {
-  const result = {
-    GIT_MERGE_AUTOEDIT: "no",
-    GIT_TERMINAL_PROMPT: "0",
-    LC_ALL: "C"
-  };
-  for (const name of ["PATH", "SystemRoot", "HOME", "USERPROFILE"]) {
-    const value = process.env[name];
-    if (value !== void 0) result[name] = value;
-  }
-  return result;
-}
-function assertObjectId(value) {
-  if (!OBJECT_ID.test(value)) throw new TypeError(`unsafe Git object ID: ${value}`);
-}
-function assertRef(value) {
-  let unsafeCharacter = false;
-  for (const character of value) {
-    if (character.charCodeAt(0) <= 32 || FORBIDDEN_REF_CHARACTERS.has(character)) {
-      unsafeCharacter = true;
-      break;
-    }
-  }
-  if (!value.startsWith("refs/") || value.length > 512 || unsafeCharacter || value.includes("..") || value.includes("@{") || value.includes("//") || value.endsWith("/") || value.endsWith(".") || value.endsWith(".lock")) {
-    throw new TypeError(`unsafe Git ref: ${value}`);
-  }
-}
-function assertPathspec(value) {
-  if (value.length === 0 || value.includes("\0") || value.includes("\\") || value.startsWith("/") || value.startsWith(":") || /^[A-Za-z]:/.test(value) || value.split("/").some((part) => part === "..")) {
-    throw new TypeError(`unsafe Git pathspec: ${value}`);
-  }
-}
-function assertMessage(value) {
-  if (value.trim().length === 0 || value.includes("\0")) {
-    throw new TypeError("Git commit message must be non-empty and NUL-free");
-  }
-}
-function records2(value) {
-  const parts = value.split("\0");
-  if (parts.at(-1) === "") parts.pop();
-  return parts;
-}
-var IntegrationGitCliClient = class extends GitCliClient {
-  constructor(integrationRunner) {
-    super(integrationRunner);
-    this.integrationRunner = integrationRunner;
-  }
-  integrationRunner;
-  async #execute(cwd, args, maxOutputBytes = 4194304) {
-    const result = await this.integrationRunner.run({
-      executable: "git",
-      args: ["-c", "core.longpaths=true", ...args],
-      cwd,
-      timeout_ms: 12e4,
-      env_allowlist: gitEnvironment2(),
-      max_output_bytes: maxOutputBytes
-    });
-    if (result.timed_out) throw new Error("Git command timed out");
-    if (result.output_truncated) throw new Error("Git command output exceeded its bound");
-    return result;
-  }
-  async #checked(cwd, args) {
-    const result = await this.#execute(cwd, args);
-    if (result.exit_code !== 0) {
-      throw new Error(
-        `Git command failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
-      );
-    }
-    return result.stdout;
-  }
-  async resolveRef(repo, ref) {
-    assertRef(ref);
-    const revision = (await this.#checked(repo, [
-      "rev-parse",
-      "--verify",
-      `${ref}^{commit}`
-    ])).trim();
-    assertObjectId(revision);
-    return revision;
-  }
-  async commitParents(repo, revision) {
-    assertObjectId(revision);
-    const values = (await this.#checked(repo, [
-      "rev-list",
-      "--parents",
-      "-n",
-      "1",
-      revision
-    ])).trim().split(/\s+/u);
-    const commit = values.shift();
-    if (commit !== revision) throw new Error("Git returned the wrong commit ancestry");
-    values.forEach(assertObjectId);
-    return values;
-  }
-  async listTree(repo, revision, pathspec) {
-    assertObjectId(revision);
-    assertPathspec(pathspec);
-    return records2(await this.#checked(repo, [
-      "ls-tree",
-      "-r",
-      "--name-only",
-      "-z",
-      revision,
-      "--",
-      pathspec
-    ]));
-  }
-  async readBlob(repo, revision, relativePath) {
-    assertObjectId(revision);
-    assertPathspec(relativePath);
-    const entries = await this.listTree(repo, revision, relativePath);
-    if (!entries.includes(relativePath)) return null;
-    const result = await this.#execute(
-      repo,
-      ["show", `${revision}:${relativePath}`],
-      67108864
-    );
-    if (result.exit_code !== 0) {
-      throw new Error(
-        `Git blob read failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
-      );
-    }
-    return new TextEncoder().encode(result.stdout);
-  }
-  async listCommits(repo, base, head) {
-    assertObjectId(base);
-    assertObjectId(head);
-    const output = await this.#checked(repo, ["rev-list", "--reverse", `${base}..${head}`]);
-    const commits = output.split(/\r?\n/u).filter((value) => value.length > 0);
-    commits.forEach(assertObjectId);
-    return commits;
-  }
-  async cherryPickNoCommit(worktree, commit) {
-    assertObjectId(commit);
-    return this.#execute(worktree, ["cherry-pick", "--no-commit", commit]);
-  }
-  async stageAll(worktree) {
-    await this.#checked(worktree, ["add", "--all", "--", "."]);
-  }
-  async writeTree(worktree) {
-    const tree = (await this.#checked(worktree, ["write-tree"])).trim();
-    assertObjectId(tree);
-    return tree;
-  }
-  async commitTree(repo, tree, parent, message) {
-    assertObjectId(tree);
-    assertObjectId(parent);
-    assertMessage(message);
-    const commit = (await this.#checked(repo, [
-      "commit-tree",
-      tree,
-      "-p",
-      parent,
-      "-m",
-      message
-    ])).trim();
-    assertObjectId(commit);
-    return commit;
-  }
-  async updateRef(repo, ref, next, expected) {
-    assertRef(ref);
-    assertObjectId(next);
-    assertObjectId(expected);
-    const result = await this.#execute(repo, ["update-ref", ref, next, expected]);
-    if (result.exit_code === 0) return true;
-    if (result.stderr.includes("cannot lock ref") || result.stderr.includes("but expected")) return false;
-    throw new Error(
-      `Git update-ref failed with exit ${String(result.exit_code)}: ${result.stderr.trim()}`
-    );
-  }
-  async removeWorktree(repo, destination) {
-    await this.#checked(repo, [
-      "worktree",
-      "remove",
-      "--force",
-      fileURLToPath9(destination)
-    ]);
-  }
-};
+import { lstat as lstat11, readFile as readFile14 } from "node:fs/promises";
 
 // src/profile/catalog-selection-resolver.ts
 var import_semver6 = __toESM(require_semver2(), 1);
@@ -32633,7 +34157,7 @@ async function readReleaseFile(root, relativePath) {
     );
   }
 }
-function byteEqual6(left, right) {
+function byteEqual7(left, right) {
   return Buffer.from(left).equals(Buffer.from(right));
 }
 async function verifyCatalogRelease(releaseRoot, suppliedLock, sourceRoot) {
@@ -32656,7 +34180,7 @@ async function verifyCatalogRelease(releaseRoot, suppliedLock, sourceRoot) {
   const expectedLockBytes = new Uint8Array(
     Buffer.from(canonicalJson(lock), "utf8")
   );
-  if (!byteEqual6(lockFile.value, expectedLockBytes)) {
+  if (!byteEqual7(lockFile.value, expectedLockBytes)) {
     return failure(
       "CATALOG_RELEASE_LOCK_MISMATCH",
       "catalog lock bytes are not canonical or do not match the supplied lock",
@@ -32704,7 +34228,7 @@ async function verifyCatalogRelease(releaseRoot, suppliedLock, sourceRoot) {
   const checksums = await readReleaseFile(releaseRoot, "SHA256SUMS");
   if (!checksums.ok) return checksums;
   const expectedChecksums = catalogChecksums(bundleBytes, lockFile.value);
-  if (!byteEqual6(checksums.value, expectedChecksums)) {
+  if (!byteEqual7(checksums.value, expectedChecksums)) {
     return failure(
       "CATALOG_RELEASE_CHECKSUMS_MISMATCH",
       "SHA256SUMS does not match the bundle and lock bytes",
@@ -32721,21 +34245,21 @@ async function verifyCatalogRelease(releaseRoot, suppliedLock, sourceRoot) {
 }
 
 // src/profile/catalog-release-reader.ts
-function byteEqual7(left, right) {
+function byteEqual8(left, right) {
   return Buffer.from(left).equals(Buffer.from(right));
 }
-function compareUtf821(left, right) {
+function compareUtf828(left, right) {
   return Buffer.from(left).compare(Buffer.from(right));
 }
-function isRecord4(value) {
+function isRecord6(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 function hasExactKeys2(value, expected) {
-  const actual = Object.keys(value).sort(compareUtf821);
-  return actual.length === expected.length && actual.every((key, index) => key === [...expected].sort(compareUtf821)[index]);
+  const actual = Object.keys(value).sort(compareUtf828);
+  return actual.length === expected.length && actual.every((key, index) => key === [...expected].sort(compareUtf828)[index]);
 }
 function parseSchemaIndex(value) {
-  if (!isRecord4(value) || !hasExactKeys2(value, ["schema_version", "schemas"]) || value.schema_version !== "1.0.0" || !Array.isArray(value.schemas)) {
+  if (!isRecord6(value) || !hasExactKeys2(value, ["schema_version", "schemas"]) || value.schema_version !== "1.0.0" || !Array.isArray(value.schemas)) {
     return failure(
       "CATALOG_SCHEMA_INDEX_INVALID",
       "schema index must contain only schema_version 1.0.0 and schemas",
@@ -32746,7 +34270,7 @@ function parseSchemaIndex(value) {
   const ids = /* @__PURE__ */ new Set();
   const paths = /* @__PURE__ */ new Set();
   for (const [index, candidate] of value.schemas.entries()) {
-    if (!isRecord4(candidate) || !hasExactKeys2(candidate, ["id", "path", "sha256"]) || typeof candidate.id !== "string" || !/^project-memory\/v1\/[a-z][a-z0-9-]*$/.test(candidate.id) || typeof candidate.path !== "string" || candidate.path.length === 0 || candidate.path.includes("\\") || candidate.path.split("/").includes("..") || typeof candidate.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(candidate.sha256)) {
+    if (!isRecord6(candidate) || !hasExactKeys2(candidate, ["id", "path", "sha256"]) || typeof candidate.id !== "string" || !/^project-memory\/v1\/[a-z][a-z0-9-]*$/.test(candidate.id) || typeof candidate.path !== "string" || candidate.path.length === 0 || candidate.path.includes("\\") || candidate.path.split("/").includes("..") || typeof candidate.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(candidate.sha256)) {
       return failure(
         "CATALOG_SCHEMA_INDEX_INVALID",
         "schema index entry is malformed",
@@ -32768,7 +34292,7 @@ function parseSchemaIndex(value) {
       sha256: candidate.sha256
     });
   }
-  const sorted2 = [...entries].sort((left, right) => compareUtf821(left.id, right.id));
+  const sorted2 = [...entries].sort((left, right) => compareUtf828(left.id, right.id));
   if (entries.some((entry, index) => entry.id !== sorted2[index]?.id)) {
     return failure(
       "CATALOG_SCHEMA_INDEX_ORDER_INVALID",
@@ -32819,7 +34343,7 @@ async function readVerifiedSources(sourceRoot, lock) {
     files.push({ ...entry, bytes: bytes.value });
   }
   return success(
-    files.sort((left, right) => compareUtf821(left.relative_path, right.relative_path))
+    files.sort((left, right) => compareUtf828(left.relative_path, right.relative_path))
   );
 }
 async function readVerifiedSchemas(schemaRoot) {
@@ -32836,7 +34360,7 @@ async function readVerifiedSchemas(schemaRoot) {
   const index = parseSchemaIndex(parsed.value);
   if (!index.ok) return index;
   const canonicalBytes = new Uint8Array(Buffer.from(canonicalJson(index.value), "utf8"));
-  if (!byteEqual7(indexBytes.value, canonicalBytes)) {
+  if (!byteEqual8(indexBytes.value, canonicalBytes)) {
     return failure(
       "CATALOG_SCHEMA_INDEX_NONCANONICAL",
       "schema index bytes must be canonical JSON",
@@ -32923,7 +34447,7 @@ async function readVerifiedCatalogRelease(releaseRoot, expectedRelease, expected
       ...sources.value.map((file) => `source:${file.relative_path}`),
       "schema:schema-index.json",
       ...schemas2.value.map((file) => `schema:${file.relative_path}`)
-    ].sort(compareUtf821)
+    ].sort(compareUtf828)
   });
 }
 
@@ -33373,7 +34897,7 @@ function buildInitialSourceProposal(input) {
 }
 
 // src/cli/init/build-init-plan.ts
-function compareUtf822(left, right) {
+function compareUtf829(left, right) {
   return Buffer.compare(Buffer.from(left), Buffer.from(right));
 }
 function initPlanDocumentValue(value) {
@@ -33429,14 +34953,14 @@ function briefMentions(briefText, blueprints) {
       }
     }
   }
-  const ordered = (values) => [...values.values()].sort((left, right) => compareUtf822(left.id, right.id));
+  const ordered = (values) => [...values.values()].sort((left, right) => compareUtf829(left.id, right.id));
   return { positive: ordered(positive), negative: ordered(negative) };
 }
 function inferBlueprintFromBrief(root, briefPath, briefText, blueprints) {
   const mentions = briefMentions(briefText, blueprints);
   const contradictory = mentions.positive.filter((candidate) => mentions.negative.some((item) => item.id === candidate.id));
   if (mentions.positive.length !== 1 || contradictory.length > 0) {
-    const references = contradictory.length > 0 ? contradictory.map((candidate) => candidate.id) : mentions.positive.length > 0 ? mentions.positive.map((candidate) => candidate.id) : blueprints.map((candidate) => candidate.id).sort(compareUtf822);
+    const references = contradictory.length > 0 ? contradictory.map((candidate) => candidate.id) : mentions.positive.length > 0 ? mentions.positive.map((candidate) => candidate.id) : blueprints.map((candidate) => candidate.id).sort(compareUtf829);
     return failure(
       "INIT_BLUEPRINT_CLARIFICATION_REQUIRED",
       "the natural brief must provide one non-contradictory positive catalog shape",
@@ -33511,7 +35035,7 @@ function inferBlueprintFromBrief(root, briefPath, briefText, blueprints) {
   return success({ blueprint, root_kind: rootKind, observations: observations2, decision: decision.value });
 }
 function selectableBlueprints(blueprints) {
-  return [...blueprints].sort((left, right) => compareUtf822(left.id, right.id)).map((blueprint) => ({
+  return [...blueprints].sort((left, right) => compareUtf829(left.id, right.id)).map((blueprint) => ({
     id: blueprint.id,
     version: blueprint.version,
     status: blueprint.status,
@@ -33535,7 +35059,7 @@ function slug(id) {
 }
 function profileDefinitionClosure(blueprint, bundle, adapterIds) {
   const overlayIds = /* @__PURE__ */ new Set([...blueprint.overlays.baked, ...blueprint.overlays.defaults]);
-  const overlayQueue = [...overlayIds].sort(compareUtf822);
+  const overlayQueue = [...overlayIds].sort(compareUtf829);
   for (let cursor = 0; cursor < overlayQueue.length; cursor += 1) {
     const id = overlayQueue[cursor];
     if (id === void 0) continue;
@@ -33543,7 +35067,7 @@ function profileDefinitionClosure(blueprint, bundle, adapterIds) {
     if (overlay === null) {
       return failure("INIT_CATALOG_REFERENCE_MISSING", "selected overlay is missing from the catalog", id);
     }
-    for (const required of [...overlay.requires_overlays].sort(compareUtf822)) {
+    for (const required of [...overlay.requires_overlays].sort(compareUtf829)) {
       if (!overlayIds.has(required)) {
         overlayIds.add(required);
         overlayQueue.push(required);
@@ -33569,7 +35093,7 @@ function profileDefinitionClosure(blueprint, bundle, adapterIds) {
   let changed = true;
   while (changed) {
     changed = false;
-    for (const id of [...componentIds].sort(compareUtf822)) {
+    for (const id of [...componentIds].sort(compareUtf829)) {
       const component = byId(bundle.definitions.components, id);
       if (component === null) {
         return failure("INIT_CATALOG_REFERENCE_MISSING", "selected component is missing from the catalog", id);
@@ -33581,7 +35105,7 @@ function profileDefinitionClosure(blueprint, bundle, adapterIds) {
         }
       }
     }
-    for (const id of [...domainIds].sort(compareUtf822)) {
+    for (const id of [...domainIds].sort(compareUtf829)) {
       const domain = byId(bundle.definitions.domains, id);
       if (domain === null) {
         return failure("INIT_CATALOG_REFERENCE_MISSING", "selected domain is missing from the catalog", id);
@@ -33595,9 +35119,9 @@ function profileDefinitionClosure(blueprint, bundle, adapterIds) {
     }
   }
   return success({
-    overlays: [...overlayIds].sort(compareUtf822),
-    components: [...componentIds].sort(compareUtf822).map((id) => byId(bundle.definitions.components, id)),
-    domains: [...domainIds].sort(compareUtf822).map((id) => byId(bundle.definitions.domains, id))
+    overlays: [...overlayIds].sort(compareUtf829),
+    components: [...componentIds].sort(compareUtf829).map((id) => byId(bundle.definitions.components, id)),
+    domains: [...domainIds].sort(compareUtf829).map((id) => byId(bundle.definitions.domains, id))
   });
 }
 function adapterSelections(bundle, ids, kind) {
@@ -33628,7 +35152,7 @@ async function readText(root, relativePath) {
   const target = await resolveInside(root, relativePath);
   if (!target.ok) return target;
   try {
-    const stat2 = await lstat10(target.value);
+    const stat2 = await lstat11(target.value);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure("INIT_INPUT_UNSAFE", "initialization input must be a regular file", relativePath);
     }
@@ -33643,7 +35167,7 @@ async function readText(root, relativePath) {
 }
 async function jsonFile(url) {
   try {
-    const stat2 = await lstat10(url);
+    const stat2 = await lstat11(url);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure("INIT_CATALOG_UNSAFE", "catalog document must be a regular file", url.href);
     }
@@ -33975,13 +35499,10 @@ async function buildInitPlan(replay, dependencies = createDefaultBuildInitPlanDe
 // src/host/proposal-envelope.ts
 var REVIEW_TTL_MILLISECONDS2 = 60 * 60 * 1e3;
 
-// src/version.ts
-var PACKAGE_VERSION = "0.1.1";
-
 // src/cli/commands/doctor.ts
-var PROJECT_PATH = "docs/project-memory/project.yaml";
+var PROJECT_PATH2 = "docs/project-memory/project.yaml";
 var PROFILE_LOCK_PATH2 = "docs/project-memory/profile.lock.yaml";
-var CATALOG_LOCK_PATH = "docs/project-memory/catalog.lock.json";
+var CATALOG_LOCK_PATH2 = "docs/project-memory/catalog.lock.json";
 var SHA2564 = /^[0-9a-f]{64}$/;
 function issue3(code, message, pathValue = "") {
   return { code, severity: "error", path: pathValue, message, references: [] };
@@ -34056,7 +35577,7 @@ async function viewRevision(root, relativePath) {
   const target = await resolveInside(root, relativePath);
   if (!target.ok) return target;
   try {
-    const stat2 = await lstat11(target.value);
+    const stat2 = await lstat12(target.value);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure("DOCTOR_VIEW_UNSAFE", "generated view must be a regular file", relativePath);
     }
@@ -34115,7 +35636,7 @@ async function readDocument(root, relativePath, missingCode) {
   const target = await resolveInside(root, relativePath);
   if (!target.ok) return target;
   try {
-    const stat2 = await lstat11(target.value);
+    const stat2 = await lstat12(target.value);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure("DOCTOR_DOCUMENT_UNSAFE", "diagnostic target must be a regular file", relativePath);
     }
@@ -34156,13 +35677,13 @@ async function inspectRepository(root, dependencies = createDefaultDoctorDepende
       checks.push(warning(id, `${id} check skipped because configuration is invalid`));
     }
   } else {
-    const project = await readDocument(root, PROJECT_PATH, "PROJECT_SELECTION_MISSING");
+    const project = await readDocument(root, PROJECT_PATH2, "PROJECT_SELECTION_MISSING");
     if (!project.ok) {
       checks.push(fromResult("project", project, "project selection is available"));
     } else {
-      const header = compatibleHeader(project.value, PROJECT_PATH);
+      const header = compatibleHeader(project.value, PROJECT_PATH2);
       const rootId = rootIdFromProject(project.value);
-      const binding = !header.ok ? header : rootId === config.value.root_id ? success(true) : failure("DOCTOR_ROOT_ID_MISMATCH", "project selection root does not match config", PROJECT_PATH);
+      const binding = !header.ok ? header : rootId === config.value.root_id ? success(true) : failure("DOCTOR_ROOT_ID_MISMATCH", "project selection root does not match config", PROJECT_PATH2);
       checks.push(fromResult("project", binding, "project selection is bound to the configured root"));
     }
     const profile = await readDocument(root, PROFILE_LOCK_PATH2, "PROFILE_LOCK_MISSING");
@@ -34173,12 +35694,12 @@ async function inspectRepository(root, dependencies = createDefaultDoctorDepende
       const binding = !header.ok ? header : profile.value.root_id === config.value.root_id && typeof profile.value.lock_hash === "string" && SHA2564.test(profile.value.lock_hash) ? success(true) : failure("PROFILE_LOCK_BINDING_INVALID", "profile lock header does not bind to config", PROFILE_LOCK_PATH2);
       checks.push(fromResult("profile_lock", binding, "profile lock header is valid and bound"));
     }
-    const catalog = await readDocument(root, CATALOG_LOCK_PATH, "SELECTED_CATALOG_LOCK_MISSING");
+    const catalog = await readDocument(root, CATALOG_LOCK_PATH2, "SELECTED_CATALOG_LOCK_MISSING");
     if (!catalog.ok) {
       checks.push(fromResult("catalog_lock", catalog, "catalog lock is available"));
     } else {
-      const header = compatibleHeader(catalog.value, CATALOG_LOCK_PATH);
-      const valid = !header.ok ? header : typeof catalog.value.lock_hash === "string" && SHA2564.test(catalog.value.lock_hash) ? success(true) : failure("SELECTED_CATALOG_LOCK_INVALID", "catalog lock header is invalid", CATALOG_LOCK_PATH);
+      const header = compatibleHeader(catalog.value, CATALOG_LOCK_PATH2);
+      const valid = !header.ok ? header : typeof catalog.value.lock_hash === "string" && SHA2564.test(catalog.value.lock_hash) ? success(true) : failure("SELECTED_CATALOG_LOCK_INVALID", "catalog lock header is invalid", CATALOG_LOCK_PATH2);
       checks.push(fromResult("catalog_lock", valid, "selected catalog lock header is valid"));
     }
     const hub = await dependencies.hub(root, config.value);
@@ -34236,7 +35757,7 @@ function createDoctorCommand(dependencies = createDefaultDoctorDependencies()) {
 }
 
 // src/agent/infer-repository-brief.ts
-import { lstat as lstat12, readFile as readFile16, readdir as readdir9 } from "node:fs/promises";
+import { lstat as lstat13, readFile as readFile16, readdir as readdir9 } from "node:fs/promises";
 import path17 from "node:path";
 import { fileURLToPath as fileURLToPath11 } from "node:url";
 var MAX_EVIDENCE_BYTES = 1048576;
@@ -34257,7 +35778,7 @@ var MARKDOWN_PROFILE_BASENAMES = new Set(
 );
 var MAX_MARKDOWN_PROFILE_DEPTH = 4;
 var MAX_MARKDOWN_PROFILE_DIRECTORIES = 256;
-function compareUtf823(left, right) {
+function compareUtf830(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function record4(value) {
@@ -34270,7 +35791,7 @@ async function optionalText(root, relativePath) {
   const target = await resolveInside(root, relativePath);
   if (!target.ok) return target;
   try {
-    const stat2 = await lstat12(target.value);
+    const stat2 = await lstat13(target.value);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure(
         "AGENT_REPOSITORY_EVIDENCE_UNSAFE",
@@ -34298,7 +35819,7 @@ async function optionalDirectory(root, relativePath) {
   const target = await resolveInside(root, relativePath);
   if (!target.ok) return target;
   try {
-    const stat2 = await lstat12(target.value);
+    const stat2 = await lstat13(target.value);
     if (stat2.isSymbolicLink()) {
       return failure(
         "AGENT_REPOSITORY_EVIDENCE_UNSAFE",
@@ -34319,7 +35840,7 @@ async function markdownProfilePaths(root) {
   const candidates = new Set(MARKDOWN_PROFILE_FILENAMES);
   const docsPresent = await optionalDirectory(root, "docs");
   if (!docsPresent.ok) return docsPresent;
-  if (!docsPresent.value) return success([...candidates].sort(compareUtf823));
+  if (!docsPresent.value) return success([...candidates].sort(compareUtf830));
   const docs = await resolveInside(root, "docs");
   if (!docs.ok) return docs;
   const pending = [{ directory: docs.value, relativePath: "docs", depth: 0 }];
@@ -34338,7 +35859,7 @@ async function markdownProfilePaths(root) {
         current.relativePath
       );
     }
-    for (const entry of entries.sort((left, right) => compareUtf823(left.name, right.name))) {
+    for (const entry of entries.sort((left, right) => compareUtf830(left.name, right.name))) {
       if (entry.isSymbolicLink()) continue;
       const relativePath = `${current.relativePath}/${entry.name}`;
       if (entry.isFile() && MARKDOWN_PROFILE_BASENAMES.has(entry.name.toLowerCase())) {
@@ -34351,7 +35872,7 @@ async function markdownProfilePaths(root) {
       }
     }
   }
-  return success([...candidates].sort(compareUtf823));
+  return success([...candidates].sort(compareUtf830));
 }
 function missionFrom(text) {
   const named = /^\s*[-*]\s+(?:His\s+)?mission:\s+\*\*([^*\r\n]+)\*\*\s*(?:\u2014|\u2013|\u00e2\u20ac\u201d|-|:)\s*(.+?)\s*$/imu.exec(text);
@@ -34393,7 +35914,7 @@ function humanName(value) {
 }
 function dependencyKeys(document) {
   const dependencies = record4(document?.dependencies);
-  return dependencies === null ? [] : Object.keys(dependencies).sort(compareUtf823);
+  return dependencies === null ? [] : Object.keys(dependencies).sort(compareUtf830);
 }
 async function conventionalBrief(root) {
   for (const relativePath of STRUCTURED_BRIEF_CANDIDATES) {
@@ -34520,8 +36041,8 @@ async function inferRepositoryBrief(root) {
     namespace: namespace(packageName ?? resolvedName),
     lifecycle: "active",
     owners: [ownerText],
-    runtime_adapters: [...runtimeAdapters].sort(compareUtf823),
-    workflow_adapters: [...workflowAdapters].sort(compareUtf823),
+    runtime_adapters: [...runtimeAdapters].sort(compareUtf830),
+    workflow_adapters: [...workflowAdapters].sort(compareUtf830),
     success_criteria: [
       `The product continues to deliver its documented mission: ${missionText}`
     ],
@@ -34533,7 +36054,7 @@ async function inferRepositoryBrief(root) {
     ]
   });
   if (!emitted.ok) return emitted;
-  const sortedSources = [...sourcePaths].sort(compareUtf823);
+  const sortedSources = [...sourcePaths].sort(compareUtf830);
   return success({
     brief_path: `inferred://repository/${sortedSources.map(encodeURIComponent).join("+")}`,
     brief_text: emitted.value,
@@ -34542,799 +36063,10 @@ async function inferRepositoryBrief(root) {
 }
 
 // src/agent/node-view-verifier.ts
-import { lstat as lstat13, mkdir as mkdir3, mkdtemp, readFile as readFile17, rm as rm2 } from "node:fs/promises";
+import { lstat as lstat14, mkdir as mkdir3, mkdtemp, readFile as readFile17, rm as rm2 } from "node:fs/promises";
 import { tmpdir as tmpdir2 } from "node:os";
 import path18 from "node:path";
 import { fileURLToPath as fileURLToPath12 } from "node:url";
-
-// src/governance/records/supersession-index.ts
-function compareUtf824(left, right) {
-  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
-}
-function sortedMap(source) {
-  return new Map(
-    [...source.entries()].sort(([left], [right]) => compareUtf824(left, right)).map(([id, values]) => [id, Object.freeze([...values].sort(compareUtf824))])
-  );
-}
-function detectCycle(ids, edges) {
-  const state = /* @__PURE__ */ new Map();
-  function visit(id) {
-    const current = state.get(id);
-    if (current === "visiting") {
-      return failure(
-        "record.supersession_cycle",
-        "supersession relationships must form an acyclic history",
-        id
-      );
-    }
-    if (current === "visited") return success(true);
-    state.set(id, "visiting");
-    for (const target of edges.get(id) ?? []) {
-      const result = visit(target);
-      if (!result.ok) return result;
-    }
-    state.set(id, "visited");
-    return success(true);
-  }
-  for (const id of ids) {
-    const result = visit(id);
-    if (!result.ok) return result;
-  }
-  return success(true);
-}
-function buildSupersessionIndex(records3) {
-  const recordsById = /* @__PURE__ */ new Map();
-  for (const record5 of records3) {
-    if (recordsById.has(record5.id)) {
-      return failure(
-        "record.id_duplicate",
-        "canonical record IDs must be unique across every record directory",
-        record5.id
-      );
-    }
-    recordsById.set(record5.id, record5);
-  }
-  const supersedesById = /* @__PURE__ */ new Map();
-  const supersededById = /* @__PURE__ */ new Map();
-  for (const record5 of records3) {
-    const targets = record5.relationships.filter((relationship) => relationship.type === "supersedes").map((relationship) => relationship.target_id).sort(compareUtf824);
-    supersedesById.set(record5.id, targets);
-    for (const targetId of targets) {
-      const target = recordsById.get(targetId);
-      if (target === void 0) {
-        return failure(
-          "record.supersession_target_missing",
-          "a supersession relationship must reference an existing immutable record",
-          record5.id,
-          [targetId]
-        );
-      }
-      if (target.root_id !== record5.root_id) {
-        return failure(
-          "record.root_mismatch",
-          "a supersession relationship cannot cross product roots",
-          record5.id,
-          [targetId]
-        );
-      }
-      if (target.type !== record5.type) {
-        return failure(
-          "record.fact_class_mismatch",
-          "a supersession relationship must preserve the canonical fact class",
-          record5.id,
-          [targetId]
-        );
-      }
-      const replacements = supersededById.get(targetId) ?? [];
-      replacements.push(record5.id);
-      supersededById.set(targetId, replacements);
-    }
-  }
-  const sortedIds = [...recordsById.keys()].sort(compareUtf824);
-  const acyclic = detectCycle(sortedIds, supersedesById);
-  if (!acyclic.ok) return acyclic;
-  return success({
-    records_by_id: new Map(
-      [...recordsById.entries()].sort(([left], [right]) => compareUtf824(left, right))
-    ),
-    supersedes_by_id: sortedMap(supersedesById),
-    superseded_by_id: sortedMap(supersededById),
-    superseded_ids: new Set([...supersededById.keys()].sort(compareUtf824))
-  });
-}
-
-// src/governance/snapshot/snapshot-parsers.ts
-var PROJECT_PATH2 = "docs/project-memory/project.yaml";
-var PROFILE_PATH = "docs/project-memory/profile.lock.yaml";
-var CATALOG_LOCK_PATH2 = "docs/project-memory/catalog.lock.json";
-function compareUtf825(left, right) {
-  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
-}
-function byteEqual8(left, right) {
-  return Buffer.from(left).equals(Buffer.from(right));
-}
-function translatedFailure2(code, message, path27, issues) {
-  return failure(
-    code,
-    message,
-    path27,
-    issues.map((issue5) => `${issue5.code}:${issue5.path}`)
-  );
-}
-function strictJson(blob, schemaId, errorCode) {
-  const decoded = decodeStrictUtf8(blob.bytes, blob.relative_path);
-  if (!decoded.ok) {
-    return translatedFailure2(
-      errorCode,
-      "canonical JSON must use strict UTF-8",
-      blob.relative_path,
-      decoded.issues
-    );
-  }
-  const parsed = parseJsonDocument(decoded.value, blob.relative_path);
-  if (!parsed.ok) {
-    return translatedFailure2(
-      errorCode,
-      "canonical JSON could not be parsed",
-      blob.relative_path,
-      parsed.issues
-    );
-  }
-  const validated = validateWithSchema(schemaId, parsed.value);
-  if (!validated.ok) {
-    return translatedFailure2(
-      errorCode,
-      "canonical JSON failed schema validation",
-      blob.relative_path,
-      validated.issues
-    );
-  }
-  if (!byteEqual8(blob.bytes, new TextEncoder().encode(canonicalJson(validated.value)))) {
-    return failure(errorCode, "canonical JSON bytes are not deterministic", blob.relative_path);
-  }
-  return validated;
-}
-function strictYaml(blob, schemaId, errorCode) {
-  const decoded = decodeStrictUtf8(blob.bytes, blob.relative_path);
-  if (!decoded.ok) {
-    return translatedFailure2(
-      errorCode,
-      "canonical YAML must use strict UTF-8",
-      blob.relative_path,
-      decoded.issues
-    );
-  }
-  const parsed = parseYamlDocument(decoded.value, blob.relative_path);
-  if (!parsed.ok) {
-    return translatedFailure2(
-      errorCode,
-      "canonical YAML could not be parsed",
-      blob.relative_path,
-      parsed.issues
-    );
-  }
-  const validated = validateWithSchema(schemaId, parsed.value);
-  if (!validated.ok) {
-    return translatedFailure2(
-      errorCode,
-      "canonical YAML failed schema validation",
-      blob.relative_path,
-      validated.issues
-    );
-  }
-  const emitted = emitGeneratedYaml(validated.value);
-  if (!emitted.ok) {
-    return translatedFailure2(
-      errorCode,
-      "canonical YAML could not be emitted",
-      blob.relative_path,
-      emitted.issues
-    );
-  }
-  if (!byteEqual8(blob.bytes, new TextEncoder().encode(emitted.value))) {
-    return failure(errorCode, "canonical YAML bytes are not deterministic", blob.relative_path);
-  }
-  return validated;
-}
-function requiredBlob(indexed, relativePath) {
-  const blob = indexed.get(relativePath);
-  return blob === void 0 ? failure(
-    "snapshot.profile_missing",
-    "required canonical profile source is missing",
-    relativePath
-  ) : success(blob);
-}
-function validateLocks(indexed) {
-  const projectBlob = requiredBlob(indexed, PROJECT_PATH2);
-  if (!projectBlob.ok) return projectBlob;
-  const profileBlob = requiredBlob(indexed, PROFILE_PATH);
-  if (!profileBlob.ok) return profileBlob;
-  const catalogBlob = requiredBlob(indexed, CATALOG_LOCK_PATH2);
-  if (!catalogBlob.ok) return catalogBlob;
-  const project = strictYaml(
-    projectBlob.value,
-    "project-memory/v1/project-selection",
-    "snapshot.project_invalid"
-  );
-  if (!project.ok) return project;
-  const profile = strictYaml(
-    profileBlob.value,
-    "project-memory/v1/profile-lock",
-    "snapshot.profile_invalid"
-  );
-  if (!profile.ok) return profile;
-  const catalog = strictJson(
-    catalogBlob.value,
-    "project-memory/v1/selected-catalog-lock",
-    "snapshot.catalog_lock_invalid"
-  );
-  if (!catalog.ok) return catalog;
-  const { lock_hash: profileHash, ...profileBody } = profile.value;
-  const { lock_hash: catalogHash, ...catalogBody } = catalog.value;
-  if (sha256(canonicalJson(profileBody)) !== profileHash) {
-    return failure(
-      "snapshot.profile_hash_mismatch",
-      "profile lock self-hash is invalid",
-      PROFILE_PATH
-    );
-  }
-  if (sha256(canonicalJson(catalogBody)) !== catalogHash) {
-    return failure(
-      "snapshot.catalog_hash_mismatch",
-      "catalog lock self-hash is invalid",
-      CATALOG_LOCK_PATH2
-    );
-  }
-  if (profile.value.root_id !== project.value.root.id || profile.value.profile.root.id !== project.value.root.id) {
-    return failure(
-      "snapshot.root_mismatch",
-      "project and profile roots do not match",
-      PROFILE_PATH
-    );
-  }
-  if (profile.value.project_hash !== sha256(projectBlob.value.bytes)) {
-    return failure(
-      "snapshot.project_hash_mismatch",
-      "profile lock does not bind project.yaml",
-      PROJECT_PATH2
-    );
-  }
-  if (profile.value.selected_catalog_lock_hash !== catalogHash) {
-    return failure(
-      "snapshot.catalog_reference_mismatch",
-      "profile lock does not bind the selected catalog lock",
-      CATALOG_LOCK_PATH2
-    );
-  }
-  for (const entry of profile.value.accepted_source_entries) {
-    const source = indexed.get(entry.target_path);
-    if (source === void 0 || sha256(source.bytes) !== entry.sha256) {
-      return failure(
-        "snapshot.profile_source_hash_mismatch",
-        "profile lock accepted-source reference is missing or stale",
-        entry.target_path,
-        [entry.sha256]
-      );
-    }
-  }
-  return success({
-    project: project.value,
-    profile: profile.value,
-    catalog: catalog.value
-  });
-}
-function parseSourceDocuments(indexed) {
-  const documents = [];
-  for (const [relativePath, blob] of indexed) {
-    if (!relativePath.startsWith("docs/project-memory/source/")) continue;
-    const decoded = decodeStrictUtf8(blob.bytes, relativePath);
-    if (!decoded.ok) {
-      return translatedFailure2(
-        "snapshot.source_invalid",
-        "source document is not UTF-8",
-        relativePath,
-        decoded.issues
-      );
-    }
-    documents.push({ relative_path: relativePath, text: decoded.value });
-  }
-  return success(documents);
-}
-function markdownCandidate(relativePath) {
-  return relativePath === "docs/project-memory/source/PROJECT.md" || relativePath.startsWith("docs/project-memory/components/") || relativePath.startsWith("docs/project-memory/domains/") || relativePath.startsWith("docs/project-memory/initiatives/") || relativePath.startsWith("docs/project-memory/workstreams/");
-}
-function parseMarkdown(indexed, rootId) {
-  const documents = [];
-  const ids = /* @__PURE__ */ new Set();
-  for (const [relativePath, blob] of indexed) {
-    if (!markdownCandidate(relativePath) || !relativePath.endsWith(".md")) continue;
-    const parsed = parseCanonicalMarkdown(blob.bytes);
-    if (!parsed.ok) {
-      return translatedFailure2(
-        "snapshot.markdown_invalid",
-        "canonical Markdown is invalid",
-        relativePath,
-        parsed.issues
-      );
-    }
-    if (parsed.value.envelope.root_id !== rootId) {
-      return failure(
-        "snapshot.root_mismatch",
-        "canonical Markdown belongs to another root",
-        relativePath
-      );
-    }
-    if (ids.has(parsed.value.envelope.id)) {
-      return failure(
-        "snapshot.id_duplicate",
-        "canonical artifact ID appears more than once",
-        parsed.value.envelope.id
-      );
-    }
-    if (parsed.value.envelope.type !== "project" && !relativePath.split("/").includes(parsed.value.envelope.id)) {
-      return failure(
-        "snapshot.artifact_path_mismatch",
-        "artifact ID does not match its path",
-        relativePath
-      );
-    }
-    ids.add(parsed.value.envelope.id);
-    documents.push(parsed.value);
-  }
-  return success(
-    documents.sort(
-      (left, right) => compareUtf825(left.envelope.id, right.envelope.id)
-    )
-  );
-}
-function parseRecords(indexed, rootId) {
-  const records3 = [];
-  for (const [relativePath, blob] of indexed) {
-    if (!relativePath.startsWith("docs/project-memory/records/") || !relativePath.endsWith(".json")) {
-      continue;
-    }
-    const parsed = strictJson(
-      blob,
-      "project-memory/v1/canonical-record",
-      "snapshot.record_schema_invalid"
-    );
-    if (!parsed.ok) return parsed;
-    if (canonicalRecordPath(parsed.value) !== relativePath) {
-      return failure(
-        "snapshot.record_path_mismatch",
-        "record ID and type do not match its path",
-        relativePath
-      );
-    }
-    if (parsed.value.root_id !== rootId) {
-      return failure(
-        "snapshot.root_mismatch",
-        "canonical record belongs to another root",
-        relativePath
-      );
-    }
-    records3.push(parsed.value);
-  }
-  records3.sort((left, right) => compareUtf825(left.id, right.id));
-  const index = buildSupersessionIndex(records3);
-  return index.ok ? success(records3) : index;
-}
-function parseClaims(indexed) {
-  const claims = [];
-  for (const [relativePath, blob] of indexed) {
-    if (!relativePath.startsWith("docs/project-memory/governance/claims/") || !relativePath.endsWith(".json")) {
-      continue;
-    }
-    const parsed = strictJson(
-      blob,
-      "project-memory/v1/claim",
-      "snapshot.claim_invalid"
-    );
-    if (!parsed.ok) return parsed;
-    claims.push({ relative_path: relativePath, value: parsed.value });
-  }
-  return success(claims);
-}
-function parseEvents(indexed) {
-  const groups = /* @__PURE__ */ new Map();
-  for (const [relativePath, blob] of indexed) {
-    if (!relativePath.startsWith("docs/project-memory/governance/events/") || !relativePath.endsWith(".json")) {
-      continue;
-    }
-    const parsed = strictJson(
-      blob,
-      "project-memory/v1/governance-event",
-      "snapshot.event_invalid"
-    );
-    if (!parsed.ok) return parsed;
-    if (eventPath(parsed.value) !== relativePath) {
-      return failure(
-        "snapshot.event_path_mismatch",
-        "event hash and timestamp do not match its path",
-        relativePath
-      );
-    }
-    const values = groups.get(parsed.value.aggregate_id) ?? [];
-    values.push(parsed.value);
-    groups.set(parsed.value.aggregate_id, values);
-  }
-  const events = [];
-  for (const aggregateId of [...groups.keys()].sort(compareUtf825)) {
-    const chain = groups.get(aggregateId) ?? [];
-    chain.sort((left, right) => left.sequence - right.sequence);
-    const verified = verifyEventChain(chain);
-    if (!verified.ok) return verified;
-    events.push(...chain);
-  }
-  return success(events);
-}
-function parseSnapshot(indexed) {
-  const locks = validateLocks(indexed);
-  if (!locks.ok) return locks;
-  const sourceDocuments = parseSourceDocuments(indexed);
-  if (!sourceDocuments.ok) return sourceDocuments;
-  const markdown = parseMarkdown(indexed, locks.value.project.root.id);
-  if (!markdown.ok) return markdown;
-  const records3 = parseRecords(indexed, locks.value.project.root.id);
-  if (!records3.ok) return records3;
-  const claims = parseClaims(indexed);
-  if (!claims.ok) return claims;
-  const events = parseEvents(indexed);
-  if (!events.ok) return events;
-  return success({
-    project: locks.value.project,
-    profile: locks.value.profile,
-    catalog: locks.value.catalog,
-    source_documents: sourceDocuments.value,
-    markdown: markdown.value,
-    records: records3.value,
-    claims: claims.value,
-    events: events.value
-  });
-}
-
-// src/governance/snapshot/revision-tree-reader.ts
-var OBJECT_ID2 = /^[0-9a-f]{40}$/;
-function compareUtf826(left, right) {
-  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
-}
-function gitEnvironment3() {
-  const environment = {
-    GIT_TERMINAL_PROMPT: "0",
-    LC_ALL: "C"
-  };
-  for (const name of ["PATH", "SystemRoot", "HOME", "USERPROFILE"]) {
-    const value = process.env[name];
-    if (value !== void 0) environment[name] = value;
-  }
-  return environment;
-}
-async function git(root, runner, args, maximumBytes = 16777216) {
-  const result = await runCommand(
-    {
-      executable: "git",
-      args,
-      cwd: root,
-      timeout_ms: 3e4,
-      env_allowlist: gitEnvironment3(),
-      max_output_bytes: maximumBytes
-    },
-    runner
-  );
-  if (!result.ok) return result;
-  if (result.value.timed_out) {
-    return failure("snapshot.git_timeout", "Git object read timed out");
-  }
-  if (result.value.output_truncated) {
-    return failure("snapshot.git_output_truncated", "Git object output exceeded its bound");
-  }
-  if (result.value.exit_code !== 0) {
-    return failure(
-      "snapshot.git_failed",
-      result.value.stderr.trim() || `Git exited with ${String(result.value.exit_code)}`,
-      args.join(" ")
-    );
-  }
-  return success(result.value.stdout);
-}
-function isForbiddenTruthSource(relativePath) {
-  return relativePath.startsWith("docs/project-memory/views/") || relativePath.startsWith("docs/project-memory/archive/");
-}
-function isCanonicalSnapshotPath(relativePath) {
-  if (isForbiddenTruthSource(relativePath) || relativePath.endsWith("/.gitkeep")) {
-    return false;
-  }
-  if (relativePath === "docs/project-memory/project.yaml" || relativePath === "docs/project-memory/profile.lock.yaml" || relativePath === "docs/project-memory/catalog.lock.json") {
-    return true;
-  }
-  return [
-    "docs/project-memory/source/",
-    "docs/project-memory/components/",
-    "docs/project-memory/domains/",
-    "docs/project-memory/initiatives/",
-    "docs/project-memory/workstreams/",
-    "docs/project-memory/records/",
-    "docs/project-memory/governance/events/",
-    "docs/project-memory/governance/claims/",
-    "docs/project-memory/governance/integration/"
-  ].some((prefix) => relativePath.startsWith(prefix));
-}
-function parseTreeEntries(value) {
-  const rawEntries = value.split("\0");
-  if (rawEntries.at(-1) === "") rawEntries.pop();
-  const entries = [];
-  const paths = /* @__PURE__ */ new Set();
-  for (const raw of rawEntries) {
-    const tab = raw.indexOf("	");
-    if (tab < 0) {
-      return failure("snapshot.tree_malformed", "Git ls-tree entry has no path delimiter");
-    }
-    const header = raw.slice(0, tab).split(" ");
-    const [mode, type, objectId] = header;
-    const relativePath = raw.slice(tab + 1);
-    if (header.length !== 3 || mode === void 0 || type === void 0 || objectId === void 0 || !OBJECT_ID2.test(objectId) || relativePath.length === 0) {
-      return failure(
-        "snapshot.tree_malformed",
-        "Git ls-tree returned a malformed canonical entry",
-        relativePath
-      );
-    }
-    if (!isCanonicalSnapshotPath(relativePath)) continue;
-    if (paths.has(relativePath)) {
-      return failure(
-        "snapshot.path_duplicate",
-        "one Git tree cannot provide a canonical path more than once",
-        relativePath
-      );
-    }
-    paths.add(relativePath);
-    entries.push({ mode, type, object_id: objectId, relative_path: relativePath });
-  }
-  return success(entries.sort((left, right) => compareUtf826(left.relative_path, right.relative_path)));
-}
-async function verifySource(root, source, runner) {
-  if (!OBJECT_ID2.test(source.object_id)) {
-    return failure(
-      "snapshot.revision_invalid",
-      "snapshot object IDs must be exact lowercase SHA-1 values",
-      source.object_id
-    );
-  }
-  const type = await runCommand(
-    {
-      executable: "git",
-      args: ["cat-file", "-t", source.object_id],
-      cwd: root,
-      timeout_ms: 3e4,
-      env_allowlist: gitEnvironment3(),
-      max_output_bytes: 65536
-    },
-    runner
-  );
-  if (!type.ok) return type;
-  if (type.value.exit_code === 1 || type.value.exit_code === 128) {
-    return failure(
-      "snapshot.revision_not_found",
-      "the requested Git object does not exist",
-      source.object_id
-    );
-  }
-  if (type.value.exit_code !== 0 || type.value.timed_out || type.value.output_truncated) {
-    return failure(
-      "snapshot.git_failed",
-      type.value.stderr.trim() || "could not inspect requested Git object",
-      source.object_id
-    );
-  }
-  if (type.value.stdout.trim() !== source.kind) {
-    return failure(
-      "snapshot.revision_type_mismatch",
-      `requested ${source.kind} object has type ${type.value.stdout.trim()}`,
-      source.object_id
-    );
-  }
-  const exists2 = await git(root, runner, [
-    "cat-file",
-    "-e",
-    `${source.object_id}^{${source.kind}}`
-  ]);
-  return exists2.ok ? success(true) : exists2;
-}
-function createRevisionTreeReader(runner) {
-  return {
-    async readCanonicalBlobs(root, source) {
-      const verified = await verifySource(root, source, runner);
-      if (!verified.ok) return verified;
-      const listed = await git(root, runner, [
-        "ls-tree",
-        "-rz",
-        "--full-tree",
-        source.object_id,
-        "--",
-        "docs/project-memory"
-      ]);
-      if (!listed.ok) return listed;
-      const entries = parseTreeEntries(listed.value);
-      if (!entries.ok) return entries;
-      const blobs = [];
-      for (const entry of entries.value) {
-        if (entry.type !== "blob" || entry.mode !== "100644") {
-          return failure(
-            "snapshot.non_blob_entry",
-            "canonical snapshot paths must be regular non-executable blobs",
-            entry.relative_path,
-            [entry.mode, entry.type]
-          );
-        }
-        const content = await git(root, runner, [
-          "cat-file",
-          "blob",
-          entry.object_id
-        ]);
-        if (!content.ok) return content;
-        blobs.push({
-          relative_path: entry.relative_path,
-          object_id: entry.object_id,
-          bytes: new TextEncoder().encode(content.value)
-        });
-      }
-      return success(blobs);
-    }
-  };
-}
-
-// src/governance/snapshot/canonical-snapshot-builder.ts
-function compareUtf827(left, right) {
-  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
-}
-async function indexBlobs(root, blobs) {
-  const indexed = /* @__PURE__ */ new Map();
-  for (const blob of blobs) {
-    if (isForbiddenTruthSource(blob.relative_path)) {
-      return failure(
-        "snapshot.forbidden_truth_source",
-        "generated views and archives cannot become current truth",
-        blob.relative_path
-      );
-    }
-    if (!isCanonicalSnapshotPath(blob.relative_path)) {
-      return failure(
-        "snapshot.source_path_forbidden",
-        "reader returned a path outside the canonical snapshot boundary",
-        blob.relative_path
-      );
-    }
-    if (!/^[0-9a-f]{40}$/.test(blob.object_id)) {
-      return failure("snapshot.blob_id_invalid", "blob object ID is malformed", blob.relative_path);
-    }
-    if (indexed.has(blob.relative_path)) {
-      return failure(
-        "snapshot.path_duplicate",
-        "canonical snapshot path appears more than once",
-        blob.relative_path
-      );
-    }
-    const confined2 = await resolveInside(root, blob.relative_path);
-    if (!confined2.ok) return confined2;
-    indexed.set(blob.relative_path, blob);
-  }
-  return success(
-    new Map([...indexed.entries()].sort(([left], [right]) => compareUtf827(left, right)))
-  );
-}
-function claimId(claim) {
-  const id = claim.value.id ?? claim.value.claim_id;
-  return typeof id === "string" ? id : null;
-}
-function validateReferences(parsed) {
-  const approvals = new Set(
-    parsed.records.filter((record5) => record5.type === "approval").map((record5) => record5.id)
-  );
-  const approvalRefs = [
-    parsed.project.acceptance.approval_id,
-    ...parsed.profile.accepted_source_entries.flatMap((entry) => entry.approval_refs),
-    ...parsed.markdown.flatMap((document) => document.envelope.approval_refs)
-  ];
-  const missingApproval = approvalRefs.find((id) => !approvals.has(id));
-  if (missingApproval !== void 0) {
-    return failure("snapshot.approval_missing", "accepted truth lacks canonical approval", missingApproval);
-  }
-  const known = /* @__PURE__ */ new Set([
-    parsed.project.root.id,
-    ...parsed.markdown.map((document) => document.envelope.id),
-    ...parsed.records.map((record5) => record5.id),
-    ...parsed.events.map((event) => event.aggregate_id),
-    ...parsed.claims.flatMap((claim) => claimId(claim) === null ? [] : [claimId(claim)])
-  ]);
-  for (const record5 of parsed.records) {
-    const structuralIds = [
-      ...record5.component_ids,
-      record5.initiative_id,
-      record5.workstream_id,
-      record5.task_id
-    ].filter((value) => value !== null);
-    const missingStructural = structuralIds.find((id) => !known.has(id));
-    if (missingStructural !== void 0) {
-      return failure("snapshot.relationship_missing", "record structural reference is missing", record5.id, [missingStructural]);
-    }
-    const missingRelationship = record5.relationships.find(
-      (relationship) => !known.has(relationship.target_id)
-    );
-    if (missingRelationship !== void 0) {
-      return failure(
-        "snapshot.relationship_missing",
-        "record relationship target is absent from current truth",
-        record5.id,
-        [missingRelationship.target_id]
-      );
-    }
-  }
-  const evidenceIds = new Set(
-    parsed.records.filter((record5) => record5.type === "evidence").map((record5) => record5.id)
-  );
-  for (const event of parsed.events) {
-    const missingEvidence = event.evidence_ids.find((id) => !evidenceIds.has(id));
-    if (missingEvidence !== void 0) {
-      return failure("snapshot.evidence_missing", "event evidence is absent", event.event_hash, [missingEvidence]);
-    }
-  }
-  return success(true);
-}
-async function buildCanonicalSnapshot(root, source, reader) {
-  const blobs = await reader.readCanonicalBlobs(root, source);
-  if (!blobs.ok) return blobs;
-  const indexed = await indexBlobs(root, blobs.value);
-  if (!indexed.ok) return indexed;
-  const parsed = parseSnapshot(indexed.value);
-  if (!parsed.ok) return parsed;
-  const references = validateReferences(parsed.value);
-  if (!references.ok) return references;
-  const supersession = buildSupersessionIndex(parsed.value.records);
-  if (!supersession.ok) return supersession;
-  const sourcePaths = [...indexed.value.keys()];
-  const sourceHashes = Object.fromEntries(
-    sourcePaths.map((relativePath) => [relativePath, sha256(indexed.value.get(relativePath)?.bytes ?? new Uint8Array())])
-  );
-  const objectIds = Object.fromEntries(
-    sourcePaths.map((relativePath) => [relativePath, indexed.value.get(relativePath)?.object_id ?? ""])
-  );
-  const byType = (type) => parsed.value.records.filter((record5) => record5.type === type);
-  const markdownByType = (type) => parsed.value.markdown.filter((document) => document.envelope.type === type);
-  return success({
-    source_revision: source.object_id,
-    source_kind: source.kind,
-    root_id: parsed.value.project.root.id,
-    profile_revision: parsed.value.profile.profile_revision,
-    profile_lock_hash: parsed.value.profile.lock_hash,
-    selected_catalog_lock_hash: parsed.value.catalog.lock_hash,
-    catalog_versions: [parsed.value.profile.profile.catalog.release],
-    source_paths: sourcePaths,
-    source_hashes: sourceHashes,
-    blob_object_ids: objectIds,
-    project: parsed.value.project,
-    profile_lock: parsed.value.profile,
-    source_documents: parsed.value.source_documents,
-    components: markdownByType("component"),
-    domains: markdownByType("domain"),
-    initiatives: markdownByType("initiative"),
-    workstreams: markdownByType("workstream"),
-    tasks: markdownByType("task"),
-    records: parsed.value.records,
-    effective_records: parsed.value.records.filter(
-      (record5) => !supersession.value.superseded_ids.has(record5.id)
-    ),
-    evidence: byType("evidence"),
-    risks: byType("risk"),
-    approvals: byType("approval"),
-    claims: parsed.value.claims,
-    events: parsed.value.events
-  });
-}
-function createCanonicalSnapshotBuilder(reader) {
-  return { build: (root, source) => buildCanonicalSnapshot(root, source, reader) };
-}
-
-// src/agent/node-view-verifier.ts
 var INDEX_PATH = "docs/project-memory/views/INDEX.json";
 var DERIVED_AUDIT = /^docs\/project-memory\/governance\/integration\/(?:bootstrap\/ROOT-[0-9A-HJKMNP-TV-Z]{26}|mutations\/[0-9a-f]{64})[.]json$/u;
 var REVISION3 = /^[0-9a-f]{40}$/;
@@ -35354,7 +36086,7 @@ async function embeddedSourceRevision(root) {
   const target = await resolveInside(root, INDEX_PATH);
   if (!target.ok) return target;
   try {
-    const stat2 = await lstat13(target.value);
+    const stat2 = await lstat14(target.value);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure("AGENT_VIEW_INDEX_UNSAFE", "view index must be a regular file", INDEX_PATH);
     }
@@ -35496,7 +36228,7 @@ var REVIEWABLE_LEGACY_ROLES = /* @__PURE__ */ new Set([
   "task-list",
   "agent-instructions"
 ]);
-function compareUtf828(left, right) {
+function compareUtf831(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 async function catalogBundleUrl() {
@@ -35507,7 +36239,7 @@ async function catalogBundleUrl() {
   ];
   for (const candidate of candidates) {
     try {
-      const stat2 = await lstat14(candidate);
+      const stat2 = await lstat15(candidate);
       if (!stat2.isSymbolicLink() && stat2.isFile()) return success(candidate);
     } catch (error) {
       if (error.code !== "ENOENT") {
@@ -35535,7 +36267,7 @@ async function findAssignedTaskPackets(root) {
   if (!workstreams.ok) return workstreams;
   let rootStat;
   try {
-    rootStat = await lstat14(workstreams.value);
+    rootStat = await lstat15(workstreams.value);
   } catch (error) {
     return error.code === "ENOENT" ? success([]) : failure(
       "AGENT_TASK_PACKET_SCAN_FAILED",
@@ -35580,13 +36312,14 @@ async function findAssignedTaskPackets(root) {
       if (entry.isFile() && entry.name === "TASK.md") packets.push(relative);
     }
   }
-  return success(packets.sort(compareUtf828));
+  return success(packets.sort(compareUtf831));
 }
 function createNodeAgentStartDependencies(now = () => /* @__PURE__ */ new Date()) {
   const profiles = createProfileVerifier();
   const importer = createLegacyImporter();
   const git2 = new GitCliClient(new NodeCommandRunner());
   const views = createNodeViewVerifier();
+  const upgrades = createNodeRepositoryUpgradePlanner(now);
   const doctorDependencies = {
     ...createDefaultDoctorDependencies(),
     async views(root) {
@@ -35597,7 +36330,7 @@ function createNodeAgentStartDependencies(now = () => /* @__PURE__ */ new Date()
           ...report.value.drifted_paths,
           ...report.value.missing_paths,
           ...report.value.metadata_invalid_paths
-        ])].sort(compareUtf828)
+        ])].sort(compareUtf831)
       }, report.warnings) : report;
     }
   };
@@ -35636,6 +36369,7 @@ function createNodeAgentStartDependencies(now = () => /* @__PURE__ */ new Date()
         expires_at: new Date(created.getTime() + 60 * 60 * 1e3).toISOString()
       });
     },
+    planRepositoryUpgrade: (root) => upgrades.plan(root),
     verifyProfile: (root) => profiles.verify(root),
     verifyViews: (root) => views.verify(root),
     findPendingLegacyReview: (input) => findPendingLegacyReview(input.root, input.root_id, importer),
@@ -36153,12 +36887,12 @@ function createBootstrapMutationHooks(dependencies) {
 }
 
 // src/governance/integration/canonical-mutation-finalizer.ts
-import { lstat as lstat16, mkdtemp as mkdtemp2, mkdir as mkdir4, rm as rm3, unlink } from "node:fs/promises";
+import { lstat as lstat17, mkdtemp as mkdtemp2, mkdir as mkdir4, rm as rm3, unlink } from "node:fs/promises";
 import path20 from "node:path";
 import { fileURLToPath as fileURLToPath14, pathToFileURL as pathToFileURL7 } from "node:url";
 
 // src/governance/integration/bootstrap-transaction.ts
-import { lstat as lstat15, readFile as readFile18 } from "node:fs/promises";
+import { lstat as lstat16, readFile as readFile18 } from "node:fs/promises";
 var BOOTSTRAP_FAULT_POINTS = Object.freeze([
   "after_lease",
   "after_plan_validation",
@@ -36206,7 +36940,7 @@ async function verifyAppliedViews(worktree, writes) {
     const target = await resolveInside(worktree, write.relative_path);
     if (!target.ok) return target;
     try {
-      const info = await lstat15(target.value);
+      const info = await lstat16(target.value);
       if (info.isSymbolicLink() || !info.isFile()) {
         return failure(
           "bootstrap.view_drift",
@@ -36435,7 +37169,7 @@ async function removeGeneratedViews(worktree) {
     const target = await resolveInside(worktree, relativePath);
     if (!target.ok) return target;
     try {
-      const info = await lstat16(target.value);
+      const info = await lstat17(target.value);
       if (info.isSymbolicLink() || !info.isFile()) {
         return failure("mutation.generated_view_unsafe", "generated views must be regular files", relativePath);
       }
@@ -36685,7 +37419,7 @@ import { randomBytes } from "node:crypto";
 
 // src/governance/integration/integration-lease-io.ts
 import {
-  lstat as lstat17,
+  lstat as lstat18,
   mkdir as mkdir5,
   readFile as readFile19,
   rename as rename2,
@@ -36733,7 +37467,7 @@ async function readIntegrationLease(commonGitDir2) {
   const target = leaseUrl(commonGitDir2);
   let bytes;
   try {
-    const info = await lstat17(target);
+    const info = await lstat18(target);
     if (info.isSymbolicLink() || !info.isFile()) {
       return failure(
         "lease.path_unsafe",
@@ -36842,7 +37576,7 @@ async function mutexOwner(commonGitDir2) {
 async function recoverExpiredMutex(commonGitDir2, now, nonce) {
   const mutex = mutexUrl(commonGitDir2);
   try {
-    const info = await lstat17(mutex);
+    const info = await lstat18(mutex);
     if (info.isSymbolicLink() || !info.isDirectory()) {
       return failure(
         "lease.mutex_unsafe",
@@ -37244,13 +37978,13 @@ function createIntegrationLeaseStore(dependencies) {
 }
 
 // src/governance/work/work-document.ts
-import { lstat as lstat18, readFile as readFile20 } from "node:fs/promises";
+import { lstat as lstat19, readFile as readFile20 } from "node:fs/promises";
 var STATUS_LINE = /^Status: ([a-z_]+)$/gm;
-function compareUtf829(left, right) {
+function compareUtf832(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function unique2(values) {
-  return [...new Set(values)].sort(compareUtf829);
+  return [...new Set(values)].sort(compareUtf832);
 }
 function initiativeDocumentPath(initiativeId) {
   return `docs/project-memory/initiatives/${initiativeId}/INITIATIVE.md`;
@@ -37379,7 +38113,7 @@ var FilesystemWorkDocumentReader = class {
     const target = await resolveInside(root, relativePath);
     if (!target.ok) return target;
     try {
-      const info = await lstat18(target.value);
+      const info = await lstat19(target.value);
       if (info.isSymbolicLink() || !info.isFile()) {
         return failure("work.document_path_unsafe", "work documents must be regular files", relativePath);
       }
@@ -37428,11 +38162,11 @@ var PLAN_TTL_MS = 5 * 60 * 1e3;
 var REVISION8 = /^[0-9a-f]{40}$/;
 var SHA2566 = /^[0-9a-f]{64}$/;
 var INSTANCE = /^(ROOT|INIT|WS|TASK|APR|EVD)-[0-9A-HJKMNP-TV-Z]{26}$/;
-function compareUtf830(left, right) {
+function compareUtf833(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
 }
 function unique3(values) {
-  return [...new Set(values)].sort(compareUtf830);
+  return [...new Set(values)].sort(compareUtf833);
 }
 function validStrings(values) {
   return values.length > 0 && values.every((value) => value.trim().length > 0) && new Set(values).size === values.length;
@@ -37487,7 +38221,7 @@ function buildPlan(context, createdAt, metadata, documentWrite, event, approvalI
     authority_class: context.authority_class
   };
   const writes = [documentWrite, event.write].sort(
-    (left, right) => compareUtf830(left.relative_path, right.relative_path)
+    (left, right) => compareUtf833(left.relative_path, right.relative_path)
   );
   const withoutHash = {
     schema_version: "1.0.0",
@@ -37812,7 +38546,7 @@ async function applyInitPlan(input, dependencies) {
 }
 
 // src/cli/commands/init.ts
-import { lstat as lstat19, mkdir as mkdir6, readFile as readFile21, writeFile as writeFile4 } from "node:fs/promises";
+import { lstat as lstat20, mkdir as mkdir6, readFile as readFile21, writeFile as writeFile4 } from "node:fs/promises";
 import path21 from "node:path";
 import { fileURLToPath as fileURLToPath15, pathToFileURL as pathToFileURL8 } from "node:url";
 function requiredFlag(flags, name) {
@@ -37870,7 +38604,7 @@ function reviveSerializedBytes(value, source) {
 }
 async function defaultReadJson(url) {
   try {
-    const stat2 = await lstat19(url);
+    const stat2 = await lstat20(url);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure("CLI_INPUT_UNSAFE", "CLI input must be a regular file", url.href);
     }
@@ -37996,7 +38730,7 @@ function createInitCommands(dependencies = defaultDependencies2()) {
 }
 
 // src/cli/commands/workflow-support.ts
-import { lstat as lstat20, readFile as readFile22 } from "node:fs/promises";
+import { lstat as lstat21, readFile as readFile22 } from "node:fs/promises";
 import path22 from "node:path";
 import { fileURLToPath as fileURLToPath16, pathToFileURL as pathToFileURL9 } from "node:url";
 function inputUrl(value, currentDirectory2) {
@@ -38033,7 +38767,7 @@ async function readJsonCommandInput(context, invocation) {
   const target = inputUrl(input, context.current_directory);
   if (!target.ok) return target;
   try {
-    const stat2 = await lstat20(target.value);
+    const stat2 = await lstat21(target.value);
     if (stat2.isSymbolicLink() || !stat2.isFile()) {
       return failure("CLI_INPUT_UNSAFE", "command input must be a regular file", input);
     }
@@ -38569,7 +39303,7 @@ function createDefaultCommandRegistry(dependencies = {}) {
     ...createIntegrateCommands(),
     ...createSatelliteCommands(),
     ...createHubCommands(),
-    ...createMigrateCommands(),
+    ...createMigrateCommands(dependencies.migration),
     ...createImportCommands(dependencies.import),
     ...createBenchmarkCommands(),
     ...createAgentCommands(dependencies.agent)
@@ -38581,6 +39315,15 @@ var INTEGRATOR_ID = "project-memory-integrator";
 function sameRoot(left, right) {
   return left.protocol === "file:" && left.href === right.href;
 }
+function compareUtf834(left, right) {
+  return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
+}
+function isRecord7(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function exactStringArray(value, expected) {
+  return Array.isArray(value) && value.length === expected.length && value.every((entry, index) => entry === expected[index]);
+}
 async function currentSnapshot(repo, git2, snapshots, targetRef) {
   const head = await git2.resolveRef(repo, targetRef);
   return snapshots.build(repo, { kind: "commit", object_id: head });
@@ -38590,7 +39333,7 @@ async function verifyExactHashes(root, expected) {
     const target = await resolveInside(root, relativePath);
     if (!target.ok) return target;
     try {
-      const stat2 = await lstat21(target.value);
+      const stat2 = await lstat22(target.value);
       if (stat2.isSymbolicLink() || !stat2.isFile()) {
         return failure(
           "runtime.repository_artifact_unsafe",
@@ -38617,7 +39360,7 @@ async function verifyExactHashes(root, expected) {
   }
   return success(true);
 }
-function createBindingValidator(fixedRepo, targetRef, runner, git2, profiles) {
+function createBindingValidator(fixedRepo, targetRef, runner, git2, profiles, snapshots, allowLegacyUpgrade = false) {
   return {
     async verify(repo, plan) {
       if (!sameRoot(repo, fixedRepo) || plan.target_ref !== targetRef) {
@@ -38668,7 +39411,20 @@ function createBindingValidator(fixedRepo, targetRef, runner, git2, profiles) {
         );
       }
       const profile = await profiles.verify(repo);
-      if (!profile.ok) return profile;
+      if (!profile.ok) {
+        const legacyArtifactsOnly = allowLegacyUpgrade && profile.issues.length > 0 && profile.issues.every((issue5) => issue5.code === "PROFILE_ADAPTER_ARTIFACT_MISMATCH" && issue5.path === CONFIG_RELATIVE_PATH || issue5.code === "PROFILE_GENERATED_ARTIFACT_MISMATCH" && issue5.path === PROJECT_CONTEXT_PATH);
+        if (!legacyArtifactsOnly) return profile;
+        const snapshot = await snapshots.build(repo, {
+          kind: "commit",
+          object_id: head
+        });
+        if (!snapshot.ok) return snapshot;
+        return snapshot.value.root_id === plan.root_id && snapshot.value.profile_lock_hash === plan.profile_lock_hash ? success(true) : failure(
+          "runtime.binding_profile_mismatch",
+          "legacy upgrade snapshot does not match the approved profile",
+          plan.plan_id
+        );
+      }
       return profile.value.valid && profile.value.root_id === plan.root_id && profile.value.profile_lock_hash === plan.profile_lock_hash ? success(true) : failure(
         "runtime.binding_profile_mismatch",
         "mutation root or profile does not match the verified local profile",
@@ -38688,6 +39444,25 @@ function createAuthorityValidator(fixedRepo) {
         "runtime.trusted_integrator_required",
         "lifecycle and import mutation require a separate trusted host adapter",
         plan.mutation_kind
+      ));
+    }
+  };
+}
+function createRepositoryUpgradeAuthorityValidator(fixedRepo) {
+  const changedPaths = [
+    PROJECT_CONTEXT_PATH,
+    REPOSITORY_UPGRADE_RECORD_PATH,
+    CONFIG_RELATIVE_PATH
+  ].sort(compareUtf834);
+  return {
+    verify(repo, plan) {
+      const metadata = plan.metadata;
+      const writePaths = plan.writes.map((write) => write.relative_path).sort(compareUtf834);
+      const authorized = sameRoot(repo, fixedRepo) && plan.mutation_kind === "migration" && isRecord7(metadata) && metadata.governance_kind === "repository_upgrade" && metadata.migration_id === "project-memory-v1-1" && metadata.authority_impact === "none" && metadata.from_version === "1.0.0" && metadata.to_version === "1.1.0" && metadata.migration_record_path === REPOSITORY_UPGRADE_RECORD_PATH && exactStringArray(metadata.changed_paths, changedPaths) && exactStringArray(metadata.derived_paths, GENERATED_VIEW_PATHS) && exactStringArray(writePaths, changedPaths);
+      return Promise.resolve(authorized ? success(true) : failure(
+        "runtime.upgrade_authority_denied",
+        "repository upgrade plan exceeds the exact local upgrade authority",
+        plan.plan_id
       ));
     }
   };
@@ -38793,7 +39568,7 @@ function unavailableSingleRepo() {
     ))
   };
 }
-function createLocalCoordinator(repo, targetRef, clock, runner, git2, snapshots, profiles, authority2 = createAuthorityValidator(repo)) {
+function createLocalCoordinator(repo, targetRef, clock, runner, git2, snapshots, profiles, authority2 = createAuthorityValidator(repo), allowLegacyUpgrade = false) {
   const temporaryRoot = pathToFileURL11(
     `${path25.join(tmpdir3(), "project-memory-runtime")}${path25.sep}`
   );
@@ -38823,7 +39598,15 @@ function createLocalCoordinator(repo, targetRef, clock, runner, git2, snapshots,
     leases: createIntegrationLeaseStore({ clock, git: git2 }),
     snapshots,
     views,
-    bindings: createBindingValidator(repo, targetRef, runner, git2, profiles),
+    bindings: createBindingValidator(
+      repo,
+      targetRef,
+      runner,
+      git2,
+      profiles,
+      snapshots,
+      allowLegacyUpgrade
+    ),
     authority: authority2,
     repository: createRepositoryValidator(snapshots, profiles),
     bootstrap: createBootstrapMutationHooks({ git: git2, verifier: profiles }),
@@ -38864,7 +39647,7 @@ async function readGuidedImportSource(root, relativePath) {
   const resolved = await resolveInside(root, relativePath);
   if (!resolved.ok) return resolved;
   try {
-    const stat2 = await lstat21(resolved.value);
+    const stat2 = await lstat22(resolved.value);
     if (!stat2.isFile() || stat2.isSymbolicLink()) {
       return failure(
         "GUIDED_IMPORT_SOURCE_UNSAFE",
@@ -38888,6 +39671,8 @@ function createNodeProjectMemoryServices(repo) {
   const snapshots = createCanonicalSnapshotBuilder(createRevisionTreeReader(runner));
   const profiles = createProfileVerifier();
   const coordinator = createDynamicLocalCoordinator(repo, clock, runner, git2, snapshots, profiles);
+  const upgrades = createNodeRepositoryUpgradePlanner(() => clock.now());
+  const migrationRegistry = createProjectMemoryMigrationRegistry();
   const legacyImport = {
     now: () => clock.now(),
     async context(root) {
@@ -38990,13 +39775,55 @@ function createNodeProjectMemoryServices(repo) {
     }),
     now: () => clock.now()
   };
+  const applyUpgrade = async (root, savedPlan) => {
+    if (!sameRoot(root, repo)) {
+      return failure(
+        "runtime.root_mismatch",
+        "repository upgrade is bound to the configured local repository",
+        root.href
+      );
+    }
+    const replanned = await upgrades.plan(root, {
+      created_at: savedPlan.created_at,
+      expires_at: savedPlan.expires_at
+    });
+    if (!replanned.ok) return replanned;
+    if (replanned.value === null) {
+      return failure(
+        "UPGRADE_NO_LONGER_REQUIRED",
+        "repository already uses the current contract",
+        root.href
+      );
+    }
+    if (replanned.value.plan_hash !== savedPlan.plan_hash) {
+      return failure(
+        "UPGRADE_PLAN_CHANGED",
+        "repository upgrade inputs changed; request a fresh proposal",
+        savedPlan.plan_id,
+        [savedPlan.plan_hash, replanned.value.plan_hash]
+      );
+    }
+    return createLocalCoordinator(
+      repo,
+      replanned.value.target_ref,
+      clock,
+      runner,
+      git2,
+      snapshots,
+      profiles,
+      createRepositoryUpgradeAuthorityValidator(repo),
+      true
+    ).finalizeMutation(replanned.value);
+  };
+  const migration = migrationRegistry.ok ? { service: createMigrationService(migrationRegistry.value), coordinator } : void 0;
   const registry = createDefaultCommandRegistry({
     agent: { start },
     init,
     import: { planner: importer, coordinator },
+    ...migration === void 0 ? {} : { migration },
     work_lifecycle: { service: lifecycle, coordinator }
   });
-  return { registry, start, applyBootstrap: init.apply_plan, legacyImport };
+  return { registry, start, applyBootstrap: init.apply_plan, applyUpgrade, legacyImport };
 }
 function createNodeCommandRegistry(repo) {
   return createNodeProjectMemoryServices(repo).registry;

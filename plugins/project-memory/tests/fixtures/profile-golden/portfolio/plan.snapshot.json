@@ -5,7 +5,7 @@
   "root_id": "ROOT-01J04000000000000000000000",
   "target_ref": "refs/heads/main",
   "expected_head": "4444444444444444444444444444444444444444",
-  "plan_hash": "3ebe3ac1380acab80769e1d83418169c18013e1f26b502834b991a01464363e3",
+  "plan_hash": "3cbfa6580686ccacd6dad60cdd39b10f3719da6b12cb4d99daadac11339d085c",
   "approval_ids": ["APR-01J04000000000000000000000"],
   "selected_catalog_lock": {"relative_path":"docs/project-memory/catalog.lock.json","lock_hash":"4afc0320077d1c32df7b4c46e3b05dca7559ae0bcb51e87686b2d9dcd1187fd7"},
   "profile_lock": {"relative_path":"docs/project-memory/profile.lock.yaml","lock_hash":"7e3eedeb0f43782c6e2a2a3f62f4507f58fa5d73f4db123bda0c4b28d3ccae16"},
@@ -627,12 +627,12 @@
     {"relative_path":"schemas/project-memory/v1/overlay-definition.schema.json","mode":"create_or_replace","expected_existing_sha256":null,"final_sha256":"d3e91462a66a5154bef3d26a03972c5038905a35ab1b3a0daabc48daddd3cc58","byte_length":2801},
     {"relative_path":"schemas/project-memory/v1/pattern-core.schema.json","mode":"create_or_replace","expected_existing_sha256":null,"final_sha256":"b20e7ed1f2edafbb6172055ae8f0927d3a646c9543d68852bb1feac14eb40b86","byte_length":7597},
     {"relative_path":"schemas/project-memory/v1/pattern-taxonomy.schema.json","mode":"create_or_replace","expected_existing_sha256":null,"final_sha256":"81113ce9d9f5378aab3deb4d352f37d822b7d8ad79c9a30e2d5c8a3d00bc3cc4","byte_length":5688},
-    {"relative_path":"tools/project-memory/config.json","mode":"create_or_replace","expected_existing_sha256":null,"final_sha256":"703cf2c73adc67f6dd8c0ef7d95b552bf90872c343dd8bed04764ce9efb3b4e6","byte_length":9373}
+    {"relative_path":"tools/project-memory/config.json","mode":"create_or_replace","expected_existing_sha256":null,"final_sha256":"26d894266f2582b4c2c7836611a1b104b50047a44e1d254bcfed25710b4978c7","byte_length":9411}
   ],
   "exact_payload": {
     "relative_path": "plan.bytes.snapshot.json.gz",
-    "uncompressed_sha256": "928cde619f0c0904862665e6aaa1319579f55b3b89cc98a833696c10a7bf5d54",
-    "uncompressed_byte_length": 825414,
+    "uncompressed_sha256": "411a8c4f6fbdcd031c0d978228b9f4effe6d144468444aede2edcfee997077c9",
+    "uncompressed_byte_length": 825462,
     "entries": [
       {"relative_path":"AGENTS.md","final_sha256":"ffa57ce2917d0cd774bf11f38efbeadd3def55f3bbc918875818dea9d3b9c427","byte_length":1134},
       {"relative_path":"PROJECT_CONTEXT.md","final_sha256":"b3a4435cb38ebb3dbc50cfa8ea0a90ad0d17dcc1fcac85585f318c33de381a75","byte_length":1333},
@@ -689,7 +689,7 @@
       {"relative_path":"schemas/project-memory/v1/overlay-definition.schema.json","final_sha256":"d3e91462a66a5154bef3d26a03972c5038905a35ab1b3a0daabc48daddd3cc58","byte_length":2801},
       {"relative_path":"schemas/project-memory/v1/pattern-core.schema.json","final_sha256":"b20e7ed1f2edafbb6172055ae8f0927d3a646c9543d68852bb1feac14eb40b86","byte_length":7597},
       {"relative_path":"schemas/project-memory/v1/pattern-taxonomy.schema.json","final_sha256":"81113ce9d9f5378aab3deb4d352f37d822b7d8ad79c9a30e2d5c8a3d00bc3cc4","byte_length":5688},
-      {"relative_path":"tools/project-memory/config.json","final_sha256":"703cf2c73adc67f6dd8c0ef7d95b552bf90872c343dd8bed04764ce9efb3b4e6","byte_length":9373}
+      {"relative_path":"tools/project-memory/config.json","final_sha256":"26d894266f2582b4c2c7836611a1b104b50047a44e1d254bcfed25710b4978c7","byte_length":9411}
     ]
   }
 }

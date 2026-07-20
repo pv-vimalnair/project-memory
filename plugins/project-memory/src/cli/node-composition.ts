@@ -185,13 +185,16 @@ function createBindingValidator(
       }
       const profile = await profiles.verify(repo);
       if (!profile.ok) {
-        const legacyConfigOnly = allowLegacyUpgrade &&
+        const legacyArtifactsOnly = allowLegacyUpgrade &&
           profile.issues.length > 0 &&
-          profile.issues.every((issue) =>
+          profile.issues.every((issue) => (
             issue.code === "PROFILE_ADAPTER_ARTIFACT_MISMATCH" &&
             issue.path === CONFIG_RELATIVE_PATH
-          );
-        if (!legacyConfigOnly) return profile;
+          ) || (
+            issue.code === "PROFILE_GENERATED_ARTIFACT_MISMATCH" &&
+            issue.path === PROJECT_CONTEXT_PATH
+          ));
+        if (!legacyArtifactsOnly) return profile;
         const snapshot = await snapshots.build(repo, {
           kind: "commit",
           object_id: head,

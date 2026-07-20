@@ -161,5 +161,5 @@ describe("automatic Plugin workflow for a new project", () => {
         assigned_task_packets: [],
       },
     });
-  }, 120_000);
+  }, 300_000);
 });

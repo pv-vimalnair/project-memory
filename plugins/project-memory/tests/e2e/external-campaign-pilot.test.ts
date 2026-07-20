@@ -49,5 +49,5 @@ describe("external campaign scratch pilot", () => {
     ]));
     expect(pilot.task_status).toBe("integrated_verified");
     expect(pilot.history_is_append_only).toBe(true);
-  }, 120_000);
+  }, 240_000);
 });

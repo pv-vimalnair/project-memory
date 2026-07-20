@@ -753,6 +753,16 @@ async function runCleanMcp() {
     ? /** @type {unknown[]} */ (listed.tools)
     : [];
   const tools = listedTools.map((tool) => record(tool)?.name);
+  const applyTool = listedTools
+    .map((tool) => record(tool))
+    .find((tool) => tool?.name === "project_memory_apply");
+  const applySchema = record(applyTool?.inputSchema);
+  const applyBranches = Array.isArray(applySchema?.oneOf)
+    ? /** @type {unknown[]} */ (applySchema.oneOf)
+    : [];
+  const upgradeBranch = applyBranches.find((branch) =>
+    JSON.stringify(branch).includes('"upgrade"'));
+  const upgradeSchema = JSON.stringify(upgradeBranch);
   const expectedTools = [
     "project_memory_start",
     "project_memory_read",
@@ -764,6 +774,9 @@ async function runCleanMcp() {
     initialized?.protocolVersion !== "2025-06-18" ||
     record(responses[1])?.id !== 2 ||
     JSON.stringify(tools) !== JSON.stringify(expectedTools) ||
+    upgradeBranch === undefined ||
+    !upgradeSchema.includes('"confirmed"') ||
+    upgradeSchema.includes("granted_by") ||
     record(responses[2])?.id !== 3 ||
     pinged === null ||
     Object.keys(pinged).length !== 0 ||
@@ -777,6 +790,7 @@ async function runCleanMcp() {
   return {
     initialize: "passed",
     tools: expectedTools,
+    upgrade_approval: "confirmed_only",
     ping: "passed",
     node_modules_present: false,
   };

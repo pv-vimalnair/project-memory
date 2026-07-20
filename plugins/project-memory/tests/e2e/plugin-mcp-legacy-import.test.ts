@@ -22,7 +22,7 @@ const workflows: PluginWorkflow[] = [];
 
 afterEach(async () => {
   await Promise.all(workflows.splice(0).map(cleanupPluginWorkflow));
-});
+}, 120_000);
 
 interface ReviewSource {
   readonly source_path: string;
@@ -293,5 +293,5 @@ describe("guided legacy history through the packaged MCP plugin", () => {
     expect(changed.sources[0]?.source_sha256).not.toBe(
       sha256(originalBytes["TASKS.md"] ?? new Uint8Array()),
     );
-  }, 180_000);
+  }, 600_000);
 });

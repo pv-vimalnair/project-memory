@@ -53,6 +53,12 @@ interface ExecutionReport {
     readonly agent_start: "bootstrap_review_required";
     readonly node_modules_present: false;
   };
+  readonly mcp: {
+    readonly initialize: "passed";
+    readonly tools: readonly string[];
+    readonly upgrade_approval: "confirmed_only";
+    readonly ping: "passed";
+  };
 }
 
 let verification: SpawnSyncReturns<string>;
@@ -155,6 +161,8 @@ describe("clean installable Project Memory Plugin", () => {
       "scripts/project-memory.mjs",
       "dist/project-memory.mjs",
       "dist/project-memory.mjs.sha256",
+      "dist/project-memory-mcp.mjs",
+      "dist/project-memory-mcp.mjs.sha256",
       "dist/catalog/project-memory/1.0.0/catalog.bundle.json",
       "dist/catalog/project-memory/1.0.0/catalog.lock.json",
       "dist/catalog/project-memory/1.0.0/SHA256SUMS",
@@ -215,6 +223,11 @@ describe("clean installable Project Memory Plugin", () => {
       launcher: {
         version: "0.1.1",
         agent_start: "bootstrap_review_required",
+        node_modules_present: false,
+      },
+      mcp: {
+        tools: ["project_memory_start", "project_memory_read", "project_memory_apply"],
+        upgrade_approval: "confirmed_only",
         node_modules_present: false,
       },
     });

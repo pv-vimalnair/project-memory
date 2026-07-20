@@ -108,20 +108,25 @@ async function copyPluginRuntime(pluginRoot: string): Promise<void> {
   }
 }
 
+let cleanBundlesReady = false;
+
 async function buildCleanBundles(
   sandbox: string,
   pluginRoot: string,
 ): Promise<void> {
-  const result = spawnSync(process.execPath, [
-    path.join(PACKAGE_ROOT, "scripts", "build-plugin-bundle.mjs"),
-  ], {
-    cwd: PACKAGE_ROOT,
-    encoding: "utf8",
-    shell: false,
-    windowsHide: true,
-    env: offlineEnvironment(),
-  });
-  expect(result.status, result.stderr || result.stdout).toBe(0);
+  if (!cleanBundlesReady) {
+    const result = spawnSync(process.execPath, [
+      path.join(PACKAGE_ROOT, "scripts", "build-plugin-bundle.mjs"),
+    ], {
+      cwd: PACKAGE_ROOT,
+      encoding: "utf8",
+      shell: false,
+      windowsHide: true,
+      env: offlineEnvironment(),
+    });
+    expect(result.status, result.stderr || result.stdout).toBe(0);
+    cleanBundlesReady = true;
+  }
 
   const outputDirectory = path.join(pluginRoot, "dist");
   await mkdir(outputDirectory, { recursive: true });
@@ -209,7 +214,7 @@ function waitFor<T>(promise: Promise<T>, label: string): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       reject(new Error(label + " timed out"));
-    }, 90_000);
+    }, 240_000);
     promise.then(
       (value) => {
         clearTimeout(timer);

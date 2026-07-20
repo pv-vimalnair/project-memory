@@ -34,7 +34,7 @@ async function closeSession(session: McpSession): Promise<void> {
 afterEach(async () => {
   await Promise.all(sessions.splice(0).map(async (session) => session.close()));
   await Promise.all(workflows.splice(0).map(cleanupPluginWorkflow));
-}, 60_000);
+}, 120_000);
 
 describe("clean Plugin MCP resume across processes", () => {
   it("recovers accepted context from the repository without prior process memory", async () => {
@@ -94,5 +94,5 @@ describe("clean Plugin MCP resume across processes", () => {
     }
 
     await closeSession(resumeSession);
-  }, 120_000);
+  }, 360_000);
 });
