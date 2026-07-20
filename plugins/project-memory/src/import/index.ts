@@ -42,3 +42,4 @@ export * from "./planner.js";
 export * from "./plan-reviewed-import.js";
 export * from "./render-import-report.js";
 export * from "./pending-review.js";
+export * from "./materialize-guided-import.js";

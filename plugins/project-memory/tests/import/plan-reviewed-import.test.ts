@@ -179,4 +179,27 @@ describe("reviewed import planning", () => {
     expect(integration.finalizeMutation).toHaveBeenCalledTimes(1);
     expect("apply" in planner).toBe(false);
   });
+
+  it("forbids the incomplete generic canonical-record writer", () => {
+    const base = input();
+    const candidate = firstCandidate(base);
+    expect(planReviewedImport(input({
+      candidates: [{
+        ...candidate,
+        decision: {
+          ...candidate.decision,
+          destination: {
+            kind: "canonical_record",
+            record_type: "decision",
+            record_id: "DEC-01J00000000000000000000001",
+            status: "accepted",
+            approval_id: APPROVAL,
+          },
+        },
+      }],
+    }))).toMatchObject({
+      ok: false,
+      issues: [{ code: "IMPORT_GENERIC_RECORD_FORBIDDEN" }],
+    });
+  });
 });

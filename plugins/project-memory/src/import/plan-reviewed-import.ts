@@ -5,7 +5,6 @@ import {
   success,
   type RuntimeResult,
 } from "../contracts/runtime-result.js";
-import { canonicalJson } from "../core/canonical-json.js";
 import { decodeStrictUtf8 } from "../core/document-io.js";
 import { sha256 } from "../core/hash.js";
 import { GENERATED_VIEW_PATHS } from "../governance/views/generate-views.js";
@@ -66,26 +65,11 @@ function destinationWrite(candidate: ReviewedImportCandidate): RuntimeResult<Pla
       mode: "replace",
     });
   }
-  if (
-    !/^[a-z][a-z0-9-]*$/.test(destination.record_type) ||
-    !/^[A-Z]+-[0-9A-HJKMNP-TV-Z]{26}$/.test(destination.record_id)
-  ) {
-    return failure("IMPORT_RECORD_DESTINATION_INVALID", "canonical record destination is invalid", candidate.candidate_id);
-  }
-  return success({
-    relative_path: `docs/project-memory/records/${destination.record_type}/${destination.record_id}.json`,
-    bytes: new TextEncoder().encode(canonicalJson({
-      schema_version: "1.0.0",
-      id: destination.record_id,
-      type: destination.record_type,
-      status: destination.status,
-      imported_source_sha256: candidate.expected_source_sha256,
-      imported_source_path: candidate.source_path,
-      approval_id: destination.approval_id,
-    })),
-    expected_existing_sha256: null,
-    mode: "create",
-  });
+  return failure(
+    "IMPORT_GENERIC_RECORD_FORBIDDEN",
+    "canonical records must be materialized through the guided schema-valid import path",
+    candidate.candidate_id,
+  );
 }
 
 function validateRedaction(candidate: ReviewedImportCandidate): RuntimeResult<true> {

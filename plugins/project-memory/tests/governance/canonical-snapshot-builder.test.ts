@@ -18,8 +18,11 @@ import {
   PROJECT_SCHEMA_REGISTRARS,
   NodeCommandRunner,
   canonicalJson,
+  planGuidedLegacyImport,
+  sha256,
   registerProjectSchemas,
   success,
+  type IdFactory,
 } from "../../src/index.js";
 import type {
   CanonicalRecord,
@@ -394,5 +397,63 @@ describe("revision-pinned canonical snapshot", () => {
       ok: false,
       issues: [{ code: "snapshot.path_duplicate" }],
     });
+  });
+
+  it("parses schema-valid records produced by guided history import", async () => {
+    const legacyBytes = new TextEncoder().encode("A repository finding was recorded.\n");
+    let counter = 20;
+    const ids: IdFactory = {
+      next(prefix) {
+        counter += 1;
+        return `${prefix}-${String(counter).padStart(26, "0")}`;
+      },
+    };
+    const planned = await planGuidedLegacyImport({
+      root_id: config.root_id,
+      target_ref: "refs/heads/main",
+      expected_head: revision,
+      profile_lock_hash: "2".repeat(64),
+      catalog_version: "1.0.0",
+      proposal_hash: "3".repeat(64),
+      created_by: "codex",
+      created_at: "2026-07-20T04:00:00.000Z",
+      expires_at: "2026-07-20T05:00:00.000Z",
+      sources: [{
+        source_path: "LEGACY.md",
+        source_sha256: sha256(legacyBytes),
+        source_git_revision: revision,
+        disposition: "import",
+        rationale: "Preserve the reviewed finding.",
+        facts: [{
+          source_line_start: 1,
+          source_line_end: 1,
+          category: "finding",
+          title: "Imported repository finding",
+          statement: "A repository finding was recorded.",
+          rationale: "The legacy source records the finding.",
+          confidence: "high",
+        }],
+      }],
+    }, {
+      ids,
+      read_source: () => Promise.resolve(success(legacyBytes)),
+    });
+    if (!planned.ok) throw new Error(JSON.stringify(planned.issues));
+    for (const write of planned.value.writes.filter((item) =>
+      item.relative_path.includes("/records/")
+    )) {
+      await writeRelative(write.relative_path, write.bytes);
+    }
+    await git(["add", "docs/project-memory/records"]);
+    await git(["commit", "-m", "guided history records"]);
+    const importedRevision = await git(["rev-parse", "HEAD"]);
+    const snapshot = await builder().build(repository, {
+      kind: "commit",
+      object_id: importedRevision,
+    });
+    if (!snapshot.ok) throw new Error(JSON.stringify(snapshot.issues));
+    expect(snapshot.value.records.map((record) => record.type)).toEqual(
+      expect.arrayContaining(["evidence", "finding"]),
+    );
   });
 });

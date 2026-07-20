@@ -168,9 +168,57 @@ export interface ReviewedImportMetadata {
   readonly import_report_path: string;
   readonly import_report_hash: string;
   readonly required_view_paths: readonly string[];
+  readonly resolved_source_paths?: readonly string[];
+  readonly unresolved_source_paths?: readonly string[];
+  readonly imported_fact_record_ids?: readonly string[];
 }
 
 export type ReviewedImportPlan = CanonicalMutationPlan<ReviewedImportMetadata>;
+
+export type LegacyFactCategory =
+  | "completed_work"
+  | "current_decision"
+  | "constraint"
+  | "next_action"
+  | "idea"
+  | "risk"
+  | "finding"
+  | "removed"
+  | "rejected"
+  | "superseded"
+  | "lesson";
+
+export interface LegacyFactDraft {
+  readonly source_line_start: number;
+  readonly source_line_end: number;
+  readonly category: LegacyFactCategory;
+  readonly title: string;
+  readonly statement: string;
+  readonly rationale: string;
+  readonly confidence: "high" | "medium" | "low";
+}
+
+export interface LegacySourceReviewDraft {
+  readonly source_path: string;
+  readonly source_sha256: string;
+  readonly source_git_revision?: string | null;
+  readonly disposition: "import" | "archive" | "reject" | "unresolved";
+  readonly rationale: string;
+  readonly facts: readonly LegacyFactDraft[];
+}
+
+export interface GuidedLegacyImportInput {
+  readonly root_id: string;
+  readonly target_ref: string;
+  readonly expected_head: string;
+  readonly profile_lock_hash: string;
+  readonly catalog_version: string;
+  readonly proposal_hash: string;
+  readonly created_by: string;
+  readonly created_at: string;
+  readonly expires_at: string;
+  readonly sources: readonly LegacySourceReviewDraft[];
+}
 
 export interface LegacyScanOptions {
   readonly phase: "bootstrap" | "post_bootstrap";
