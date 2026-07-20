@@ -358,6 +358,11 @@ export async function startPluginMcp(
   }));
 }
 
+export interface McpOneShotResult {
+  readonly process_id: number;
+  readonly tool_result: McpToolResult;
+}
+
 export async function callMcpTool(
   session: McpSession,
   name: "project_memory_start" | "project_memory_read" | "project_memory_apply",
@@ -383,6 +388,62 @@ export async function callMcpTool(
   return result as unknown as McpToolResult;
 }
 
+export async function callPluginMcpOnce(
+  workflow: PluginWorkflow,
+  name: "project_memory_start" | "project_memory_read" | "project_memory_apply",
+  arguments_: unknown,
+): Promise<McpOneShotResult> {
+  const session = await startPluginMcp(workflow);
+  try {
+    return {
+      process_id: session.process_id,
+      tool_result: await callMcpTool(session, name, arguments_),
+    };
+  } finally {
+    const exited = await session.close();
+    expect(exited.status, exited.stderr).toBe(0);
+    expect(exited.signal).toBeNull();
+    expect(exited.stderr).toBe("");
+  }
+}
+
+export const GUIDED_LEGACY_SOURCE_PATHS = Object.freeze([
+  "PRD.md",
+  "HANDOFF.md",
+  "CHANGELOG.md",
+  "DECISIONS.md",
+  "TASKS.md",
+] as const);
+
+export async function addGuidedLegacyDocuments(
+  workflow: PluginWorkflow,
+): Promise<Readonly<Record<string, Uint8Array>>> {
+  await Promise.all([
+    writeFile(
+      path.join(workflow.project_root, "CHANGELOG.md"),
+      "# Changelog\n\n- Completed the offline lesson reminder.\n",
+      "utf8",
+    ),
+    writeFile(
+      path.join(workflow.project_root, "DECISIONS.md"),
+      "# Decisions\n\n- Keep project memory repository-local and offline.\n- Do not require a hosted service.\n",
+      "utf8",
+    ),
+    writeFile(
+      path.join(workflow.project_root, "TASKS.md"),
+      "# Tasks\n\n- Next: verify the daily lesson reminder experience.\n",
+      "utf8",
+    ),
+  ]);
+  runGit(workflow.project_root, ["add", "--all", "--", "."]);
+  runGit(workflow.project_root, ["commit", "--quiet", "-m", "test: add guided history sources"]);
+  return Object.fromEntries(await Promise.all(
+    GUIDED_LEGACY_SOURCE_PATHS.map(async (relativePath) => [
+      relativePath,
+      new Uint8Array(await readFile(path.join(workflow.project_root, relativePath))),
+    ] as const),
+  ));
+}
 function bootstrapApproval(root: URL, plan: InitPlan): CanonicalRecord {
   const compilation = plan.profile_compilation;
   return {

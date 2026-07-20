@@ -81,6 +81,7 @@ describe("automatic Plugin workflow for a legacy project", () => {
     const replayedProposal = (replayed.envelope?.data as {
       readonly legacy_import_proposal: LegacyImportProposal;
     }).legacy_import_proposal;
+    expect(replayedProposal.mappings).toHaveLength(2);
     expect(replayedProposal).toEqual(data.legacy_import_proposal);
     expect(await projectSnapshot(workflow.project_root)).toEqual(before);
   }, 120_000);

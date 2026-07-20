@@ -135,6 +135,52 @@ describe("clean Plugin MCP workflow for a new project", () => {
         ...relativePath.split("/"),
       ))).resolves.toBeUndefined();
     }
+    const reviewRequired = await callMcpTool(session, "project_memory_start", {
+      root: workflow.project_url.href,
+    });
+    expect(reviewRequired.isError).toBeUndefined();
+    const review = reviewRequired.structuredContent as {
+      readonly kind: "legacy_import_review_required";
+      readonly review_handle: string;
+      readonly sources: readonly {
+        readonly source_path: string;
+        readonly source_sha256: string;
+        readonly source_git_revision: string | null;
+      }[];
+    };
+    expect(review.kind).toBe("legacy_import_review_required");
+    expect(review.sources.map((source) => source.source_path)).toEqual(["AGENTS.md"]);
+
+    const planned = await callMcpTool(session, "project_memory_read", {
+      mode: "legacy_import",
+      review_handle: review.review_handle,
+      created_by: "codex-e2e",
+      sources: review.sources.map((source) => ({
+        source_path: source.source_path,
+        source_sha256: source.source_sha256,
+        source_git_revision: source.source_git_revision,
+        disposition: "reject",
+        rationale: "Bootstrap already captured the initialization-only facts.",
+        facts: [],
+      })),
+    });
+    expect(planned.isError, JSON.stringify(planned)).toBeUndefined();
+    const importProposal = planned.structuredContent as {
+      readonly operation: "legacy_import";
+      readonly proposal_handle: string;
+    };
+    expect(importProposal.operation).toBe("legacy_import");
+
+    const imported = await callMcpTool(session, "project_memory_apply", {
+      mode: "legacy_import",
+      proposal_handle: importProposal.proposal_handle,
+      approval: { confirmed: true, granted_by: "Pitaji" },
+    });
+    expect(imported.isError, JSON.stringify(imported)).toBeUndefined();
+    expect(imported.structuredContent).toMatchObject({
+      status: "legacy_imported_verified",
+    });
+
     const resumed = await callMcpTool(session, "project_memory_start", {
       root: workflow.project_url.href,
     });
@@ -146,5 +192,5 @@ describe("clean Plugin MCP workflow for a new project", () => {
     });
 
     await closeSession(session);
-  }, 180_000);
+  }, 300_000);
 });
