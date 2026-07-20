@@ -4,7 +4,7 @@
 
 **Goal:** Make v0.1.1 the current source on local `main` while preserving the published v0.1.0 release as an independently recoverable and installable historical version.
 
-**Architecture:** Treat Git tags and GitHub releases as immutable version boundaries. Import the existing remote `v0.1.0` annotated tag into the local repository, fast-forward `main` without squashing the v0.1.1 commits, and validate the old tag and new package independently.
+**Architecture:** Treat Git tags and GitHub releases as immutable version boundaries. Import the existing public `v0.1.0` annotated tag directly from the canonical GitHub repository because this checkout's `origin` is a local publication mirror, fast-forward `main` without squashing the v0.1.1 commits, and validate the old tag and new package independently.
 
 **Tech Stack:** Git, GitHub Releases, Node.js, npm, TypeScript, Vitest
 
@@ -44,7 +44,7 @@ Expected: both status commands emit nothing, both ancestry checks exit `0`, and 
 - [ ] **Step 2: Fetch and verify the existing published v0.1.0 tag**
 
 ```powershell
-git -C "C:\Users\Pv Vimal Nair\project-memory" fetch origin refs/tags/v0.1.0:refs/tags/v0.1.0
+git -C "C:\Users\Pv Vimal Nair\project-memory" fetch https://github.com/pv-vimalnair/project-memory.git refs/tags/v0.1.0:refs/tags/v0.1.0
 git -C "C:\Users\Pv Vimal Nair\project-memory" rev-parse v0.1.0
 git -C "C:\Users\Pv Vimal Nair\project-memory" rev-parse 'v0.1.0^{commit}'
 ```
