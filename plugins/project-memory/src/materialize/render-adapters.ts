@@ -17,6 +17,7 @@ import type {
   ResolvedGateExecution,
   ResolvedProfile,
 } from "../profile/contracts/index.js";
+import { REPOSITORY_CONTRACT_VERSION } from "../version.js";
 import { renderCompilerOwnedProjectTree } from "./render-project-tree.js";
 
 const CONFIG_PATH = "tools/project-memory/config.json";
@@ -120,6 +121,7 @@ function renderConfig(profile: ResolvedProfile): PlannedWrite {
     .sort((left, right) => compareUtf8(left.id, right.id));
   const config = {
     schema_version: "1.0.0",
+    repository_contract_version: REPOSITORY_CONTRACT_VERSION,
     root_id: profile.root.id,
     memory_root: "docs/project-memory",
     profile_lock: "docs/project-memory/profile.lock.yaml",

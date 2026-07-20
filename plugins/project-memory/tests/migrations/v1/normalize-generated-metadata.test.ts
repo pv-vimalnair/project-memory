@@ -102,7 +102,7 @@ describe("normalize generated profile metadata", () => {
     ].sort();
     expect(planned.value.writes.map((write) => write.relative_path)).toEqual([
       ...archivePaths,
-      "docs/project-memory/governance/migrations/normalize-generated-metadata.json",
+      "docs/project-memory/governance/migrations/project-memory-v1-1.json",
       "docs/project-memory/profile.lock.yaml",
     ]);
     expect(planned.value.metadata.archive_preimage_paths).toEqual(archivePaths);

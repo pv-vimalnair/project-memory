@@ -30,6 +30,7 @@ import {
   SafeRelativePathSchema,
   Sha256Schema,
 } from "../profile/contracts/project-selection.js";
+import { REPOSITORY_CONTRACT_VERSION } from "../version.js";
 
 export const CONFIG_RELATIVE_PATH = "tools/project-memory/config.json";
 export const TOOL_CONFIG_SCHEMA_ID = "project-memory/v1/tool-config" as const;
@@ -61,6 +62,9 @@ const RuntimeGateSchema = Type.Object({
 
 export const ToolConfigSchema = Type.Object({
   schema_version: Type.Literal("1.0.0"),
+  repository_contract_version: Type.Optional(
+    Type.Literal(REPOSITORY_CONTRACT_VERSION),
+  ),
   root_id: InstanceIdSchema("ROOT"),
   memory_root: Type.Literal("docs/project-memory"),
   profile_lock: Type.Literal("docs/project-memory/profile.lock.yaml"),

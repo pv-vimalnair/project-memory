@@ -4,6 +4,7 @@ import type { RuntimeResult } from "../contracts/runtime-result.js";
 export type ArtifactKind =
   | "project-selection"
   | "profile-lock"
+  | "tool-config"
   | "catalog-lock"
   | "canonical-source"
   | "governance-record"
