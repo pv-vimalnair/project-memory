@@ -546,6 +546,12 @@ export class ProjectMemoryMcpServer {
               approval: approvalInput,
             });
         if (applied.ok) this.#proposalHosts.delete(proposalHandle);
+        if (mode === "legacy_import" && applied.ok) {
+          return boundedToolResult({
+            status: "legacy_imported_verified",
+            receipt: applied.value,
+          });
+        }
         return runtimeToolResult(applied);
       } catch {
         return toolFailure(

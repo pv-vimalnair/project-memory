@@ -260,7 +260,10 @@ describe("ProjectMemoryMcpServer", () => {
       approval: { confirmed: true, granted_by: "Pitaji" },
     });
     expect(applied).toMatchObject({
-      structuredContent: { status: "mutation_integrated" },
+      structuredContent: {
+        status: "legacy_imported_verified",
+        receipt: { status: "mutation_integrated" },
+      },
     });
     expect(host.applyLegacyImport).toHaveBeenCalledWith({
       proposal_handle: IMPORT_HANDLE,
@@ -288,7 +291,12 @@ describe("ProjectMemoryMcpServer", () => {
       mode: "legacy_import",
       proposal_handle: IMPORT_HANDLE,
       approval: { confirmed: true, granted_by: "Pitaji" },
-    })).toMatchObject({ structuredContent: { status: "mutation_integrated" } });
+    })).toMatchObject({
+      structuredContent: {
+        status: "legacy_imported_verified",
+        receipt: { status: "mutation_integrated" },
+      },
+    });
     expect(resolveProposal).toHaveBeenCalledWith(REVIEW_HANDLE);
     expect(resolveProposal).toHaveBeenCalledWith(IMPORT_HANDLE);
   });
