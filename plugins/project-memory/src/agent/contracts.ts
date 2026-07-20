@@ -8,6 +8,7 @@ import type {
   LegacyImportProposal,
   PendingLegacyReview,
 } from "../import/contracts.js";
+import type { RepositoryUpgradePlan } from "../upgrades/contracts.js";
 
 export interface AgentStartInput {
   readonly root: URL;
@@ -39,6 +40,14 @@ export type AgentStartDirective =
       readonly apply_command: readonly string[];
     }
   | {
+      readonly kind: "upgrade_review_required";
+      readonly proposal: {
+        readonly confirmation_required: true;
+        readonly plan: RepositoryUpgradePlan;
+      };
+      readonly warnings: readonly RuntimeIssue[];
+    }
+  | {
       readonly kind: "legacy_import_review_required";
       readonly root_id: string;
       readonly profile_lock_hash: string;
@@ -67,6 +76,9 @@ export interface AgentStartDependencies {
   readonly planInitialization: (
     input: AgentInitializationInput,
   ) => Promise<RuntimeResult<InitPlan>>;
+  readonly planRepositoryUpgrade: (
+    root: URL,
+  ) => Promise<RuntimeResult<RepositoryUpgradePlan | null>>;
   readonly verifyProfile: (
     root: URL,
   ) => Promise<RuntimeResult<ProfileVerificationReport>>;

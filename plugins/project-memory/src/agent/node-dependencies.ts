@@ -22,6 +22,7 @@ import {
   type LegacyDocumentRole,
 } from "../import/index.js";
 import { createProfileVerifier } from "../profile/verify-profile.js";
+import { createNodeRepositoryUpgradePlanner } from "../upgrades/node-repository-upgrade.js";
 import type { AgentStartDependencies } from "./contracts.js";
 import { inferRepositoryBrief } from "./infer-repository-brief.js";
 import { createNodeViewVerifier } from "./node-view-verifier.js";
@@ -139,6 +140,7 @@ export function createNodeAgentStartDependencies(
   const importer = createLegacyImporter();
   const git = new GitCliClient(new NodeCommandRunner());
   const views = createNodeViewVerifier();
+  const upgrades = createNodeRepositoryUpgradePlanner(now);
   const doctorDependencies = {
     ...createDefaultDoctorDependencies(),
     async views(root: URL) {
@@ -190,6 +192,7 @@ export function createNodeAgentStartDependencies(
         expires_at: new Date(created.getTime() + 60 * 60 * 1000).toISOString(),
       });
     },
+    planRepositoryUpgrade: (root) => upgrades.plan(root),
     verifyProfile: (root) => profiles.verify(root),
     verifyViews: (root) => views.verify(root),
     findPendingLegacyReview: (input) =>

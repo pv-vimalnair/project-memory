@@ -149,13 +149,31 @@ export async function startAgentSession(
   const doctor = await callDependency("doctor", () => dependencies.doctor({ root: input.root }));
   const doctorIssues = doctor.ok ? failedDoctorIssues(doctor.value) : doctor.issues;
   const uninitialized = isUninitialized(doctorIssues);
-  if (!doctor.ok || !doctor.value.valid) {
-    if (!uninitialized) {
-      return blocked(doctorIssues.length > 0
-        ? doctorIssues
-        : [agentIssue("AGENT_DOCTOR_INVALID", "repository diagnostics are not valid")]);
-    }
+  if ((!doctor.ok || !doctor.value.valid) && uninitialized) {
     return bootstrapDirective(input, dependencies);
+  }
+
+  const upgrade = await callDependency("planRepositoryUpgrade", () =>
+    dependencies.planRepositoryUpgrade(input.root));
+  if (!upgrade.ok) return blocked(upgrade.issues);
+  if (upgrade.value !== null) {
+    const warnings = stableIssues([
+      ...(doctor.ok ? doctor.warnings : []),
+      ...upgrade.warnings,
+    ]);
+    return success({
+      kind: "upgrade_review_required",
+      proposal: {
+        confirmation_required: true,
+        plan: upgrade.value,
+      },
+      warnings,
+    }, warnings);
+  }
+  if (!doctor.ok || !doctor.value.valid) {
+    return blocked(doctorIssues.length > 0
+      ? doctorIssues
+      : [agentIssue("AGENT_DOCTOR_INVALID", "repository diagnostics are not valid")]);
   }
 
   const profile = await callDependency("verifyProfile", () => dependencies.verifyProfile(input.root));

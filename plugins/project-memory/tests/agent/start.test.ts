@@ -11,6 +11,7 @@ import {
 } from "../../src/agent/index.js";
 import type { AgentStartDependencies } from "../../src/agent/contracts.js";
 import type { PendingLegacyReview } from "../../src/import/contracts.js";
+import type { RepositoryUpgradePlan } from "../../src/upgrades/contracts.js";
 
 const ROOT = new URL("file:///C:/project/");
 const HEAD = "1".repeat(40);
@@ -139,6 +140,15 @@ function initPlan(fields: readonly string[] = []): InitPlan {
   };
 }
 
+function upgradePlan(): RepositoryUpgradePlan {
+  return {
+    metadata: {
+      from_version: "1.0.0",
+      to_version: "1.1.0",
+    },
+  } as RepositoryUpgradePlan;
+}
+
 function dependencies(
   overrides: Partial<AgentStartDependencies> = {},
 ): AgentStartDependencies & {
@@ -151,6 +161,7 @@ function dependencies(
   return {
     doctor: vi.fn(() => Promise.resolve(success(doctorReport()))),
     planInitialization: vi.fn(() => Promise.resolve(success(initPlan()))),
+    planRepositoryUpgrade: vi.fn(() => Promise.resolve(success(null))),
     verifyProfile: vi.fn(() => Promise.resolve(success(profileReport()))),
     verifyViews: vi.fn(() => Promise.resolve(success(viewReport()))),
     findPendingLegacyReview: vi.fn(() => Promise.resolve(success(null))),
@@ -342,6 +353,55 @@ describe("read-only agent startup", () => {
       ok: true,
       value: { kind: "blocked", issues: [{ code: "PROFILE_LOCK_HASH_MISMATCH" }] },
     });
+    expect(deps.verifyViews).not.toHaveBeenCalled();
+  });
+
+  it("selects a compatible upgrade before a stale-view doctor block", async () => {
+    const staleViewIssue = {
+      code: "VIEW_DRIFT",
+      severity: "error" as const,
+      path: "docs/project-memory/views/NOW.md",
+      message: "generated view is stale",
+      references: [],
+    };
+    const deps = dependencies({
+      doctor: vi.fn(() => Promise.resolve(success({
+        ...doctorReport(),
+        valid: false,
+        checks: [{
+          id: "views" as const,
+          status: "failed" as const,
+          message: staleViewIssue.message,
+          issue: staleViewIssue,
+        }],
+      }))),
+      planRepositoryUpgrade: vi.fn(() => Promise.resolve(success(
+        upgradePlan(),
+        [{
+          code: "UPGRADE_REVIEW_NOTE",
+          severity: "warning",
+          path: "tools/project-memory/config.json",
+          message: "compatible upgrade is ready for review",
+          references: [],
+        }],
+      ))),
+    });
+    const result = await startAgentSession(
+      { root: ROOT, brief_path: null, adapter_id: "adapter.codex" },
+      deps,
+    );
+    expect(result).toMatchObject({
+      ok: true,
+      value: {
+        kind: "upgrade_review_required",
+        proposal: {
+          confirmation_required: true,
+          plan: { metadata: { from_version: "1.0.0", to_version: "1.1.0" } },
+        },
+        warnings: [{ code: "UPGRADE_REVIEW_NOTE" }],
+      },
+    });
+    expect(deps.verifyProfile).not.toHaveBeenCalled();
     expect(deps.verifyViews).not.toHaveBeenCalled();
   });
 
