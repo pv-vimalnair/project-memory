@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import type { AgentStartDirective } from "../../src/agent/contracts.js";
-import type { InitPlan } from "../../src/cli/init/build-init-plan.js";
+import {
+  initPlanHash,
+  type InitPlan,
+} from "../../src/cli/init/build-init-plan.js";
 import { failure, success } from "../../src/contracts/runtime-result.js";
 import { InMemoryProposalStore } from "../../src/host/proposal-store.js";
 import {
@@ -16,11 +19,10 @@ const APPROVAL_ID = "APR-01J00000000000000000000000";
 const CREATED_AT = "2026-07-17T12:00:00.000Z";
 const EXPIRES_AT = "2026-07-17T13:00:00.000Z";
 
-const PLAN = {
+const PLAN_BODY = {
   target_root_id: ROOT_ID,
   target_ref: "refs/heads/main",
   expected_head: HEAD,
-  plan_hash: "2".repeat(64),
   selection: {
     disposition: "automatic",
     winner: { definition_id: "application.consumer-mobile" },
@@ -88,7 +90,11 @@ const PLAN = {
     reason: "Pitaji approval required",
     approval_id: APPROVAL_ID,
   },
-} as unknown as InitPlan;
+} as unknown as Omit<InitPlan, "plan_hash">;
+const PLAN = {
+  ...PLAN_BODY,
+  plan_hash: initPlanHash(PLAN_BODY),
+} as InitPlan;
 
 const BOOTSTRAP_DIRECTIVE: AgentStartDirective = {
   kind: "bootstrap_review_required",

@@ -11,27 +11,39 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { deserialize, serialize } from "node:v8";
 
-import {
-  initPlanHash,
-  type InitPlan,
-} from "../cli/init/build-init-plan.js";
+import type { InitPlan } from "../cli/init/build-init-plan.js";
 import {
   failure,
   success,
   type RuntimeResult,
 } from "../contracts/runtime-result.js";
+import {
+  cloneProposalEnvelope,
+  decodedProposalEntry,
+  normalizeProposalIssue,
+  parsedProposalTimestamp,
+  persistedProposalEntry,
+  proposalEntryValid,
+  proposalExpiryForIssue,
+  proposalIssuedFields,
+  type StoredProposalEntry,
+  type StoredProposalEnvelope,
+  type StoredProposalKind,
+} from "./proposal-envelope.js";
+
+export type {
+  StoredBootstrapProposal,
+  StoredProposalEnvelope,
+  StoredProposalKind,
+} from "./proposal-envelope.js";
 
 const MAX_ACTIVE_PROPOSALS = 8;
 const HANDLE_PATTERN = /^pm-proposal-[0-9a-f]{32}$/u;
 const CACHE_FILE_PATTERN = /^(pm-proposal-[0-9a-f]{32})[.]bin$/u;
 
-export interface StoredBootstrapProposal {
-  readonly root: URL;
-  readonly plan: InitPlan;
-}
-
 export interface IssuedProposal {
   readonly handle: string;
+  readonly kind: StoredProposalKind;
   readonly plan_hash: string;
   readonly expected_head: string;
   readonly expires_at: string;
@@ -45,19 +57,22 @@ export interface ProposalStoreDependencies {
 export type ProposalStoreResult<T> = RuntimeResult<T> | Promise<RuntimeResult<T>>;
 
 export interface ProposalStore {
+  issue(value: StoredProposalEnvelope): ProposalStoreResult<IssuedProposal>;
   issue(root: URL, plan: InitPlan): ProposalStoreResult<IssuedProposal>;
-  resolve(handle: string): ProposalStoreResult<StoredBootstrapProposal>;
-  consume(handle: string): ProposalStoreResult<StoredBootstrapProposal>;
+  resolve<K extends StoredProposalKind>(
+    handle: string,
+    expectedKind: K,
+  ): ProposalStoreResult<Extract<StoredProposalEnvelope, { readonly kind: K }>>;
+  resolve(handle: string): ProposalStoreResult<StoredProposalEnvelope>;
+  consume<K extends StoredProposalKind>(
+    handle: string,
+    expectedKind: K,
+  ): ProposalStoreResult<Extract<StoredProposalEnvelope, { readonly kind: K }>>;
+  consume(handle: string): ProposalStoreResult<StoredProposalEnvelope>;
 }
 
 export interface FileProposalStoreDependencies extends ProposalStoreDependencies {
   readonly cache_root: string;
-}
-
-interface StoredProposalEnvelope {
-  readonly schema_version: "1.0.0";
-  readonly root: string;
-  readonly plan: InitPlan;
 }
 
 function defaultDependencies(): ProposalStoreDependencies {
@@ -74,132 +89,69 @@ function defaultFileDependencies(): FileProposalStoreDependencies {
   };
 }
 
-function cloneProposal(proposal: StoredBootstrapProposal): StoredBootstrapProposal {
-  return {
-    root: new URL(proposal.root.href),
-    plan: structuredClone(proposal.plan),
-  };
+function issueResult(
+  handle: string,
+  entry: StoredProposalEntry,
+): RuntimeResult<IssuedProposal> {
+  return success({
+    handle,
+    kind: entry.value.kind,
+    ...proposalIssuedFields(entry.value),
+    expires_at: entry.expires_at,
+  });
 }
 
-function validExpiry(plan: InitPlan): number | null {
-  const expiresAt = Date.parse(plan.replay.expires_at);
-  return Number.isFinite(expiresAt) ? expiresAt : null;
-}
-
-function exactPlan(plan: InitPlan): boolean {
-  try {
-    return initPlanHash(plan) === plan.plan_hash;
-  } catch {
-    return false;
-  }
-}
-
-function storedEnvelope(value: unknown): value is StoredProposalEnvelope {
-  if (typeof value !== "object" || value === null) return false;
-  const candidate = value as Readonly<Record<string, unknown>>;
-  const plan = candidate.plan;
-  return candidate.schema_version === "1.0.0" &&
-    typeof candidate.root === "string" &&
-    typeof plan === "object" &&
-    plan !== null &&
-    typeof (plan as Readonly<Record<string, unknown>>).plan_hash === "string" &&
-    typeof (plan as Readonly<Record<string, unknown>>).replay === "object";
+function kindMismatch(
+  handle: string,
+  expectedKind: StoredProposalKind,
+  actualKind: StoredProposalKind,
+): RuntimeResult<never> {
+  return failure(
+    "HOST_PROPOSAL_KIND_MISMATCH",
+    `proposal handle contains ${actualKind}, not ${expectedKind}`,
+    handle,
+  );
 }
 
 export class InMemoryProposalStore implements ProposalStore {
-  readonly #proposals = new Map<string, StoredBootstrapProposal>();
+  readonly #proposals = new Map<string, StoredProposalEntry>();
 
   constructor(private readonly dependencies: ProposalStoreDependencies = defaultDependencies()) {}
 
-  issue(root: URL, plan: InitPlan): RuntimeResult<IssuedProposal> {
+  issue(value: StoredProposalEnvelope): RuntimeResult<IssuedProposal>;
+  issue(root: URL, plan: InitPlan): RuntimeResult<IssuedProposal>;
+  issue(
+    valueOrRoot: StoredProposalEnvelope | URL,
+    plan?: InitPlan,
+  ): RuntimeResult<IssuedProposal> {
     this.pruneExpired();
+    const value = normalizeProposalIssue(valueOrRoot, plan);
+    const now = this.dependencies.now();
+    const expiresAt = value === null ? null : proposalExpiryForIssue(value, now);
+    const expiryMilliseconds =
+      expiresAt === null ? null : parsedProposalTimestamp(expiresAt);
+    if (
+      value === null ||
+      expiresAt === null ||
+      expiryMilliseconds === null ||
+      expiryMilliseconds <= now.getTime()
+    ) {
+      return failure(
+        "HOST_PROPOSAL_INVALID",
+        "proposal store requires one current exact envelope bound to a local repository",
+      );
+    }
+    const entry = { value, expires_at: expiresAt };
+    if (!proposalEntryValid(entry, now)) {
+      return failure(
+        "HOST_PROPOSAL_INVALID",
+        "proposal store requires one current exact envelope bound to a local repository",
+      );
+    }
     if (this.#proposals.size >= MAX_ACTIVE_PROPOSALS) {
       return failure(
         "HOST_PROPOSAL_CACHE_FULL",
         "proposal cache contains eight active plans",
-      );
-    }
-    const handle = this.dependencies.handle();
-    if (this.#proposals.has(handle)) {
-      return failure(
-        "HOST_PROPOSAL_HANDLE_COLLISION",
-        "proposal handle generator returned an active handle",
-      );
-    }
-    this.#proposals.set(handle, cloneProposal({ root, plan }));
-    return success({
-      handle,
-      plan_hash: plan.plan_hash,
-      expected_head: plan.expected_head,
-      expires_at: plan.replay.expires_at,
-    });
-  }
-
-  resolve(handle: string): RuntimeResult<StoredBootstrapProposal> {
-    const proposal = this.#proposals.get(handle);
-    if (proposal === undefined) {
-      return failure(
-        "HOST_PROPOSAL_NOT_FOUND",
-        "proposal handle is unknown or already consumed",
-        handle,
-      );
-    }
-    if (this.expired(proposal)) {
-      this.#proposals.delete(handle);
-      return failure(
-        "HOST_PROPOSAL_EXPIRED",
-        "proposal handle has expired",
-        handle,
-      );
-    }
-    return success(cloneProposal(proposal));
-  }
-
-  consume(handle: string): RuntimeResult<StoredBootstrapProposal> {
-    const proposal = this.resolve(handle);
-    if (!proposal.ok) return proposal;
-    this.#proposals.delete(handle);
-    return proposal;
-  }
-
-  private expired(proposal: StoredBootstrapProposal): boolean {
-    const expiresAt = validExpiry(proposal.plan);
-    return expiresAt === null || expiresAt <= this.dependencies.now().getTime();
-  }
-
-  private pruneExpired(): void {
-    for (const [handle, proposal] of this.#proposals) {
-      if (this.expired(proposal)) this.#proposals.delete(handle);
-    }
-  }
-}
-
-export class FileProposalStore implements ProposalStore {
-  constructor(
-    private readonly dependencies: FileProposalStoreDependencies = defaultFileDependencies(),
-  ) {}
-
-  async issue(root: URL, plan: InitPlan): Promise<RuntimeResult<IssuedProposal>> {
-    const ready = await this.ensureCacheRoot();
-    if (!ready.ok) return ready;
-    const active = await this.pruneExpired();
-    if (!active.ok) return active;
-    if (active.value >= MAX_ACTIVE_PROPOSALS) {
-      return failure(
-        "HOST_PROPOSAL_CACHE_FULL",
-        "proposal cache contains eight active plans",
-      );
-    }
-    const expiresAt = validExpiry(plan);
-    if (
-      root.protocol !== "file:" ||
-      expiresAt === null ||
-      expiresAt <= this.dependencies.now().getTime() ||
-      !exactPlan(plan)
-    ) {
-      return failure(
-        "HOST_PROPOSAL_INVALID",
-        "proposal store requires one current exact plan bound to a local repository",
       );
     }
     const handle = this.dependencies.handle();
@@ -209,13 +161,136 @@ export class FileProposalStore implements ProposalStore {
         "proposal handle generator returned an invalid handle",
       );
     }
-    const envelope: StoredProposalEnvelope = {
-      schema_version: "1.0.0",
-      root: root.href,
-      plan: structuredClone(plan),
+    if (this.#proposals.has(handle)) {
+      return failure(
+        "HOST_PROPOSAL_HANDLE_COLLISION",
+        "proposal handle generator returned an active handle",
+      );
+    }
+    const stored = {
+      value: cloneProposalEnvelope(value),
+      expires_at: expiresAt,
+    };
+    this.#proposals.set(handle, stored);
+    return issueResult(handle, stored);
+  }
+
+  resolve<K extends StoredProposalKind>(
+    handle: string,
+    expectedKind: K,
+  ): RuntimeResult<Extract<StoredProposalEnvelope, { readonly kind: K }>>;
+  resolve(handle: string): RuntimeResult<StoredProposalEnvelope>;
+  resolve(
+    handle: string,
+    expectedKind?: StoredProposalKind,
+  ): RuntimeResult<StoredProposalEnvelope> {
+    const entry = this.#proposals.get(handle);
+    if (entry === undefined) return this.notFound(handle);
+    const expiresAt = parsedProposalTimestamp(entry.expires_at);
+    if (expiresAt === null || expiresAt <= this.dependencies.now().getTime()) {
+      this.#proposals.delete(handle);
+      return failure("HOST_PROPOSAL_EXPIRED", "proposal handle has expired", handle);
+    }
+    if (!proposalEntryValid(entry, this.dependencies.now())) {
+      return failure("HOST_PROPOSAL_CORRUPT", "proposal cache entry failed validation", handle);
+    }
+    if (expectedKind !== undefined && entry.value.kind !== expectedKind) {
+      return kindMismatch(handle, expectedKind, entry.value.kind);
+    }
+    return success(cloneProposalEnvelope(entry.value));
+  }
+
+  consume<K extends StoredProposalKind>(
+    handle: string,
+    expectedKind: K,
+  ): RuntimeResult<Extract<StoredProposalEnvelope, { readonly kind: K }>>;
+  consume(handle: string): RuntimeResult<StoredProposalEnvelope>;
+  consume(
+    handle: string,
+    expectedKind?: StoredProposalKind,
+  ): RuntimeResult<StoredProposalEnvelope> {
+    const proposal = expectedKind === undefined
+      ? this.resolve(handle)
+      : this.resolve(handle, expectedKind);
+    if (!proposal.ok) return proposal;
+    this.#proposals.delete(handle);
+    return proposal;
+  }
+
+  private notFound(handle: string): RuntimeResult<never> {
+    return failure(
+      "HOST_PROPOSAL_NOT_FOUND",
+      "proposal handle is unknown or already consumed",
+      handle,
+    );
+  }
+
+  private pruneExpired(): void {
+    const now = this.dependencies.now().getTime();
+    for (const [handle, entry] of this.#proposals) {
+      const expiresAt = parsedProposalTimestamp(entry.expires_at);
+      if (expiresAt === null || expiresAt <= now) this.#proposals.delete(handle);
+    }
+  }
+}
+
+export class FileProposalStore implements ProposalStore {
+  constructor(
+    private readonly dependencies: FileProposalStoreDependencies = defaultFileDependencies(),
+  ) {}
+
+  issue(value: StoredProposalEnvelope): Promise<RuntimeResult<IssuedProposal>>;
+  issue(root: URL, plan: InitPlan): Promise<RuntimeResult<IssuedProposal>>;
+  async issue(
+    valueOrRoot: StoredProposalEnvelope | URL,
+    plan?: InitPlan,
+  ): Promise<RuntimeResult<IssuedProposal>> {
+    const ready = await this.ensureCacheRoot();
+    if (!ready.ok) return ready;
+    const active = await this.pruneExpired();
+    if (!active.ok) return active;
+    const value = normalizeProposalIssue(valueOrRoot, plan);
+    const now = this.dependencies.now();
+    const expiresAt = value === null ? null : proposalExpiryForIssue(value, now);
+    const expiryMilliseconds =
+      expiresAt === null ? null : parsedProposalTimestamp(expiresAt);
+    if (
+      value === null ||
+      expiresAt === null ||
+      expiryMilliseconds === null ||
+      expiryMilliseconds <= now.getTime()
+    ) {
+      return failure(
+        "HOST_PROPOSAL_INVALID",
+        "proposal store requires one current exact envelope bound to a local repository",
+      );
+    }
+    const entry = { value, expires_at: expiresAt };
+    if (!proposalEntryValid(entry, now)) {
+      return failure(
+        "HOST_PROPOSAL_INVALID",
+        "proposal store requires one current exact envelope bound to a local repository",
+      );
+    }
+    if (active.value >= MAX_ACTIVE_PROPOSALS) {
+      return failure(
+        "HOST_PROPOSAL_CACHE_FULL",
+        "proposal cache contains eight active plans",
+      );
+    }
+    const handle = this.dependencies.handle();
+    if (!HANDLE_PATTERN.test(handle)) {
+      return failure(
+        "HOST_PROPOSAL_HANDLE_INVALID",
+        "proposal handle generator returned an invalid handle",
+      );
+    }
+    const stored = {
+      value: cloneProposalEnvelope(value),
+      expires_at: expiresAt,
     };
     try {
-      await writeFile(this.filePath(handle), serialize(envelope), {
+      await writeFile(this.filePath(handle), serialize(persistedProposalEntry(stored)), {
         flag: "wx",
         mode: 0o600,
       });
@@ -228,34 +303,46 @@ export class FileProposalStore implements ProposalStore {
         handle,
       );
     }
-    return success({
-      handle,
-      plan_hash: plan.plan_hash,
-      expected_head: plan.expected_head,
-      expires_at: plan.replay.expires_at,
-    });
+    return issueResult(handle, stored);
   }
 
-  async resolve(handle: string): Promise<RuntimeResult<StoredBootstrapProposal>> {
+  resolve<K extends StoredProposalKind>(
+    handle: string,
+    expectedKind: K,
+  ): Promise<RuntimeResult<Extract<StoredProposalEnvelope, { readonly kind: K }>>>;
+  resolve(handle: string): Promise<RuntimeResult<StoredProposalEnvelope>>;
+  async resolve(
+    handle: string,
+    expectedKind?: StoredProposalKind,
+  ): Promise<RuntimeResult<StoredProposalEnvelope>> {
     if (!HANDLE_PATTERN.test(handle)) return this.notFound(handle);
     const ready = await this.ensureCacheRoot();
     if (!ready.ok) return ready;
-    const proposal = await this.readProposal(handle);
-    if (!proposal.ok) return proposal;
-    const expiresAt = validExpiry(proposal.value.plan);
+    const entry = await this.readProposal(handle);
+    if (!entry.ok) return entry;
+    const expiresAt = parsedProposalTimestamp(entry.value.expires_at);
     if (expiresAt === null || expiresAt <= this.dependencies.now().getTime()) {
       await this.remove(handle);
-      return failure(
-        "HOST_PROPOSAL_EXPIRED",
-        "proposal handle has expired",
-        handle,
-      );
+      return failure("HOST_PROPOSAL_EXPIRED", "proposal handle has expired", handle);
     }
-    return success(cloneProposal(proposal.value));
+    if (expectedKind !== undefined && entry.value.value.kind !== expectedKind) {
+      return kindMismatch(handle, expectedKind, entry.value.value.kind);
+    }
+    return success(cloneProposalEnvelope(entry.value.value));
   }
 
-  async consume(handle: string): Promise<RuntimeResult<StoredBootstrapProposal>> {
-    const proposal = await this.resolve(handle);
+  consume<K extends StoredProposalKind>(
+    handle: string,
+    expectedKind: K,
+  ): Promise<RuntimeResult<Extract<StoredProposalEnvelope, { readonly kind: K }>>>;
+  consume(handle: string): Promise<RuntimeResult<StoredProposalEnvelope>>;
+  async consume(
+    handle: string,
+    expectedKind?: StoredProposalKind,
+  ): Promise<RuntimeResult<StoredProposalEnvelope>> {
+    const proposal = expectedKind === undefined
+      ? await this.resolve(handle)
+      : await this.resolve(handle, expectedKind);
     if (!proposal.ok) return proposal;
     const removed = await this.remove(handle);
     return removed.ok ? proposal : removed;
@@ -293,9 +380,7 @@ export class FileProposalStore implements ProposalStore {
     }
   }
 
-  private async readProposal(
-    handle: string,
-  ): Promise<RuntimeResult<StoredBootstrapProposal>> {
+  private async readProposal(handle: string): Promise<RuntimeResult<StoredProposalEntry>> {
     const target = this.filePath(handle);
     let bytes: Buffer;
     try {
@@ -327,31 +412,14 @@ export class FileProposalStore implements ProposalStore {
         handle,
       );
     }
-    if (!storedEnvelope(decoded)) {
-      return failure(
-        "HOST_PROPOSAL_CORRUPT",
-        "proposal cache entry has an incompatible shape",
-        handle,
-      );
-    }
-    let root: URL;
-    try {
-      root = new URL(decoded.root);
-    } catch {
-      return failure(
-        "HOST_PROPOSAL_CORRUPT",
-        "proposal cache entry contains an invalid repository",
-        handle,
-      );
-    }
-    if (root.protocol !== "file:" || !exactPlan(decoded.plan)) {
-      return failure(
-        "HOST_PROPOSAL_CORRUPT",
-        "proposal cache entry does not preserve the exact reviewed plan",
-        handle,
-      );
-    }
-    return success({ root, plan: decoded.plan });
+    const entry = decodedProposalEntry(decoded, this.dependencies.now());
+    return entry === null
+      ? failure(
+          "HOST_PROPOSAL_CORRUPT",
+          "proposal cache entry has an invalid shape or binding",
+          handle,
+        )
+      : success(entry);
   }
 
   private async remove(handle: string): Promise<RuntimeResult<true>> {
@@ -395,7 +463,7 @@ export class FileProposalStore implements ProposalStore {
       if (handle === undefined) continue;
       const proposal = await this.readProposal(handle);
       if (!proposal.ok) return proposal;
-      const expiresAt = validExpiry(proposal.value.plan);
+      const expiresAt = parsedProposalTimestamp(proposal.value.expires_at);
       if (expiresAt === null || expiresAt <= this.dependencies.now().getTime()) {
         const removed = await this.remove(handle);
         if (!removed.ok) return removed;

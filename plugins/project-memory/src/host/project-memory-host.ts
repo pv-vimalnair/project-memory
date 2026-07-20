@@ -214,7 +214,11 @@ export class ProjectMemoryHost {
       return success(started.value, started.warnings);
     }
     const plan = started.value.proposal.plan;
-    const issued = await this.proposals.issue(input.root, plan);
+    const issued = await this.proposals.issue({
+      kind: "bootstrap",
+      root: input.root,
+      plan,
+    });
     if (!issued.ok) return issued;
     return success({
       kind: "bootstrap_review_required",
@@ -237,7 +241,10 @@ export class ProjectMemoryHost {
         "approval",
       );
     }
-    const proposal = await this.proposals.resolve(input.proposal_handle);
+    const proposal = await this.proposals.resolve(
+      input.proposal_handle,
+      "bootstrap",
+    );
     if (!proposal.ok) return proposal;
     let applied: RuntimeResult<BootstrapFinalization>;
     try {
@@ -249,7 +256,7 @@ export class ProjectMemoryHost {
       return dependencyFailure("applyBootstrap");
     }
     if (!applied.ok) return applied;
-    await this.proposals.consume(input.proposal_handle);
+    await this.proposals.consume(input.proposal_handle, "bootstrap");
     return applied;
   }
 }

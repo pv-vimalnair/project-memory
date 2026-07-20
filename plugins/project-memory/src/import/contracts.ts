@@ -171,6 +171,7 @@ export interface ReviewedImportMetadata {
   readonly resolved_source_paths?: readonly string[];
   readonly unresolved_source_paths?: readonly string[];
   readonly imported_fact_record_ids?: readonly string[];
+  readonly guided_input_hash?: string;
 }
 
 export type ReviewedImportPlan = CanonicalMutationPlan<ReviewedImportMetadata>;

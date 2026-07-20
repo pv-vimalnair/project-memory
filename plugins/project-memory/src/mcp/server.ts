@@ -161,7 +161,7 @@ function defaultDependencies(): ProjectMemoryMcpServerDependencies {
     createHost: (root) => createNodeProjectMemoryHost(root),
     createRegistry: (root) => createNodeCommandRegistry(root),
     execute: executeCli,
-    resolveProposal: (handle) => proposals.resolve(handle),
+    resolveProposal: (handle) => proposals.resolve(handle, "bootstrap"),
   };
 }
 

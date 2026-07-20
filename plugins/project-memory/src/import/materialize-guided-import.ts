@@ -548,6 +548,7 @@ export async function planGuidedLegacyImport(
     imported_fact_record_ids: recordIds
       .filter((id) => !id.startsWith("EVD-"))
       .sort(compareUtf8),
+    guided_input_hash: sha256(canonicalJson(input)),
   };
   const report = renderGuidedImportReport(input, reportCandidates, reportMetadata);
   const metadata: ReviewedImportMetadata = {

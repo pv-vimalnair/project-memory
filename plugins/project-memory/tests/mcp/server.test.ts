@@ -166,6 +166,7 @@ describe("ProjectMemoryMcpServer", () => {
 
   it("recovers a reviewed proposal after the MCP process changes", async () => {
     const resolveProposal = vi.fn(() => Promise.resolve(success({
+      kind: "bootstrap" as const,
       root: ROOT,
       plan: {} as never,
     })));
